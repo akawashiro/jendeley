@@ -2,15 +2,53 @@ import argparse
 import json
 import multiprocessing
 import pathlib
+import re
 import sys
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 from urllib.error import HTTPError
 
 import bibtexparser  # type: ignore
+import isbnlib  # type: ignore
 import pdf2doi  # type: ignore
+import PyPDF2
+import requests
+
+
+def get_isbn(pdf: pathlib.Path) -> Optional[str]:
+    # Checks for ISBN-10 or ISBN-13 format
+    regex = re.compile(
+        "(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]"
+    )
+
+    pdffileobj = open(pdf, "rb")
+    try:
+        pdfreader = PyPDF2.PdfFileReader(pdffileobj)
+        n = pdfreader.numPages
+    except:
+        return None
+
+    for i in range(n):
+        try:
+            pageobj = pdfreader.getPage(i)
+            text = pageobj.extractText()
+        except:
+            continue
+        for l in text.splitlines():
+            r = regex.search(l)
+            if r is not None:
+                isbn_text = r.group(0)
+                isbn_text = isbn_text.replace("ISBN-10", "ISBN")
+                isbn_text = isbn_text.replace("ISBN-13", "ISBN")
+                if isbnlib.is_isbn10(isbn_text):
+                    isbn_text = isbnlib.canonical(isbnlib.to_isbn13(isbn_text))
+                    return isbn_text
+                elif isbnlib.is_isbn13(isbn_text):
+                    isbn_text = isbnlib.canonical(isbn_text)
+                    return isbn_text
+    return None
 
 
 def get_entry(a: Tuple[pathlib.Path, pathlib.Path]) -> Dict[Any, Any]:
@@ -20,13 +58,40 @@ def get_entry(a: Tuple[pathlib.Path, pathlib.Path]) -> Dict[Any, Any]:
     print(f"Processing {pdf}")
 
     filepath = pdf.relative_to(papers_dir)
-    entry = {"path": str(filepath), "title": filepath.name}
 
-    doi = pdf2doi.pdf2doi(str(pdf))
-    if doi is None:
+    # Special handling for my directory
+    if filepath.parts[0] == "books" and len(filepath.parts) == 3:
+        title = "/".join(list(filepath.parts[1:]))
+    else:
+        title = filepath.name
+    entry = {"path": str(filepath), "title": title}
+
+    isbn_str = get_isbn(pdf)
+    if isbn_str is not None:
+        entry["isbn"] = isbn_str
+        m = isbnlib.meta(isbn_str)
+        for k, v in m.items():
+            if k == "Title":
+                entry["title"] = str(v)
+            elif k == "Authors":
+                entry["author"] = ", ".join(v)
+            elif k == "Year":
+                entry["year"] = v
+            else:
+                entry[k] = v
         return entry
 
-    url = "http://dx.doi.org/" + str(doi["identifier"])
+    doi = pdf2doi.pdf2doi(str(pdf))
+    if doi is None or "identifier" not in doi or doi["identifier"] is None:
+        print(f"Failed to extract DOI {doi=}")
+        return entry
+
+    doi_str = str(doi["identifier"])
+    if not "/" in doi_str:
+        doi_str = "10.48550/arXiv." + doi_str
+
+    # Try dx.doi.org
+    url = "http://dx.doi.org/" + doi_str
     req = urllib.request.Request(url)
     req.add_header("Accept", "application/x-bibtex")
     try:
@@ -34,15 +99,17 @@ def get_entry(a: Tuple[pathlib.Path, pathlib.Path]) -> Dict[Any, Any]:
             bibtex_str = f.read().decode()
         bibtex_db = bibtexparser.loads(bibtex_str)
         assert len(bibtex_db.entries) == 1
+        entry["doi"] = doi_str
         entry = entry | bibtex_db.entries[0]
         entry["raw_bibtex"] = bibtex_str
         return entry
     except HTTPError as e:
         if e.code == 404:
-            print("DOI not found.")
+            print(f"DOI({doi_str}) not found on dx.doi.org.")
         else:
             print("Service unavailable.")
-        return entry
+
+    return entry
 
 
 def command_gen(args: Any) -> None:
@@ -50,12 +117,11 @@ def command_gen(args: Any) -> None:
 
     pdfs = list(args.papers_dir.rglob("*.pdf"))
     pdfs.sort()
-    pdfs = pdfs[:40]
     pool_args = []
     for p in pdfs:
         pool_args.append((p, args.papers_dir))
 
-    with multiprocessing.Pool(processes=16) as pool:
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count() * 4) as pool:
         db_json = pool.map(get_entry, pool_args)
 
     if args.output is None:
@@ -134,7 +200,7 @@ function searchFunction() {
 
     html += r'<table id="papersTable">'
 
-    columns = ["title", "author", "year", "journal"]
+    columns = ["title", "author", "year", "journal/booktitle", "doi", "isbn"]
     with open(args.database_json, "r") as f:
         db_json = json.load(f)
 
@@ -145,18 +211,28 @@ function searchFunction() {
     html += r"</tr>"
 
     # Render contents of DB
-    for e in db_json:
+    for entry in db_json:
         html += r'<tr class="header">'
         for c in columns:
             if c == "title":
-                if c not in e:
+                if c not in entry:
                     x = "N/A"
                 else:
-                    x = r'<a href="' + urllib.parse.quote(e["path"], safe="/") + r'">'
-                    x += e["title"]
+                    x = (
+                        r'<a href="'
+                        + urllib.parse.quote(entry["path"], safe="/")
+                        + r'">'
+                    )
+                    x += entry["title"]
                     x += "</a>"
+            elif c == "journal/booktitle":
+                x = "N/A"
+                if "journal" in entry:
+                    x = entry["journal"]
+                elif "booktitle" in entry:
+                    x = entry["booktitle"]
             else:
-                x = "N/A" if c not in e else str(e[c])
+                x = "N/A" if c not in entry else str(entry[c])
             html += r"<td>" + x + "</td>"
         html += r"</tr>"
 

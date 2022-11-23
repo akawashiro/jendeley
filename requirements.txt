@@ -3,3 +3,6 @@ black
 isort
 pdf2doi
 bibtexparser
+types-requests
+PyPDF2
+isbnlib
