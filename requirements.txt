@@ -1,0 +1,5 @@
+mypy
+black
+isort
+pdf2doi
+bibtexparser
