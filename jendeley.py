@@ -69,6 +69,7 @@ def get_entry(a: Tuple[pathlib.Path, pathlib.Path]) -> Dict[Any, Any]:
     isbn_str = get_isbn(pdf)
     if isbn_str is not None:
         entry["isbn"] = isbn_str
+        entry["doi"] = isbnlib.doi(isbn_str)
         m = isbnlib.meta(isbn_str)
         for k, v in m.items():
             if k == "Title":
