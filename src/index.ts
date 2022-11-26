@@ -127,13 +127,13 @@ function startServer(db: string) {
     if (fs.existsSync(db)) {
         const port = 3000;
         const server = http.createServer((request, response) => {
+            const db_content = fs.readFileSync(db);
             response.writeHead(200, {
-                "Content-Type": "text/html"
+                'Content-Type': 'application/json'
             });
 
-            const responseMessage = "<h1>Hello World</h1>";
-            response.end(responseMessage);
-            console.log(`Sent a response : ${responseMessage}`);
+            response.end(db_content);
+            console.log('Sent a response');
         });
 
         server.listen(port);
