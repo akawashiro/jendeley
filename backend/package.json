@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "gen": "npm run build && node dist/index.js gen --papers_dir ~/Dropbox/papers/ --output db.json",
+    "server": "npm run build && node dist/index.js server --db db.json"
   },
   "repository": {
     "type": "git",

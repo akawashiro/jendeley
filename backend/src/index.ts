@@ -125,7 +125,7 @@ async function getIsbnJson(isbn: string) {
 
 function startServer(db: string) {
     if (fs.existsSync(db)) {
-        const port = 3000;
+        const port = 5000;
         const server = http.createServer((request, response) => {
             const db_content = fs.readFileSync(db);
             response.writeHead(200, {
