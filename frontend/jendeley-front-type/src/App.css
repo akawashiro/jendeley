@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+#jendeley_main_table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#jendeley_main_table td, #jendeley_main_table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#jendeley_main_table tr:nth-child(even){background-color: #f2f2f2;}
+
+#jendeley_main_table tr:hover {background-color: #ddd;}
+
+#jendeley_main_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
