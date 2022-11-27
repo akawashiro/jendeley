@@ -127,9 +127,12 @@ function startServer(db: string) {
     if (fs.existsSync(db)) {
         const port = 5000;
         const server = http.createServer((request, response) => {
+            console.log('Get a request');
             const db_content = fs.readFileSync(db);
             response.writeHead(200, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
             });
 
             response.end(db_content);
@@ -156,7 +159,7 @@ async function genDB(papers_dir: string, output: string) {
             const id = await getID(p);
             if (id["doi"] != null) {
                 const json = await getDoiJSON(id["doi"]);
-                json_db["doi_" + id["doi"].replace(".", "_").replace("/", "_")] = json
+                json_db["doi_" + id["doi"].replaceAll(".", "_").replaceAll("/", "_")] = json
                 if (json != null) {
                     console.log(json["title"], p)
                 }

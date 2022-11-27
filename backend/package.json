@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "gen": "npm run build && node dist/index.js gen --papers_dir ~/Dropbox/papers/ --output db.json",
+    "gen": "npm run build && node dist/index.js gen --papers_dir ~/Dropbox/papers/books --output db.json",
     "server": "npm run build && node dist/index.js server --db db.json"
   },
   "repository": {
