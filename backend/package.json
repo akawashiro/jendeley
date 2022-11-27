@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/akawashiro/jendeley#readme",
   "devDependencies": {
+    "@types/base-64": "^1.0.0",
     "@types/node": "^18.11.9",
+    "base-64": "^1.0.0",
     "commander": "^9.4.1",
     "doi-regex": "^0.1.13",
     "doi2bib": "^1.0.10",

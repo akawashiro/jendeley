@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client'
+import base_64 from 'base-64'
 import './App.css';
 import {Entry, DB} from './schema';
 
@@ -12,11 +13,28 @@ import {
 
 const columnHelper = createColumnHelper<Entry>()
 
+// https://tanstack.com/table/v8/docs/examples/react/basic
 const columns = [
     columnHelper.accessor('title', {
         header: 'title',
+        cell: props => (
+                <a href={`${"http://localhost:5000/api/get_pdf/?file=" + base_64.encode(escape(props.row.original.path))}`}>{`${props.getValue()}`}</a>
+                ),
         footer: info => info.column.id,
     }),
+    columnHelper.accessor('authors', {
+        header: 'authors',
+        footer: info => info.column.id,
+    }),
+    columnHelper.accessor('year', {
+        header: 'year',
+        footer: info => info.column.id,
+    }),
+    columnHelper.accessor('publisher', {
+        header: 'publisher',
+        footer: info => info.column.id,
+    }),
+
 ]
 
 function App() {
@@ -24,7 +42,7 @@ function App() {
 
     React.useEffect(() => {
         console.log("Fetching from DB");
-        fetch("http://localhost:5000/")
+        fetch("http://localhost:5000/api/get_db")
             .then(response => response.json())
             .then(json => setData(() => json));
     }, []);
@@ -66,22 +84,6 @@ function App() {
                         </tr>
                     ))}
                 </tbody>
-                <tfoot>
-                    {table.getFooterGroups().map(footerGroup => (
-                        <tr key={footerGroup.id}>
-                            {footerGroup.headers.map(header => (
-                                <th key={header.id}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                            header.column.columnDef.footer,
-                                            header.getContext()
-                                        )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </tfoot>
             </table>
         </div>
     )

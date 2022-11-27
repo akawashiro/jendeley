@@ -2,10 +2,10 @@
 type Entry = {
     id: string;
     title: string;
-    authors: [string];
     path: string;
-    year: string;
-    publisher: string;
+    authors: [string] | null;
+    year: number | null;
+    publisher: string | null;
 };
 
 type DB = Entry[];
