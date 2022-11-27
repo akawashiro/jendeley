@@ -42,6 +42,7 @@ async function getID(pdf: string) {
     }
 
     const regexpDOI = '(10[.][0-9]{2,}(?:[.][0-9]+)*/(?:(?![%"#? ])\\S)+)';
+    const regexpArxivDOI = '(arXiv:[0-9]{4}[.][0-9]{5})';
     const regexpISBN = "(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]";
 
     let doi: string | null = null
@@ -55,7 +56,33 @@ async function getID(pdf: string) {
             doi = d;
             break
         }
+        if (doi != null) break;
+
+        const foundArxivDOI = [...text.matchAll(regexpArxivDOI)];
+        for (const f of foundArxivDOI) {
+            let d = f[0] as string;
+            if (d.charAt(d.length - 1) == '.') {
+                d = d.substr(0, d.length - 1);
+            }
+            doi = d;
+            break
+        }
+        if (doi != null) break;
     }
+
+    for (const text of texts) {
+        const foundDOI = [...text.matchAll(regexpDOI)];
+        for (const f of foundDOI) {
+            let d = f[0] as string;
+            if (d.charAt(d.length - 1) == '.') {
+                d = d.substr(0, d.length - 1);
+            }
+            doi = d;
+            break
+        }
+        if (doi != null) break;
+    }
+
 
     let isbn: string | null = null
     for (const text of texts) {
@@ -95,6 +122,7 @@ async function getID(pdf: string) {
             }
             break
         }
+        if (isbn != null) break;
     }
 
 
