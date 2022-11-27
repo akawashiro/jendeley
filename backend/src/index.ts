@@ -246,18 +246,20 @@ async function genDB(papers_dir: string, output: string) {
         for (const p of pdfs) {
             console.log("Processing ", p)
             const id = await getID(p);
-            if (id["doi"] != null) {
-                let json = await getDoiJSON(id["doi"]);
-                if (json != null) {
-                    json["path"] = p;
-                    json_db["doi_" + id["doi"].replaceAll(".", "_").replaceAll("/", "_")] = json
-                    console.log(json["title"], p)
-                }
-            } else if (id["isbn"] != null) {
+            // ISBN is more accurate.
+            if (id["isbn"] != null) {
                 let json = await getIsbnJson(id["isbn"]);
                 if (json != null) {
                     json.path = p;
                     json_db["isbn_" + id["isbn"]] = json
+                    console.log(json["title"], p)
+                }
+            }
+            else if (id["doi"] != null) {
+                let json = await getDoiJSON(id["doi"]);
+                if (json != null) {
+                    json["path"] = p;
+                    json_db["doi_" + id["doi"].replaceAll(".", "_").replaceAll("/", "_")] = json
                     console.log(json["title"], p)
                 }
             } else {
