@@ -4,6 +4,7 @@ import path from 'path';
 import pdfparse from 'pdf-parse';
 import node_isbn from 'node-isbn'
 import http from 'http'
+import {Entry, DB} from './schema';
 
 
 function walkPDF(dir: string): Array<string> {
@@ -128,14 +129,23 @@ function startServer(db: string) {
         const port = 5000;
         const server = http.createServer((request, response) => {
             console.log('Get a request');
-            const db_content = fs.readFileSync(db);
+            const json = JSON.parse(fs.readFileSync(db).toString());
+            let db_response: DB = [];
+
+            for (const id of Object.keys(json)) {
+                if(json[id] == null)
+                    continue;
+                const e = {id: id, title: json[id]["title"]};
+                db_response.push(e);
+            }
+
             response.writeHead(200, {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
             });
 
-            response.end(db_content);
+            response.end(JSON.stringify(db_response));
             console.log('Sent a response');
         });
 
