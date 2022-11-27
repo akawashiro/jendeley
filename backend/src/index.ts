@@ -99,13 +99,13 @@ async function getID(pdf: string) {
     return {"doi": doi, "isbn": isbn};
 }
 
-async function getDoiJSON(doi: string) {
+async function getDoiJSON(doi: string): Promise<Object> {
     let {got} = await import('got');
 
     const URL = 'https://api.crossref.org/v1/works/' + encodeURIComponent(doi) + "/transform"
     const options = {'headers': {'Accept': 'application/json'}}
     try {
-        const data = await got(URL, options).json();
+        const data = await got(URL, options).json() as Object;
         return data
     } catch {
         console.warn("Failed to get information from ", URL)
@@ -124,6 +124,33 @@ async function getIsbnJson(isbn: string) {
     return b;
 }
 
+function getEntry(id: string, json: any): Entry {
+    console.assert(json[id] != null);
+
+    if (id.startsWith("isbn")) {
+        const title: string = json[id]["title"];
+        const authors: [string] = json[id]["authors"];
+        const path: string = json[id]["path"];
+        const year: string = String(json[id]["publishedDate"]).substring(0, 4);
+        const publisher: string = json[id]["publisher"];
+
+        const e = {id: id, title: title, authors: authors, path: path, year: year, publisher: publisher};
+        console.assert(title != null && authors != null && path != null && year != null && publisher != null, JSON.stringify(e));
+        return e;
+    } else {
+        console.assert(id.startsWith("doi"), id);
+        const title: string = json[id]["title"];
+        const authors: [string] = json[id]["authors"];
+        const path: string = json[id]["path"];
+        const year: string = String(json[id]["publishedDate"]).substring(0, 4);
+        const publisher: string = json[id]["publisher"];
+
+        const e = {id: id, title: title, authors: authors, path: path, year: year, publisher: publisher};
+        console.assert(title != null && authors != null && path != null && year != null && publisher != null, JSON.stringify(e));
+        return e;
+    }
+}
+
 function startServer(db: string) {
     if (fs.existsSync(db)) {
         const port = 5000;
@@ -133,9 +160,9 @@ function startServer(db: string) {
             let db_response: DB = [];
 
             for (const id of Object.keys(json)) {
-                if(json[id] == null)
+                if (json[id] == null)
                     continue;
-                const e = {id: id, title: json[id]["title"]};
+                const e = getEntry(id, json);
                 db_response.push(e);
             }
 
@@ -168,15 +195,17 @@ async function genDB(papers_dir: string, output: string) {
             console.log("Processing ", p)
             const id = await getID(p);
             if (id["doi"] != null) {
-                const json = await getDoiJSON(id["doi"]);
-                json_db["doi_" + id["doi"].replaceAll(".", "_").replaceAll("/", "_")] = json
+                let json = await getDoiJSON(id["doi"]);
                 if (json != null) {
+                    json["path"] = p;
+                    json_db["doi_" + id["doi"].replaceAll(".", "_").replaceAll("/", "_")] = json
                     console.log(json["title"], p)
                 }
             } else if (id["isbn"] != null) {
-                const json = await getIsbnJson(id["isbn"]);
-                json_db["isbn_" + id["isbn"]] = json
+                let json = await getIsbnJson(id["isbn"]);
                 if (json != null) {
+                    json.path = p;
+                    json_db["isbn_" + id["isbn"]] = json
                     console.log(json["title"], p)
                 }
             } else {
