@@ -251,7 +251,7 @@ function startServer(db: string) {
     }
 }
 
-async function getJson(docID: DocID, path: string) {
+async function getJson(docID: DocID, path: string): Promise<Object | null> {
     let json_r: Object | null = null;
 
     if (docID.arxiv != null) {
@@ -322,12 +322,57 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string) 
     pdfs.sort();
     for (const p of pdfs) {
         console.log("Processing ", p)
-        const docID = await getDocID(p);
-        const dbID = await getDBID(docID, p);
-        const json = await getJson(docID, p);
-        if (dbID != null) {
-            json_db[dbID] = json;
+        let is_book = false;
+        for (const bd of book_dirs) {
+            if (book_db[bd] == undefined) {
+                book_db[bd] = {};
+            }
+            if (p.startsWith(bd)) {
+                const docID = await getDocID(p);
+                const json = await getJson(docID, p);
+                book_db[bd][p] = json;
+                is_book = true;
+                break;
+            }
         }
+
+        if (!is_book) {
+            const docID = await getDocID(p);
+            const dbID = await getDBID(docID, p);
+            const json = await getJson(docID, p);
+            if (dbID != null && json != null) {
+                json_db[dbID] = json;
+            }
+        }
+    }
+
+    for (const book_dir of Object.keys(book_db)) {
+        let book_info: Object | null = null;
+        for (const path of Object.keys(book_db[book_dir])) {
+            if (book_db[book_dir][path] != null) {
+                book_info = book_db[book_dir][path];
+            }
+        }
+        if (book_info != null) {
+            for (const chapter_path of Object.keys(book_db[book_dir])) {
+                const chapter_id = escape(path.basename(book_dir)) + "_" + escape(path.basename(chapter_path));
+                let chapter_info = JSON.parse(JSON.stringify(book_info));
+                chapter_info["title"] = chapter_info["title"] + "/" + path.basename(chapter_path, ".pdf");
+                chapter_info["id_type"] = "book";
+                chapter_info["path"] = chapter_path;
+                json_db[chapter_id] = chapter_info;
+            }
+        }
+    }
+
+    let registered_pdfs: string[] = [];
+    for (const id of Object.keys(json_db)) {
+        registered_pdfs.push(json_db[id]["path"]);
+    }
+
+    const not_registerd_pdfs = pdfs.filter(x => !registered_pdfs.includes(x));
+    for (const nr of not_registerd_pdfs) {
+        console.warn("Not registered: ", nr);
     }
 
     try {
