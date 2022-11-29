@@ -7,6 +7,7 @@ import node_isbn from 'node-isbn'
 import url from 'url'
 import http from 'http'
 import {Entry, DB} from './schema'
+import xml2js from 'xml2js'
 
 
 function walkPDF(dir: string): Array<string> {
@@ -26,7 +27,13 @@ function walkPDF(dir: string): Array<string> {
     }
 }
 
-async function getID(pdf: string) {
+type DocID = {
+    doi: string | null;
+    isbn: string | null;
+    arxiv: string | null;
+};
+
+async function getID(pdf: string): Promise<DocID> {
     let dataBuffer = fs.readFileSync(pdf);
 
     const texts = await pdfparse(dataBuffer).then(data => {
@@ -38,14 +45,15 @@ async function getID(pdf: string) {
     });
 
     if (texts == null) {
-        return {"doi": null, "isbn": null};
+        return {"doi": null, "isbn": null, "arxiv": null};
     }
 
     const regexpDOI = '(10[.][0-9]{2,}(?:[.][0-9]+)*/(?:(?![%"#? ])\\S)+)';
     const regexpArxivDOI = '(arXiv:[0-9]{4}[.][0-9]{5})';
     const regexpISBN = "(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]";
 
-    let doi: string | null = null
+    let doi: string | null = null;
+    let arxiv: string | null = null;
     for (const text of texts) {
         const foundDOI = [...text.matchAll(regexpDOI)];
         for (const f of foundDOI) {
@@ -60,29 +68,12 @@ async function getID(pdf: string) {
 
         const foundArxivDOI = [...text.matchAll(regexpArxivDOI)];
         for (const f of foundArxivDOI) {
-            let d = f[0] as string;
-            if (d.charAt(d.length - 1) == '.') {
-                d = d.substr(0, d.length - 1);
-            }
-            doi = d;
+            const d = f[0] as string;
+            arxiv = d.substring(6);
             break
         }
-        if (doi != null) break;
+        if (arxiv != null) break;
     }
-
-    for (const text of texts) {
-        const foundDOI = [...text.matchAll(regexpDOI)];
-        for (const f of foundDOI) {
-            let d = f[0] as string;
-            if (d.charAt(d.length - 1) == '.') {
-                d = d.substr(0, d.length - 1);
-            }
-            doi = d;
-            break
-        }
-        if (doi != null) break;
-    }
-
 
     let isbn: string | null = null
     for (const text of texts) {
@@ -125,8 +116,7 @@ async function getID(pdf: string) {
         if (isbn != null) break;
     }
 
-
-    return {"doi": doi, "isbn": isbn};
+    return {"doi": doi, "isbn": isbn, "arxiv": arxiv};
 }
 
 async function getDoiJSON(doi: string): Promise<Object> {
@@ -152,6 +142,33 @@ async function getIsbnJson(isbn: string) {
         return null;
     });
     return b;
+}
+
+async function getArxivJson(arxiv: string) {
+    let {got} = await import('got');
+
+    const URL = 'http://export.arxiv.org/api/query?id_list=' + arxiv
+    const options = {'headers': {'Accept': 'application/json'}}
+    try {
+        const data = (await got(URL, options)).body;
+        let jsonData;
+        const parser = new xml2js.Parser({
+            async: false,
+            explicitArray: false
+        });
+        parser.parseString(data, (error, json) => {
+            jsonData = json;
+        });
+        if (jsonData.feed.entry == undefined) {
+            console.warn("Failed to get information from ", URL, jsonData);
+            return new Object();
+        } else {
+            return jsonData.feed.entry;
+        }
+    } catch {
+        console.warn("Failed to get information from ", URL)
+        return new Object();
+    }
 }
 
 function getEntry(id: string, json: any): Entry {
@@ -247,23 +264,29 @@ async function genDB(papers_dir: string, output: string) {
             console.log("Processing ", p)
             const id = await getID(p);
             // ISBN is more accurate.
-            if (id["isbn"] != null) {
-                let json = await getIsbnJson(id["isbn"]);
+            if (id.isbn != null) {
+                let json = await getIsbnJson(id.isbn);
                 if (json != null) {
                     json.path = p;
-                    json_db["isbn_" + id["isbn"]] = json
+                    json_db["isbn_" + id.isbn] = json
                     console.log(json["title"], p)
                 }
-            }
-            else if (id["doi"] != null) {
-                let json = await getDoiJSON(id["doi"]);
+            } else if (id.doi != null) {
+                let json = await getDoiJSON(id.doi);
                 if (json != null) {
                     json["path"] = p;
-                    json_db["doi_" + id["doi"].replaceAll(".", "_").replaceAll("/", "_")] = json
+                    json_db["doi_" + id.doi.replaceAll(".", "_").replaceAll("/", "_")] = json
+                    console.log(json["title"], p)
+                }
+            } else if (id.arxiv != null) {
+                let json = await getArxivJson(id.arxiv);
+                if (json != null) {
+                    json["path"] = p;
+                    json_db["arxiv_" + id.arxiv.replaceAll(".", "_")] = json
                     console.log(json["title"], p)
                 }
             } else {
-                console.warn("Failed to get DOI or ISBN of", p)
+                console.warn("Failed to get ID of", id)
             }
         }
 
