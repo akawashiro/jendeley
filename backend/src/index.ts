@@ -261,26 +261,32 @@ async function getJson(docID: DocID, path: string): Promise<Object | null> {
             json["id_type"] = "arxiv";
             json_r = json;
         } else {
-            console.warn("Failed to get info of ", docID, path);
+            console.warn("Failed to get info of ", docID, " using arxiv ", path);
         }
-    } else if (docID.isbn != null) {
+    }
+    if (docID.isbn != null && json_r == null) {
         let json = await getIsbnJson(docID.isbn);
         if (json != null) {
             json["path"] = path;
             json["id_type"] = "isbn";
             json_r = json;
         } else {
-            console.warn("Failed to get info of ", docID, path);
+            console.warn("Failed to get info of ", docID, " using isbn ", path);
         }
-    } else if (docID.doi != null) {
+    }
+    if (docID.doi != null && json_r == null) {
         let json = await getDoiJSON(docID.doi);
         if (json != null) {
             json["path"] = path;
             json["id_type"] = "doi";
             json_r = json;
         } else {
-            console.warn("Failed to get info of ", docID, path);
+            console.warn("Failed to get info of ", docID, " using doi ", path);
         }
+    }
+
+    if (json_r == null) {
+        console.warn("Failed to get info of ", docID, path);
     }
 
     return json_r;
