@@ -49,7 +49,7 @@ async function getID(pdf: string): Promise<DocID> {
     }
 
     const regexpDOI = '(10[.][0-9]{2,}(?:[.][0-9]+)*/(?:(?![%"#? ])\\S)+)';
-    const regexpArxivDOI = '(arXiv:[0-9]{4}[.][0-9]{5})';
+    const regexpArxivDOI = '(arXiv:[0-9]{4}[.][0-9]{4,5})';
     const regexpISBN = "(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]";
 
     let doi: string | null = null;
@@ -252,52 +252,61 @@ function startServer(db: string) {
     }
 }
 
-async function genDB(papers_dir: string, output: string) {
-    if (fs.existsSync(papers_dir)) {
-        console.log(papers_dir)
+async function genDB(papers_dir: string, book_dirs_str: string, output: string) {
+    const book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
 
-        let json_db = new Object();
-
-        let pdfs = walkPDF(papers_dir);
-        pdfs.sort();
-        for (const p of pdfs) {
-            console.log("Processing ", p)
-            const id = await getID(p);
-            // ISBN is more accurate.
-            if (id.isbn != null) {
-                let json = await getIsbnJson(id.isbn);
-                if (json != null) {
-                    json.path = p;
-                    json_db["isbn_" + id.isbn] = json
-                    console.log(json["title"], p)
-                }
-            } else if (id.doi != null) {
-                let json = await getDoiJSON(id.doi);
-                if (json != null) {
-                    json["path"] = p;
-                    json_db["doi_" + id.doi.replaceAll(".", "_").replaceAll("/", "_")] = json
-                    console.log(json["title"], p)
-                }
-            } else if (id.arxiv != null) {
-                let json = await getArxivJson(id.arxiv);
-                if (json != null) {
-                    json["path"] = p;
-                    json_db["arxiv_" + id.arxiv.replaceAll(".", "_")] = json
-                    console.log(json["title"], p)
-                }
-            } else {
-                console.warn("Failed to get ID of", id)
-            }
-        }
-
-        try {
-            const db_path = output == undefined ? path.join(papers_dir, "db.json") : output;
-            fs.writeFileSync(db_path, JSON.stringify(json_db));
-        } catch (err) {
-            console.warn(err);
-        }
-    } else {
+    if (!fs.existsSync(papers_dir)) {
         console.log(papers_dir + " is not exist.");
+        return;
+    }
+    for (const bd of book_dirs) {
+        if (!fs.existsSync(bd)) {
+            console.log(bd + " is not exist.");
+            return;
+        }
+    }
+
+    console.log("papers_dir = ", papers_dir)
+
+    let json_db = new Object();
+
+    let pdfs = walkPDF(papers_dir);
+    pdfs.sort();
+    for (const p of pdfs) {
+        console.log("Processing ", p)
+        const id = await getID(p);
+        // ISBN is more accurate.
+        if (id.isbn != null) {
+            let json = await getIsbnJson(id.isbn);
+            if (json != null) {
+                json.path = p;
+                json_db["isbn_" + id.isbn] = json
+                console.log(json["title"], p)
+            }
+        } else if (id.doi != null) {
+            let json = await getDoiJSON(id.doi);
+            if (json != null) {
+                json["path"] = p;
+                json_db["doi_" + id.doi.replaceAll(".", "_").replaceAll("/", "_")] = json
+                console.log(json["title"], p)
+            }
+        } else if (id.arxiv != null) {
+            let json = await getArxivJson(id.arxiv);
+            if (json != null) {
+                json["path"] = p;
+                json_db["arxiv_" + id.arxiv.replaceAll(".", "_")] = json
+                console.log(json["title"], p)
+            }
+        } else {
+            console.warn("Failed to get ID of", p)
+        }
+    }
+
+    try {
+        const db_path = output == undefined ? path.join(papers_dir, "db.json") : output;
+        fs.writeFileSync(db_path, JSON.stringify(json_db));
+    } catch (err) {
+        console.warn(err);
     }
 }
 
@@ -309,9 +318,11 @@ async function main() {
     program
         .command('gen')
         .requiredOption('--papers_dir <dir>', "Root directory of your papers")
+        .option('--book_dirs <dirs>', "Comma separated directories of books")
         .option('--output <out>', "Output DB to this file. By default, <papers_dir>/db.json.")
         .action((cmd, options) => {
-            genDB(options._optionValues.papers_dir, options._optionValues.output);
+            const book_dirs_str = options._optionValues.book_dirs == undefined ? "" : options._optionValues.book_dirs;
+            genDB(options._optionValues.papers_dir, book_dirs_str, options._optionValues.output);
         });
 
     program
