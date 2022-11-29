@@ -33,7 +33,7 @@ type DocID = {
     arxiv: string | null;
 };
 
-async function getID(pdf: string): Promise<DocID> {
+async function getDocID(pdf: string): Promise<DocID> {
     let dataBuffer = fs.readFileSync(pdf);
 
     const texts = await pdfparse(dataBuffer).then(data => {
@@ -128,17 +128,16 @@ async function getDoiJSON(doi: string): Promise<Object> {
         const data = await got(URL, options).json() as Object;
         return data
     } catch {
-        console.warn("Failed to get information from ", URL)
+        console.warn("Failed to get information from doi: ", URL)
         return new Object();
     }
 }
 
 async function getIsbnJson(isbn: string) {
     const b = await node_isbn.resolve(isbn).then(function (book) {
-        console.log('Book found ', isbn);
         return book;
     }).catch(function (err) {
-        console.log('Book not found', isbn);
+        console.warn('Failed to get information from ISBN: ', isbn);
         return null;
     });
     return b;
@@ -160,13 +159,13 @@ async function getArxivJson(arxiv: string) {
             jsonData = json;
         });
         if (jsonData.feed.entry == undefined) {
-            console.warn("Failed to get information from ", URL, jsonData);
+            console.warn("Failed to get information from arXiv: ", URL, jsonData);
             return new Object();
         } else {
             return jsonData.feed.entry;
         }
     } catch {
-        console.warn("Failed to get information from ", URL)
+        console.warn("Failed to get information from arXiv: ", URL)
         return new Object();
     }
 }
@@ -252,6 +251,54 @@ function startServer(db: string) {
     }
 }
 
+async function getJson(docID: DocID, path: string) {
+    let json_r: Object | null = null;
+
+    if (docID.arxiv != null) {
+        let json = await getArxivJson(docID.arxiv);
+        if (json != null) {
+            json["path"] = path;
+            json["id_type"] = "arxiv";
+            json_r = json;
+        } else {
+            console.warn("Failed to get info of ", docID, path);
+        }
+    } else if (docID.isbn != null) {
+        let json = await getIsbnJson(docID.isbn);
+        if (json != null) {
+            json["path"] = path;
+            json["id_type"] = "isbn";
+            json_r = json;
+        } else {
+            console.warn("Failed to get info of ", docID, path);
+        }
+    } else if (docID.doi != null) {
+        let json = await getDoiJSON(docID.doi);
+        if (json != null) {
+            json["path"] = path;
+            json["id_type"] = "doi";
+            json_r = json;
+        } else {
+            console.warn("Failed to get info of ", docID, path);
+        }
+    }
+
+    return json_r;
+}
+
+async function getDBID(docID: DocID, path: string) {
+    if (docID.isbn != null) {
+        return "isbn_" + docID.isbn;
+    } else if (docID.doi != null) {
+        return "doi_" + docID.doi.replaceAll(".", "_").replaceAll("/", "_");
+    } else if (docID.arxiv != null) {
+        return "arxiv_" + docID.arxiv.replaceAll(".", "_");
+    } else {
+        console.warn("Failed to get ID of", path)
+        return null;
+    }
+}
+
 async function genDB(papers_dir: string, book_dirs_str: string, output: string) {
     const book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
 
@@ -268,37 +315,18 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string) 
 
     console.log("papers_dir = ", papers_dir)
 
+    let book_db = new Object();
     let json_db = new Object();
 
     let pdfs = walkPDF(papers_dir);
     pdfs.sort();
     for (const p of pdfs) {
         console.log("Processing ", p)
-        const id = await getID(p);
-        // ISBN is more accurate.
-        if (id.isbn != null) {
-            let json = await getIsbnJson(id.isbn);
-            if (json != null) {
-                json.path = p;
-                json_db["isbn_" + id.isbn] = json
-                console.log(json["title"], p)
-            }
-        } else if (id.doi != null) {
-            let json = await getDoiJSON(id.doi);
-            if (json != null) {
-                json["path"] = p;
-                json_db["doi_" + id.doi.replaceAll(".", "_").replaceAll("/", "_")] = json
-                console.log(json["title"], p)
-            }
-        } else if (id.arxiv != null) {
-            let json = await getArxivJson(id.arxiv);
-            if (json != null) {
-                json["path"] = p;
-                json_db["arxiv_" + id.arxiv.replaceAll(".", "_")] = json
-                console.log(json["title"], p)
-            }
-        } else {
-            console.warn("Failed to get ID of", p)
+        const docID = await getDocID(p);
+        const dbID = await getDBID(docID, p);
+        const json = await getJson(docID, p);
+        if (dbID != null) {
+            json_db[dbID] = json;
         }
     }
 
