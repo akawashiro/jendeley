@@ -42,6 +42,8 @@ function getDocIDFromTexts(texts: [string]): DocID {
             if (d.charAt(d.length - 1) == '.') {
                 d = d.substr(0, d.length - 1);
             }
+            // Hack for POPL
+            d = d.replace("10.1145/http://dx.doi.org/", "");
             doi = d;
             break
         }
@@ -307,4 +309,4 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string) 
     }
 }
 
-export {genDB, getDocIDFromTexts};
+export {genDB, getDocID, getDocIDFromTexts, getJson};
