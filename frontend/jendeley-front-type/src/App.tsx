@@ -15,8 +15,19 @@ const columnHelper = createColumnHelper<Entry>()
 
 // https://tanstack.com/table/v8/docs/examples/react/basic
 const columns = [
+    columnHelper.accessor('id', {
+        header: 'id',
+        footer: info => info.column.id,
+    }),
     columnHelper.accessor('title', {
         header: 'title',
+        cell: props => (
+            <a href={`${"http://localhost:5000/api/get_pdf/?file=" + base_64.encode(escape(props.row.original.path))}`}>{`${props.getValue()}`}</a>
+        ),
+        footer: info => info.column.id,
+    }),
+    columnHelper.accessor('path', {
+        header: 'filename',
         cell: props => (
             <a href={`${"http://localhost:5000/api/get_pdf/?file=" + base_64.encode(escape(props.row.original.path))}`}>{`${props.getValue()}`}</a>
         ),
