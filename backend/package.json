@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "gen": "npm run build && node dist/index.js gen --papers_dir ~/Dropbox/papers/books --output db.json",
+    "gen": "npm run build && node dist/index.js gen --papers_dir /home/akira/Dropbox/papers/books --output db.json",
     "gen_arXiv": "npm run build && node dist/index.js gen --papers_dir arXivPDFs --output db_arXiv.json",
-    "gen_all": "npm run build && node dist/index.js gen --papers_dir ~/Dropbox/papers/ --output db_all.json",
+    "gen_all": "npm run build && node dist/index.js gen --papers_dir /home/akira/Dropbox/papers/ --output db_all.json --book_dirs /home/akira/Dropbox/papers/books/LinuxDeviceDrivers_ThirdEdition/,/home/akira/Dropbox/papers/books/BasicCategoryTheoryForComputerScientists/,/home/akira/Dropbox/papers/books/LecturesOnTheCurry-HowardIsomorphism/,/home/akira/Dropbox/papers/books/LinuxDeviceDrivers_ThirdEdition/,/home/akira/Dropbox/papers/books/TypesAndProgrammingLanguages/",
+    "gen_book": "npm run build && node dist/index.js gen --papers_dir /home/akira/Dropbox/papers/books/LinuxDeviceDrivers_ThirdEdition/ --output db_book.json --book_dirs /home/akira/Dropbox/papers/books/LinuxDeviceDrivers_ThirdEdition/",
     "server": "npm run build && node dist/index.js server --db db.json",
     "server_all": "npm run build && node dist/index.js server --db db_all.json"
   },
