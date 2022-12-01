@@ -44,6 +44,7 @@
     "@tanstack/react-table": "^8.7.0",
     "@types/base-64": "^1.0.0",
     "@types/react-table": "^7.7.12",
-    "base-64": "^1.0.0"
+    "base-64": "^1.0.0",
+    "path": "^0.12.7"
   }
 }
