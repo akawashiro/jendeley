@@ -171,8 +171,10 @@ async function getArxivJson(arxiv: string) {
     }
 }
 
-async function getJson(docID: DocID, path: string): Promise<Object | null> {
+// Return [JSON, ID]
+async function getJson(docID: DocID, path: string): Promise<[Object, string] | null> {
     let json_r: Object | null = null;
+    let db_id: string | null = null;
 
     if (docID.arxiv != null) {
         let json = await getArxivJson(docID.arxiv);
@@ -180,6 +182,7 @@ async function getJson(docID: DocID, path: string): Promise<Object | null> {
             json["path"] = path;
             json["id_type"] = "arxiv";
             json_r = json;
+            db_id = "arxiv_" + docID.arxiv.replaceAll(".", "_");
         } else {
             console.warn("Failed to get info of ", docID, " using arxiv ", path);
         }
@@ -190,6 +193,7 @@ async function getJson(docID: DocID, path: string): Promise<Object | null> {
             json["path"] = path;
             json["id_type"] = "isbn";
             json_r = json;
+            db_id = "isbn_" + docID.isbn;
         } else {
             console.warn("Failed to get info of ", docID, " using isbn ", path);
         }
@@ -200,28 +204,17 @@ async function getJson(docID: DocID, path: string): Promise<Object | null> {
             json["path"] = path;
             json["id_type"] = "doi";
             json_r = json;
+            db_id = "doi_" + docID.doi.replaceAll(".", "_").replaceAll("/", "_");
         } else {
             console.warn("Failed to get info of ", docID, " using doi ", path);
         }
     }
 
-    if (json_r == null) {
+    if (json_r == null || db_id == null) {
         console.warn("Failed to get info of ", docID, path);
-    }
-
-    return json_r;
-}
-
-async function getDBID(docID: DocID, path: string) {
-    if (docID.isbn != null) {
-        return "isbn_" + docID.isbn;
-    } else if (docID.doi != null) {
-        return "doi_" + docID.doi.replaceAll(".", "_").replaceAll("/", "_");
-    } else if (docID.arxiv != null) {
-        return "arxiv_" + docID.arxiv.replaceAll(".", "_");
-    } else {
-        console.warn("Failed to get ID of", path)
         return null;
+    } else {
+        return [json_r, db_id];
     }
 }
 
@@ -264,9 +257,10 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string) 
 
         if (!is_book) {
             const docID = await getDocID(p);
-            const dbID = await getDBID(docID, p);
-            const json = await getJson(docID, p);
-            if (dbID != null && json != null) {
+            const t = await getJson(docID, p);
+            if(t != null){
+                const json = t[0];
+                const dbID = t[1];
                 json_db[dbID] = json;
             }
         }
