@@ -26,6 +26,7 @@ type DocID = {
     doi: string | null;
     isbn: string | null;
     arxiv: string | null;
+    path: string | null;
 };
 
 function getDocIDFromTexts(texts: [string]): DocID {
@@ -99,10 +100,29 @@ function getDocIDFromTexts(texts: [string]): DocID {
         if (isbn != null) break;
     }
 
-    return {"doi": doi, "isbn": isbn, "arxiv": arxiv};
+    return {"doi": doi, "isbn": isbn, "arxiv": arxiv, "path": null};
 }
 
-async function getDocID(pdf: string): Promise<DocID> {
+async function getDocID(pdf: string, papers_dir: string): Promise<DocID> {
+    const regexpDOI = new RegExp('(doi_10_[0-9]{2,}_[0-9]{6,})', 'g');
+    const foundDOI = [...pdf.matchAll(regexpDOI)];
+    for (const f of foundDOI) {
+        let d = (f[0] as string).substring(4);
+        d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
+        return {"doi": d, "isbn": null, "arxiv": null, "path": null};
+    }
+
+    const regexpISBN = new RegExp('(isbn_[0-9]{10,})', 'g');
+    const foundISBN = [...pdf.matchAll(regexpISBN)];
+    for (const f of foundISBN) {
+        let d = (f[0] as string).substring(5);
+        return {"doi": null, "isbn": d, "arxiv": null, "path": null};
+    }
+
+    if (path.basename(pdf, ".pdf").endsWith("no_id") && pdf.startsWith(papers_dir)) {
+        return {"doi": null, "isbn": null, "arxiv": null, "path": pdf.replace(papers_dir, "")};
+    }
+
     let dataBuffer = fs.readFileSync(pdf);
 
     const texts = await pdfparse(dataBuffer).then(data => {
@@ -114,7 +134,7 @@ async function getDocID(pdf: string): Promise<DocID> {
     });
 
     if (texts == null) {
-        return {"doi": null, "isbn": null, "arxiv": null};
+        return {"doi": null, "isbn": null, "arxiv": null, "path": null};
     }
 
     return getDocIDFromTexts(texts)
@@ -209,6 +229,14 @@ async function getJson(docID: DocID, path: string): Promise<[Object, string] | n
             console.warn("Failed to get info of ", docID, " using doi ", path);
         }
     }
+    if (docID.path != null && json_r == null) {
+        let json = new Object();
+        json["path"] = path;
+        json["title"] = docID.path;
+        json["id_type"] = "path";
+        json_r = json;
+        db_id = "path_" + docID.path.replaceAll(".", "_").replaceAll("/", "_");
+    }
 
     if (json_r == null || db_id == null) {
         console.warn("Failed to get info of ", docID, path);
@@ -247,7 +275,7 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string) 
                 book_db[bd] = {};
             }
             if (p.startsWith(bd)) {
-                const docID = await getDocID(p);
+                const docID = await getDocID(p, papers_dir);
                 const json = await getJson(docID, p);
                 book_db[bd][p] = json;
                 is_book = true;
@@ -256,9 +284,9 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string) 
         }
 
         if (!is_book) {
-            const docID = await getDocID(p);
+            const docID = await getDocID(p, papers_dir);
             const t = await getJson(docID, p);
-            if(t != null){
+            if (t != null) {
                 const json = t[0];
                 const dbID = t[1];
                 json_db[dbID] = json;
