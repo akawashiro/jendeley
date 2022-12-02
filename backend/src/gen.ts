@@ -170,11 +170,53 @@ function getDocIDManuallyWritten(pdf: string, papers_dir: string): DocID | null 
     return null
 }
 
+function getTitleFromPath(pdf: string): string {
+    const basename = path.basename(pdf, ".pdf");
+    let r = "";
+    let level = 0;
+    for (let i = 0; i < basename.length; i++) {
+        if (basename[i] == '[') level += 1;
+        else if (basename[i] == ']') level -= 1;
+        else if (level == 0 && (r != "" || basename[i] != ' ')) r += basename[i];
+    }
+    return r;
+}
+
+async function getDocIDFromTitle(pdf: string): Promise<DocID | null> {
+    const title = getTitleFromPath(pdf);
+
+    let {got} = await import('got');
+
+    const URL = 'https://api.crossref.org/v1/works?query.bibliographic=' + title.replaceAll(' ', '+');
+    const options = {'headers': {'Accept': 'application/json'}}
+    try {
+        const data = await got(URL, options).json() as Object;
+        const n_item = data["message"]["items"].length;
+        for (let i = 0; i < n_item; i++) {
+            const t = data["message"]["items"][i]["title"][0].toLowerCase();
+            if (title.toLowerCase() == t) {
+                const doi = data["message"]["items"][i]["DOI"];
+                return {"doi": doi, "isbn": null, "arxiv": null, "path": null};
+            }
+        }
+        return null;
+    } catch {
+        console.warn("Failed to get information from doi: ", URL)
+        return null;
+    }
+}
+
 async function getDocID(pdf: string, papers_dir: string): Promise<DocID> {
     const manuallyWrittenDocID = getDocIDManuallyWritten(pdf, papers_dir);
-    if(manuallyWrittenDocID != null){
+    if (manuallyWrittenDocID != null) {
         return manuallyWrittenDocID;
     }
+
+    const docIDFromTitle = await getDocIDFromTitle(pdf);
+    if (docIDFromTitle != null) {
+        return docIDFromTitle;
+    }
+
     let dataBuffer = fs.readFileSync(pdf);
 
     const texts = await pdfparse(dataBuffer).then(data => {
@@ -415,4 +457,4 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
     }
 }
 
-export {genDB, getDocID, getDocIDFromTexts, getJson};
+export {genDB, getDocID, getDocIDFromTexts, getJson, getTitleFromPath, getDocIDFromTitle};

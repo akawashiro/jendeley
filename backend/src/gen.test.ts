@@ -1,5 +1,17 @@
 import exp from 'constants';
-import {getDocID, getDocIDFromTexts, getJson} from './gen'
+import {getDocID, getDocIDFromTexts, getJson, getTitleFromPath, getDocIDFromTitle} from './gen'
+
+test('DOI from title', async() => {
+    const pdf = "/papers/[Thomas van Noort, Peter Achten, Rinus Plasmeijer]Ad-hoc Polymorphism and Dynamic Typing in a Statically Typed Functional Language.pdf";
+    const docID = await getDocIDFromTitle(pdf);
+    expect(docID?.doi).toBe("10.1145/1863495.1863505");
+});
+
+test('Title from path', async() => {
+    const pdf = "/hoge/DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation.pdf";
+    const title = getTitleFromPath(pdf);
+    expect(title).toBe("Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation");
+});
 
 test('ISBN from text', async () => {
     const docID1 = await getDocIDFromTexts(['ISBN 0-262-16209-1 (hc. : alk. paper)']);
