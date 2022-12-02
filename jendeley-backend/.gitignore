@@ -1,0 +1,6 @@
+node_modules/*
+dist/*
+db.json
+db*.json
+./coverage/*
+./arXivPDFs/*
