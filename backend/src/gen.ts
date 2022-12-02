@@ -15,7 +15,8 @@ function walkPDF(dir: string): Array<string> {
             ret = ret.concat(walkPDF(path.join(dir, d.name)));
         });
         return ret
-    } else if (path.extname(dir) == ".pdf") {
+    } else if (path.extname(dir) == ".pdf" && !dir.includes("_Note")) {
+        // TODO: Ignore general pattern
         return [dir]
     } else {
         return []
@@ -70,7 +71,14 @@ function getDocIDFromTexts(texts: [string]): DocID {
                     n += c;
                 }
             }
+
             if (n.length == 10) {
+                const invalid = new RegExp("(0000000000)|(1111111111)|(2222222222)|(3333333333)|(4444444444)|(5555555555)|(6666666666)|(7777777777)|(8888888888)|(9999999999)", 'g');
+                const foundInvalid = [...n.matchAll(invalid)];
+                if (foundInvalid.length != 0) {
+                    continue;
+                }
+
                 let cd = 0;
                 for (let i = 0; i < 9; i++) {
                     cd += (10 - i) * (n.charCodeAt(i) - '0'.charCodeAt(0));
@@ -80,7 +88,7 @@ function getDocIDFromTexts(texts: [string]): DocID {
                 if (cd_c == n[9]) {
                     isbn = n;
                 }
-            } else if (n.length == 13) {
+            } else if (n.length == 13 && (n.substring(0, 3) == "978" || n.substring(0, 3) == "979")) {
                 let cd = 0;
                 for (let i = 0; i < 12; i++) {
                     if (i % 2 == 0) {
@@ -103,12 +111,48 @@ function getDocIDFromTexts(texts: [string]): DocID {
     return {"doi": doi, "isbn": isbn, "arxiv": arxiv, "path": null};
 }
 
-async function getDocID(pdf: string, papers_dir: string): Promise<DocID> {
-    const regexpDOI = new RegExp('(doi_10_[0-9]{2,}_[0-9]{6,})', 'g');
-    const foundDOI = [...pdf.matchAll(regexpDOI)];
-    for (const f of foundDOI) {
+function getDocIDManuallyWritten(pdf: string, papers_dir: string): DocID | null {
+    const regexpDOI1 = new RegExp('(doi_10_[0-9]{4}_[0-9]{4,}([_\-][0-9\(\)\-]{6,})?)', 'g');
+    const foundDOI1 = [...pdf.matchAll(regexpDOI1)];
+    for (const f of foundDOI1) {
         let d = (f[0] as string).substring(4);
         d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
+        d = d.replaceAll("_", ".");
+        return {"doi": d, "isbn": null, "arxiv": null, "path": null};
+    }
+
+    const regexpDOI2 = new RegExp('(doi_10_[0-9]{4}_S[0-9]+[0-9X])', 'g');
+    const foundDOI2 = [...pdf.matchAll(regexpDOI2)];
+    for (const f of foundDOI2) {
+        let d = (f[0] as string).substring(4);
+        d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
+        d = d.replaceAll("_", ".");
+        return {"doi": d, "isbn": null, "arxiv": null, "path": null};
+    }
+
+    const regexpDOI3 = new RegExp('(doi_10_[0-9]{4}_[a-zA-z]+_[0-9]+_[0-9]+)', 'g');
+    const foundDOI3 = [...pdf.matchAll(regexpDOI3)];
+    for (const f of foundDOI3) {
+        let d = (f[0] as string).substring(4);
+        d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
+        d = d.replaceAll("_", ".");
+        return {"doi": d, "isbn": null, "arxiv": null, "path": null};
+    }
+
+    const regexpDOI4 = new RegExp('(doi_10_[0-9]{4}_[0-9X\-]+_[0-9]{1,})', 'g');
+    const foundDOI4 = [...pdf.matchAll(regexpDOI4)];
+    for (const f of foundDOI4) {
+        let d = (f[0] as string).substring(4);
+        d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
+        return {"doi": d, "isbn": null, "arxiv": null, "path": null};
+    }
+
+    const regexpDOI6 = new RegExp('(doi_10_[0-9]{4}_[a-zA-z]+-[0-9]+-[0-9]+)', 'g');
+    const foundDOI6 = [...pdf.matchAll(regexpDOI6)];
+    for (const f of foundDOI6) {
+        let d = (f[0] as string).substring(4);
+        d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
+        d = d.replaceAll("_", ".");
         return {"doi": d, "isbn": null, "arxiv": null, "path": null};
     }
 
@@ -123,6 +167,14 @@ async function getDocID(pdf: string, papers_dir: string): Promise<DocID> {
         return {"doi": null, "isbn": null, "arxiv": null, "path": pdf.replace(papers_dir, "")};
     }
 
+    return null
+}
+
+async function getDocID(pdf: string, papers_dir: string): Promise<DocID> {
+    const manuallyWrittenDocID = getDocIDManuallyWritten(pdf, papers_dir);
+    if(manuallyWrittenDocID != null){
+        return manuallyWrittenDocID;
+    }
     let dataBuffer = fs.readFileSync(pdf);
 
     const texts = await pdfparse(dataBuffer).then(data => {
@@ -207,18 +259,7 @@ async function getJson(docID: DocID, path: string): Promise<[Object, string] | n
             console.warn("Failed to get info of ", docID, " using arxiv ", path);
         }
     }
-    if (docID.isbn != null && json_r == null) {
-        let json = await getIsbnJson(docID.isbn);
-        if (json != null) {
-            json["path"] = path;
-            json["id_type"] = "isbn";
-            json_r = json;
-            db_id = "isbn_" + docID.isbn;
-        } else {
-            console.warn("Failed to get info of ", docID, " using isbn ", path);
-        }
-    }
-    if (docID.doi != null && json_r == null) {
+    if (docID.doi != null && (json_r == null || json_r["title"] == null)) {
         let json = await getDoiJSON(docID.doi);
         if (json != null) {
             json["path"] = path;
@@ -229,7 +270,18 @@ async function getJson(docID: DocID, path: string): Promise<[Object, string] | n
             console.warn("Failed to get info of ", docID, " using doi ", path);
         }
     }
-    if (docID.path != null && json_r == null) {
+    if (docID.isbn != null && (json_r == null || json_r["title"] == null)) {
+        let json = await getIsbnJson(docID.isbn);
+        if (json != null) {
+            json["path"] = path;
+            json["id_type"] = "isbn";
+            json_r = json;
+            db_id = "isbn_" + docID.isbn;
+        } else {
+            console.warn("Failed to get info of ", docID, " using isbn ", path);
+        }
+    }
+    if (docID.path != null && (json_r == null || json_r["title"] == null)) {
         let json = new Object();
         json["path"] = path;
         json["title"] = docID.path;
