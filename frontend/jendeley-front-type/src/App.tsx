@@ -75,18 +75,6 @@ function App() {
     return (
         <div>
             <div className="inline-block border border-black shadow rounded">
-                <div className="px-1 border-b border-black">
-                    <label>
-                        <input
-                            {...{
-                                type: 'checkbox',
-                                checked: table.getIsAllColumnsVisible(),
-                                onChange: table.getToggleAllColumnsVisibilityHandler(),
-                            }}
-                        />{' '}
-                        Toggle All
-                    </label>
-                </div>
                 {table.getAllLeafColumns().map(column => {
                     return (
                         <div key={column.id} className="px-1">
