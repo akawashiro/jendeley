@@ -19,7 +19,7 @@ function getEntry(id: string, json: any): Entry {
         const publisher: string | null = json[id]["publisher"];
 
         const e = {id: id, title: title, authors: authors, path: path, year: year, publisher: publisher};
-        console.assert(title != null && path != null, JSON.stringify(e, null, 2));
+        console.assert(title != null && path != null, "id = ", id, JSON.stringify(e, null, 2));
         return e;
     } else if (json[id]["id_type"] == "doi") {
         const title: string = json[id]["title"];
@@ -35,9 +35,9 @@ function getEntry(id: string, json: any): Entry {
         }
         console.log(id);
         let year: number | null = null;
-        if(json[id]["published-print"] != null){
+        if (json[id]["published-print"] != null) {
             year = json[id]["published-print"]["date-parts"][0][0];
-        } else if(json[id]["created"] != null){
+        } else if (json[id]["created"] != null) {
             year = json[id]["created"]["date-parts"][0][0];
         }
         const publisher: string | null = json[id]["event"];
@@ -45,8 +45,7 @@ function getEntry(id: string, json: any): Entry {
         const e = {id: id, title: title, authors: authors, path: path, year: year, publisher: publisher};
         console.assert(title != null && path != null, JSON.stringify(e, null, 2));
         return e;
-    } else {
-        console.assert(json[id]["id_type"] == "arxiv", id);
+    } else if (json[id]["id_type"] == "arxiv") {
         const title: string = json[id]["title"];
         const path: string = json[id]["path"];
         let authors: string[] | null = [];
@@ -64,6 +63,12 @@ function getEntry(id: string, json: any): Entry {
         const publisher: string | null = json[id]["publisher"];
 
         const e = {id: id, title: title, authors: authors, path: path, year: year, publisher: publisher};
+        console.assert(title != null && path != null, JSON.stringify(e, null, 2));
+        return e;
+    }else {
+        const title: string = json[id]["title"];
+        const path: string = json[id]["path"];
+        const e = {id: id, title: title, authors: null, path: path, year: null, publisher: null};
         console.assert(title != null && path != null, JSON.stringify(e, null, 2));
         return e;
     }
