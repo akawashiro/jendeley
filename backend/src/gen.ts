@@ -121,7 +121,7 @@ function getDocIDManuallyWritten(pdf: string, papers_dir: string): DocID | null 
         return {"doi": d, "isbn": null, "arxiv": null, "path": null};
     }
 
-    const regexpDOI2 = new RegExp('(doi_10_[0-9]{4}_S[0-9]+[0-9X])', 'g');
+    const regexpDOI2 = new RegExp('(doi_10_[0-9]{4}_[A-Z]{1,3}[0-9]+[0-9X])', 'g');
     const foundDOI2 = [...pdf.matchAll(regexpDOI2)];
     for (const f of foundDOI2) {
         let d = (f[0] as string).substring(4);
@@ -150,6 +150,15 @@ function getDocIDManuallyWritten(pdf: string, papers_dir: string): DocID | null 
     const regexpDOI6 = new RegExp('(doi_10_[0-9]{4}_[a-zA-z]+-[0-9]+-[0-9]+)', 'g');
     const foundDOI6 = [...pdf.matchAll(regexpDOI6)];
     for (const f of foundDOI6) {
+        let d = (f[0] as string).substring(4);
+        d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
+        d = d.replaceAll("_", ".");
+        return {"doi": d, "isbn": null, "arxiv": null, "path": null};
+    }
+
+    const regexpDOI7 = new RegExp('(doi_10_[0-9]{4}_978-[0-9\-]+)', 'g');
+    const foundDOI7 = [...pdf.matchAll(regexpDOI7)];
+    for (const f of foundDOI7) {
         let d = (f[0] as string).substring(4);
         d = d.substring(0, 2) + "." + d.substring(3, 3 + 4) + "/" + d.substring(3 + 4 + 1);
         d = d.replaceAll("_", ".");
