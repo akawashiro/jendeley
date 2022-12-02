@@ -13,9 +13,10 @@ async function main() {
         .requiredOption('--papers_dir <dir>', "Root directory of your papers")
         .option('--book_dirs <dirs>', "Comma separated directories of books")
         .option('--output <out>', "Output DB to this file. By default, <papers_dir>/db.json.")
+        .option('--only_append', "Do not overwrite existing entries in DB")
         .action((cmd, options) => {
             const book_dirs_str = options._optionValues.book_dirs == undefined ? "" : options._optionValues.book_dirs;
-            genDB(options._optionValues.papers_dir, book_dirs_str, options._optionValues.output);
+            genDB(options._optionValues.papers_dir, book_dirs_str, options._optionValues.output, options._optionValues.only_append);
         });
 
     program
