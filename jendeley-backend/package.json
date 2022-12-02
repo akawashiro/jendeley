@@ -13,7 +13,8 @@
     "gen_tapl": "npm run build && node dist/index.js gen --papers_dir /home/akira/Dropbox/papers/books/TypesAndProgrammingLanguages --output db_tapl.json --book_dirs /home/akira/Dropbox/papers/books/TypesAndProgrammingLanguages/",
     "gen_lchi": "npm run build && node dist/index.js gen --papers_dir /home/akira/Dropbox/papers/books/LecturesOnTheCurry-HowardIsomorphism --output db_lchi.json --book_dirs /home/akira/Dropbox/papers/books/LecturesOnTheCurry-HowardIsomorphism/",
     "server": "npm run build && node dist/index.js server --db db.json",
-    "server_all": "npm run build && node dist/index.js server --db db_all.json"
+    "server_all": "npm run build && node dist/index.js server --db db_all.json",
+    "run_test_server": "npm run build && node dist/index.js gen --papers_dir test_pdfs && node dist/index.js server --db test_pdfs/db.json"
   },
   "repository": {
     "type": "git",
