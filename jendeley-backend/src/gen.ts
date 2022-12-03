@@ -314,7 +314,7 @@ async function getJson(docID: DocID, path: string): Promise<[Object, string] | n
             json["path"] = path;
             json["id_type"] = "arxiv";
             json_r = json;
-            db_id = "arxiv_" + docID.arxiv.replaceAll(".", "_");
+            db_id = "arxiv_" + docID.arxiv;
         } else {
             console.warn("Failed to get info of ", docID, " using arxiv ", path);
         }
@@ -325,7 +325,7 @@ async function getJson(docID: DocID, path: string): Promise<[Object, string] | n
             json["path"] = path;
             json["id_type"] = "doi";
             json_r = json;
-            db_id = "doi_" + docID.doi.replaceAll(".", "_").replaceAll("/", "_");
+            db_id = "doi_" + docID.doi;
         } else {
             console.warn("Failed to get info of ", docID, " using doi ", path);
         }
@@ -347,7 +347,7 @@ async function getJson(docID: DocID, path: string): Promise<[Object, string] | n
         json["title"] = docID.path;
         json["id_type"] = "path";
         json_r = json;
-        db_id = "path_" + docID.path.replaceAll(".", "_").replaceAll("/", "_");
+        db_id = "path_" + docID.path;
     }
 
     if (json_r == null || db_id == null) {
@@ -404,6 +404,7 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
                 if (t != null && t[0]["id_type"] == "isbn") {
                     const json = t[0];
                     book_db[bd][p] = json;
+                    book_db[bd]["id"] = t[1];
                 }else{
                     book_db[bd][p] = new Object();
                 }
@@ -428,14 +429,16 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
 
     for (const book_dir of Object.keys(book_db)) {
         let book_info: Object | null = null;
+        let book_id: string | null = "";
         for (const path of Object.keys(book_db[book_dir])) {
             if (book_db[book_dir][path] != null && book_db[book_dir][path]["id_type"] == "isbn") {
                 book_info = book_db[book_dir][path];
+                book_id = book_db[book_dir]["id"];
             }
         }
-        if (book_info != null) {
+        if (book_info != null && book_id != null) {
             for (const chapter_path of Object.keys(book_db[book_dir])) {
-                const chapter_id = escape(path.basename(book_dir)) + "_" + escape(path.basename(chapter_path));
+                const chapter_id = book_id + "_" + path.basename(chapter_path);
                 let chapter_info = JSON.parse(JSON.stringify(book_info));
                 chapter_info["title"] = chapter_info["title"] + "/" + path.basename(chapter_path, ".pdf");
                 chapter_info["id_type"] = "book";
