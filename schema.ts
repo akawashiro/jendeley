@@ -6,8 +6,9 @@ type Entry = {
     tags: string[];
     comments: string;
     authors: string[];
+    abstract: string;
     year: number | null;
-    publisher: string | null;
+    publisher: string;
 };
 
 type DB = Entry[];

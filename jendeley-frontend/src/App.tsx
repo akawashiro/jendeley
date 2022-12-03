@@ -9,21 +9,21 @@ import MaterialReactTable, {MRT_ColumnDef} from 'material-react-table';
 
 function authorChips(authors: string[]) {
     return (
-        <Stack direction="row" spacing={1}>
+        <div>
             {authors.map((a) =>
                 <Chip label={`${a}`} />
             )}
-        </Stack>
+        </div>
     )
 }
 
 function tagChips(tags: string[]) {
     return (
-        <Stack direction="row" spacing={1}>
+        <div>
             {tags.map((a) =>
                 <Chip label={`${a}`} />
             )}
-        </Stack>
+        </div>
     )
 }
 
@@ -74,6 +74,10 @@ function App() {
                 accessorKey: 'publisher',
                 header: 'publisher',
             },
+            {
+                accessorKey: 'abstract',
+                header: 'abstract',
+            },
         ],
         [],
     );
@@ -92,7 +96,7 @@ function App() {
         enableStickyHeader
         globalFilterFn="contains"
         enableColumnResizing
-        columnResizeMode="onChange"
+        columnResizeMode="onEnd"
     />;
 }
 

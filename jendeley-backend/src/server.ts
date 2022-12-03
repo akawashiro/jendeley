@@ -12,16 +12,19 @@ function getEntry(id: string, json: any): Entry {
         const title: string = json[id]["title"];
         const path: string = json[id]["path"];
         let authors: string[] = [];
-        if(json[id]["authors"] != null){
+        if (json[id]["authors"] != null) {
             authors = json[id]["authors"];
         }
         let year: number | null = null;
         if (json[id]["publishedDate"] != null && !isNaN(parseInt(json[id]["publishedDate"].substr(0, 4)))) {
             year = parseInt(json[id]["publishedDate"].substr(0, 4));
         }
-        const publisher: string | null = json[id]["publisher"];
+        let publisher: string = "";
+        if (json[id]["publisher"] != null) {
+            publisher = json[id]["publisher"];
+        }
 
-        const e = {id: id, title: title, authors: authors, tags: [], comments: "", path: path, year: year, publisher: publisher};
+        const e = {id: id, title: title, authors: authors, abstract: "", tags: [], comments: "", path: path, year: year, publisher: publisher};
         console.assert(title != null && path != null, "id = ", id, JSON.stringify(e, null, 2));
         return e;
     } else if (json[id]["id_type"] == "doi") {
@@ -43,9 +46,10 @@ function getEntry(id: string, json: any): Entry {
         } else if (json[id]["created"] != null) {
             year = json[id]["created"]["date-parts"][0][0];
         }
-        const publisher: string | null = json[id]["event"];
+        const publisher: string = json[id]["event"] != null ? json[id]["event"] : "";
+        const abstract: string = json[id]["abstract"] != null ? json[id]["abstract"] : "";
 
-        const e = {id: id, title: title, authors: authors, tags: [], comments: "", path: path, year: year, publisher: publisher};
+        const e = {id: id, title: title, authors: authors, tags: [], comments: "", abstract: abstract, path: path, year: year, publisher: publisher};
         console.assert(title != null && path != null, JSON.stringify(e, null, 2));
         return e;
     } else if (json[id]["id_type"] == "arxiv") {
@@ -63,15 +67,16 @@ function getEntry(id: string, json: any): Entry {
         if (json[id]["published"] != null && !isNaN(parseInt(json[id]["published"].substr(0, 4)))) {
             year = parseInt(json[id]["published"].substr(0, 4));
         }
-        const publisher: string | null = json[id]["publisher"];
+        const publisher: string = json[id]["event"] != null ? json[id]["event"] : "";
+        const abstract: string = json[id]["abstract"] != null ? json[id]["abstract"] : "";
 
-        const e = {id: id, title: title, authors: authors, tags: ["arXiv"], comments: "", path: path, year: year, publisher: publisher};
+        const e = {id: id, title: title, authors: authors, tags: ["arXiv"], abstract: abstract, comments: "", path: path, year: year, publisher: publisher};
         console.assert(title != null && path != null, JSON.stringify(e, null, 2));
         return e;
-    }else {
+    } else {
         const title: string = json[id]["title"];
         const path: string = json[id]["path"];
-        const e = {id: id, title: title, authors: [], tags: [], comments: "", path: path, year: null, publisher: null};
+        const e = {id: id, title: title, authors: [], tags: [], comments: "", abstract: "", path: path, year: null, publisher: ""};
         console.assert(title != null && path != null, JSON.stringify(e, null, 2));
         return e;
     }
