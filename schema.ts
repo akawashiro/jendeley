@@ -3,7 +3,9 @@ type Entry = {
     id: string;
     title: string;
     path: string;
-    authors: string[] | null;
+    tags: string[];
+    comments: string;
+    authors: string[];
     year: number | null;
     publisher: string | null;
 };

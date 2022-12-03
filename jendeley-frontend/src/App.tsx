@@ -7,12 +7,22 @@ import './App.css';
 import {Entry, DB} from './schema';
 import MaterialReactTable, {MRT_ColumnDef} from 'material-react-table';
 
-function authorChips(authors: any) {
-    console.log("authors = ", authors);
+function authorChips(authors: string[]) {
     return (
         <Stack direction="row" spacing={1}>
-            <Chip label="hoge" />
-            <Chip label="hoge" />
+            {authors.map((a) =>
+                <Chip label={`${a}`} />
+            )}
+        </Stack>
+    )
+}
+
+function tagChips(tags: string[]) {
+    return (
+        <Stack direction="row" spacing={1}>
+            {tags.map((a) =>
+                <Chip label={`${a}`} />
+            )}
         </Stack>
     )
 }
@@ -44,13 +54,12 @@ function App() {
             },
             {
                 accessorKey: 'authors',
-                // Cell: ({cell}) => (cell.getValue<string[]>().map((a) => <Chip label={`${a}`} />)),
-                // Cell: ({cell}) => (cell.getValue<string[]>().map((a) => <Chip label="hoge" />)),
-                Cell: ({cell}) => (authorChips(cell.getValue())),
+                Cell: ({cell}) => (authorChips(cell.getValue<string[]>())),
                 header: 'authors',
             },
             {
                 accessorKey: 'tags',
+                Cell: ({cell}) => (tagChips(cell.getValue<string[]>())),
                 header: 'tags',
             },
             {
@@ -69,7 +78,20 @@ function App() {
         [],
     );
 
-    return <MaterialReactTable columns={columns} data={data} enablePagination={false} enableStickyHeader />;
+    return <MaterialReactTable
+        columns={columns}
+        data={data}
+        enablePagination={false}
+        initialState={{
+            showColumnFilters: true,
+            sorting: [{id: 'year', desc: true}],
+            showGlobalFilter: true,
+            columnVisibility: { id: false, path: false },
+        }}
+        positionGlobalFilter="left"
+        enableStickyHeader
+        globalFilterFn="contains"
+    />;
 }
 
 const rootElement = document.getElementById('root')
