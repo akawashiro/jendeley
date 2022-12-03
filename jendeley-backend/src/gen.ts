@@ -215,15 +215,18 @@ async function getDocIDFromTitle(pdf: string): Promise<DocID | null> {
     }
 }
 
-async function getDocID(pdf: string, papers_dir: string): Promise<DocID> {
+async function getDocID(pdf: string, papers_dir: string, is_book: boolean): Promise<DocID> {
     const manuallyWrittenDocID = getDocIDManuallyWritten(pdf, papers_dir);
     if (manuallyWrittenDocID != null) {
         return manuallyWrittenDocID;
     }
 
-    const docIDFromTitle = await getDocIDFromTitle(pdf);
-    if (docIDFromTitle != null) {
-        return docIDFromTitle;
+    // Titles of chapters are sometimes confusing such as "Reference".
+    if (!is_book) {
+        const docIDFromTitle = await getDocIDFromTitle(pdf);
+        if (docIDFromTitle != null) {
+            return docIDFromTitle;
+        }
     }
 
     let dataBuffer = fs.readFileSync(pdf);
@@ -240,7 +243,13 @@ async function getDocID(pdf: string, papers_dir: string): Promise<DocID> {
         return {"doi": null, "isbn": null, "arxiv": null, "path": null};
     }
 
-    return getDocIDFromTexts(texts)
+    let id = getDocIDFromTexts(texts);
+    if (is_book) {
+        id.doi = null;
+        id.arxiv = null;
+        id.path = null;
+    }
+    return id;
 }
 
 async function getDoiJSON(doi: string): Promise<Object> {
@@ -389,20 +398,20 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
                 book_db[bd] = {};
             }
             if (p.startsWith(bd)) {
-                const docID = await getDocID(p, papers_dir);
+                is_book = true;
+                const docID = await getDocID(p, papers_dir, true);
                 const t = await getJson(docID, p);
-                book_db[bd][p] = new Object();
-                if (t != null) {
+                if (t != null && t[0]["id_type"] == "isbn") {
                     const json = t[0];
                     book_db[bd][p] = json;
-                    is_book = true;
-                    break;
+                }else{
+                    book_db[bd][p] = new Object();
                 }
             }
         }
 
         if (!is_book) {
-            const docID = await getDocID(p, papers_dir);
+            const docID = await getDocID(p, papers_dir, false);
             const t = await getJson(docID, p);
             if (t != null) {
                 const json = t[0];
@@ -420,7 +429,7 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
     for (const book_dir of Object.keys(book_db)) {
         let book_info: Object | null = null;
         for (const path of Object.keys(book_db[book_dir])) {
-            if (book_db[book_dir][path] != null) {
+            if (book_db[book_dir][path] != null && book_db[book_dir][path]["id_type"] == "isbn") {
                 book_info = book_db[book_dir][path];
             }
         }
@@ -431,12 +440,10 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
                 chapter_info["title"] = chapter_info["title"] + "/" + path.basename(chapter_path, ".pdf");
                 chapter_info["id_type"] = "book";
                 chapter_info["path"] = chapter_path;
-                json_db[chapter_id] = chapter_info;
                 if (json_db.hasOwnProperty(chapter_id)) {
                     console.warn(chapter_id, " is already registered.");
-                } else {
-                    json_db[chapter_id] = chapter_info;
                 }
+                json_db[chapter_id] = chapter_info;
             }
         }
     }
