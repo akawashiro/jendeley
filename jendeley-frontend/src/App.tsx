@@ -1,9 +1,21 @@
 import React, {useMemo} from 'react';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 import ReactDOM from 'react-dom/client'
 import base_64 from 'base-64'
 import './App.css';
 import {Entry, DB} from './schema';
 import MaterialReactTable, {MRT_ColumnDef} from 'material-react-table';
+
+function authorChips(authors: any) {
+    console.log("authors = ", authors);
+    return (
+        <Stack direction="row" spacing={1}>
+            <Chip label="hoge" />
+            <Chip label="hoge" />
+        </Stack>
+    )
+}
 
 function App() {
     const [data, setData] = React.useState<DB>([])
@@ -32,7 +44,18 @@ function App() {
             },
             {
                 accessorKey: 'authors',
+                // Cell: ({cell}) => (cell.getValue<string[]>().map((a) => <Chip label={`${a}`} />)),
+                // Cell: ({cell}) => (cell.getValue<string[]>().map((a) => <Chip label="hoge" />)),
+                Cell: ({cell}) => (authorChips(cell.getValue())),
                 header: 'authors',
+            },
+            {
+                accessorKey: 'tags',
+                header: 'tags',
+            },
+            {
+                accessorKey: 'comments',
+                header: 'comments',
             },
             {
                 accessorKey: 'year',
@@ -46,7 +69,7 @@ function App() {
         [],
     );
 
-    return <MaterialReactTable columns={columns} data={data} enablePagination={false} />;
+    return <MaterialReactTable columns={columns} data={data} enablePagination={false} enableStickyHeader />;
 }
 
 const rootElement = document.getElementById('root')
