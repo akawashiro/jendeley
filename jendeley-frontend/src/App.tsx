@@ -86,11 +86,13 @@ function App() {
             showColumnFilters: true,
             sorting: [{id: 'year', desc: true}],
             showGlobalFilter: true,
-            columnVisibility: { id: false, path: false },
+            columnVisibility: {id: false, path: false},
         }}
         positionGlobalFilter="left"
         enableStickyHeader
         globalFilterFn="contains"
+        enableColumnResizing
+        columnResizeMode="onChange"
     />;
 }
 
