@@ -1,30 +1,38 @@
 import React, {useMemo} from 'react';
 import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
 import ReactDOM from 'react-dom/client'
 import base_64 from 'base-64'
 import './App.css';
 import {Entry, DB} from './schema';
 import MaterialReactTable, {MRT_ColumnDef} from 'material-react-table';
+import sanitizeHTML from 'sanitize-html';
 
 function authorChips(authors: string[]) {
+    // TODO padding or margine
     return (
         <div>
             {authors.map((a) =>
-                <Chip label={`${a}`} />
+                <Chip label={`${a}`} size='small' />
             )}
         </div>
     )
 }
 
 function tagChips(tags: string[]) {
+    // TODO padding or margine
     return (
         <div>
             {tags.map((a) =>
-                <Chip label={`${a}`} />
+                <Chip label={`${a}`} size='small' />
             )}
         </div>
     )
+}
+
+function abstractHTML(abstract: string){
+    const __html = sanitizeHTML(abstract.replaceAll("<jats:", "<"));
+    console.log("html = ", __html);
+    return <div dangerouslySetInnerHTML={{ __html }}></div>;
 }
 
 function App() {
@@ -76,6 +84,7 @@ function App() {
             },
             {
                 accessorKey: 'abstract',
+                Cell: ({cell}) => (abstractHTML(cell.getValue<string>())),
                 header: 'abstract',
             },
         ],
