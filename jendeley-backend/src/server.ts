@@ -27,8 +27,10 @@ function getEntry(id: string, json: any): Entry {
         if (json[id]["publisher"] != null) {
             publisher = json[id]["publisher"];
         }
+        const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+        const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
 
-        const e = {id: id, title: title, authors: authors, abstract: "", tags: [], comments: "", path: path, year: year, publisher: publisher};
+        const e = {id: id, title: title, authors: authors, abstract: "", tags: tags, comments: comments, path: path, year: year, publisher: publisher};
         console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
         return e;
     } else if (json[id]["id_type"] == "doi") {
@@ -48,8 +50,10 @@ function getEntry(id: string, json: any): Entry {
         }
         const publisher: string = json[id]["event"] != null ? json[id]["event"] : "";
         const abstract: string = json[id]["abstract"] != null ? json[id]["abstract"] : "";
+        const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+        const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
 
-        const e = {id: id, title: title, authors: authors, tags: [], comments: "", abstract: abstract, path: path, year: year, publisher: publisher};
+        const e = {id: id, title: title, authors: authors, tags: tags, comments: comments, abstract: abstract, path: path, year: year, publisher: publisher};
         console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
         return e;
     } else if (json[id]["id_type"] == "arxiv") {
@@ -69,14 +73,18 @@ function getEntry(id: string, json: any): Entry {
         }
         const publisher: string = json[id]["event"] != null ? json[id]["event"] : "";
         const abstract: string = json[id]["summary"] != null ? json[id]["summary"] : "";
+        const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+        const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
 
-        const e = {id: id, title: title, authors: authors, tags: ["arXiv"], abstract: abstract, comments: "", path: path, year: year, publisher: publisher};
+        const e = {id: id, title: title, authors: authors, tags: tags, abstract: abstract, comments: comments, path: path, year: year, publisher: publisher};
         console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
         return e;
     } else {
         const title: string = json[id]["title"];
         const path: string = json[id]["path"];
-        const e = {id: id, title: title, authors: [], tags: [], comments: "", abstract: "", path: path, year: null, publisher: ""};
+        const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+        const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
+        const e = {id: id, title: title, authors: [], tags: tags, comments: comments, abstract: "", path: path, year: null, publisher: ""};
         console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
         return e;
     }
