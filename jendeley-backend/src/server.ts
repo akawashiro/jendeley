@@ -1,5 +1,6 @@
 import base_64 from 'base-64'
 import url from 'url'
+import path from 'path'
 import cors from 'cors'
 import fs from 'fs'
 import {Entry, DB} from './schema'
@@ -104,6 +105,7 @@ function startServer(db_path: string) {
         const port = 5000;
 
         app.use(cors())
+        app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
         app.get('/api/get_db', (request, response) => {
             console.log('Get a get_db request', request.url);

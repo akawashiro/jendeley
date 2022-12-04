@@ -7,3 +7,4 @@ db*.json
 ./coverage/*
 ./arXivPDFs/*
 edit_and_run.sh
+built-frontend/*
