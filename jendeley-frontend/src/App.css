@@ -43,19 +43,24 @@
   width: 100%;
 }
 
-#jendeley_main_table td, #jendeley_main_table th {
+#jendeley_main_table td,
+#jendeley_main_table th {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-#jendeley_main_table tr:nth-child(even){background-color: #f2f2f2;}
+#jendeley_main_table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
 
-#jendeley_main_table tr:hover {background-color: #ddd;}
+#jendeley_main_table tr:hover {
+  background-color: #ddd;
+}
 
 #jendeley_main_table th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #04AA6D;
+  background-color: #04aa6d;
   color: white;
 }
