@@ -93,7 +93,7 @@ function App() {
     const handleSaveRow: MaterialReactTableProps<Entry>['onEditingRowSave'] =
         async ({exitEditingMode, row, values}) => {
             // TODO: Ban editing fields other than "tags" and "comments".
-            const edittedTags = values.tags.split(",");
+            const edittedTags = values.tags.split(/[\s,]+/);
             const edittedComments = values.comments;
             tableData[row.index]["tags"] = edittedTags;
             tableData[row.index]["comments"] = edittedComments;
@@ -102,6 +102,8 @@ function App() {
             const response = await fetch("http://localhost:5000/api/update_entry", {
                 method: 'PUT',
                 headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(e)
