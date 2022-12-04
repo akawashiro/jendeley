@@ -1,9 +1,12 @@
 import base_64 from 'base-64'
 import url from 'url'
 import http from 'http'
+import cors from 'cors'
 import fs from 'fs'
 import {Entry, DB} from './schema'
 import assert from 'node:assert/strict';
+import express from 'express'
+import bodyParser from 'body-parser'
 
 
 function getEntry(id: string, json: any): Entry {
@@ -80,67 +83,87 @@ function getEntry(id: string, json: any): Entry {
 }
 
 
-function startServer(db: string) {
-    if (fs.existsSync(db)) {
+function startServer(db_path: string) {
+    if (fs.existsSync(db_path)) {
+        const app = express()
         const port = 5000;
-        const server = http.createServer((request, response) => {
-            if (request.url == "/api/get_db" && request.method == 'GET') {
-                console.log('Get a get_db request', request.url);
-                const json = JSON.parse(fs.readFileSync(db).toString());
-                let db_response: DB = [];
 
-                for (const id of Object.keys(json)) {
-                    if (json[id] == null)
-                        continue;
-                    const e = getEntry(id, json);
-                    db_response.push(e);
-                }
+        app.use(cors())
 
-                response.writeHead(200, {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
-                });
+        app.get('/api/get_db', (request, response) => {
+            console.log('Get a get_db request', request.url);
+            const json = JSON.parse(fs.readFileSync(db_path).toString());
+            let db_response: DB = [];
 
-                response.end(JSON.stringify(db_response));
-                console.log('Sent a response');
-            } else if (request.url != undefined && request.url.startsWith("/api/get_pdf/") && request.method == 'GET') {
-                console.log('Get a get_pdf request', request.url);
-                const params = url.parse(request.url, true).query;
-                const path = unescape(base_64.decode(params.file as string));
-                const pdf = fs.readFileSync(path);
-
-                response.writeHead(200, {
-                    'Content-Type': 'application/pdf',
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
-                });
-
-                response.end(pdf);
-                console.log('Sent a response');
-            } else if (request.url == "/api/update_entry" && request.method == 'PUT') {
-                console.log('Get a update_entry request', request.url);
-                const params = url.parse(request.url, true).query;
-                const entry_o = JSON.parse(unescape(base_64.decode(params.entry as string)));
-               
-                // TODO: Is there any more sophisticated way to check user defined type?
-                if(entry_o["id"] != undefined && entry_o["tags"] != undefined && entry_o["comments"] != undefined){
-                    const entry = entry_o as Entry;
-                    console.log("entry =", entry);
-                }else{
-                    console.warn("Object from the client is not legitimated. entry_o = ", entry_o)
-                }
-
-                console.log('Sent a response');
-            } else {
-                console.assert('Get a non-supported request', request.url);
+            for (const id of Object.keys(json)) {
+                if (json[id] == null)
+                    continue;
+                const e = getEntry(id, json);
+                db_response.push(e);
             }
-        });
 
-        server.listen(port);
-        console.log(`The server has started and is listening on port number: ${port}`);
+            response.writeHead(200, {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
+            });
+
+            response.end(JSON.stringify(db_response));
+            console.log('Sent a response');
+        })
+
+        app.get('/api/get_pdf', (request, response) => {
+            console.log('Get a get_pdf request', request.url);
+            const params = url.parse(request.url, true).query;
+            const path = unescape(base_64.decode(params.file as string));
+            const pdf = fs.readFileSync(path);
+
+            response.writeHead(200, {
+                'Content-Type': 'application/pdf',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
+            });
+
+            response.end(pdf);
+            console.log('Sent a response');
+        })
+
+        let jsonParser = bodyParser.json()
+        app.put('/api/update_entry', jsonParser, (request, response) => {
+            console.log('Get a update_entry request', request.url);
+            const params = url.parse(request.url, true).query
+            const entry_o = request.body
+
+            // TODO: Is there any more sophisticated way to check user defined type?
+            if (entry_o["id"] != undefined && entry_o["tags"] != undefined && entry_o["comments"] != undefined) {
+                const entry = entry_o as Entry;
+                let json = JSON.parse(fs.readFileSync(db_path).toString());
+                if(json[entry.id] != undefined){
+                    console.log("Update DB with entry =", JSON.stringify(entry));
+                    json[entry.id]["tags"] = entry.tags;
+                    json[entry.id]["comments"] = entry.comments;
+                }
+                fs.writeFileSync(db_path, JSON.stringify(json));
+            } else {
+                console.warn("Object from the client is not legitimated. entry_o = ", entry_o)
+            }
+
+            response.writeHead(200, {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
+            });
+
+            response.end();
+
+            console.log('Sent a response');
+        })
+
+        app.listen(port, () => {
+            console.log(`Example app listening on port ${port}`)
+        })
     } else {
-        console.log(db + " is not exist.");
+        console.warn(db_path + " is not exist.");
     }
 }
 
