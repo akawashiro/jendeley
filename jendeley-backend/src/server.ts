@@ -1,12 +1,14 @@
 import base_64 from 'base-64'
 import url from 'url'
-import http from 'http'
 import cors from 'cors'
 import fs from 'fs'
 import {Entry, DB} from './schema'
-import assert from 'node:assert/strict';
 import express from 'express'
 import bodyParser from 'body-parser'
+
+function checkEntry(entry: Entry) {
+    console.assert(entry.title != null && entry.path != null, "id = ", entry.id, "entry = ", JSON.stringify(entry, null, 2));
+}
 
 
 function getEntry(id: string, json: any): Entry {
@@ -29,9 +31,10 @@ function getEntry(id: string, json: any): Entry {
         }
         const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
         const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
+        const abstract = "";
 
-        const e = {id: id, title: title, authors: authors, abstract: "", tags: tags, comments: comments, path: path, year: year, publisher: publisher};
-        console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
+        const e = {id: id, title: title, authors: authors, tags: tags, comments: comments, abstract: abstract, path: path, year: year, publisher: publisher};
+        checkEntry(e);
         return e;
     } else if (json[id]["id_type"] == "doi") {
         const title: string = json[id]["title"];
@@ -54,7 +57,7 @@ function getEntry(id: string, json: any): Entry {
         const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
 
         const e = {id: id, title: title, authors: authors, tags: tags, comments: comments, abstract: abstract, path: path, year: year, publisher: publisher};
-        console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
+        checkEntry(e);
         return e;
     } else if (json[id]["id_type"] == "arxiv") {
         const title: string = json[id]["title"];
@@ -77,15 +80,19 @@ function getEntry(id: string, json: any): Entry {
         const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
 
         const e = {id: id, title: title, authors: authors, tags: tags, abstract: abstract, comments: comments, path: path, year: year, publisher: publisher};
-        console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
+        checkEntry(e);
         return e;
     } else {
         const title: string = json[id]["title"];
         const path: string = json[id]["path"];
         const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
         const comments = json[id]["comments"] != undefined ? json[id]["comments"] : [];
-        const e = {id: id, title: title, authors: [], tags: tags, comments: comments, abstract: "", path: path, year: null, publisher: ""};
-        console.assert(title != null && path != null, "id = ", id, "entry = ", JSON.stringify(e, null, 2));
+        const authors = [];
+        const abstract = "";
+        const year = null;
+        const publisher = "";
+        const e = {id: id, title: title, authors: authors, tags: tags, abstract: abstract, comments: comments, path: path, year: year, publisher: publisher};
+        checkEntry(e);
         return e;
     }
 }
@@ -146,7 +153,7 @@ function startServer(db_path: string) {
             if (entry_o["id"] != undefined && entry_o["tags"] != undefined && entry_o["comments"] != undefined) {
                 const entry = entry_o as Entry;
                 let json = JSON.parse(fs.readFileSync(db_path).toString());
-                if(json[entry.id] != undefined){
+                if (json[entry.id] != undefined) {
                     console.log("Update DB with entry =", JSON.stringify(entry));
                     json[entry.id]["tags"] = entry.tags;
                     json[entry.id]["comments"] = entry.comments;
