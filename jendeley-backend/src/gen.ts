@@ -172,7 +172,7 @@ function getDocIDManuallyWritten(pdf: string, papers_dir: string): DocID | null 
         return {"doi": null, "isbn": d, "arxiv": null, "path": null};
     }
 
-    if (path.basename(pdf, ".pdf").endsWith("no_id") && pdf.startsWith(papers_dir)) {
+    if (pdf.startsWith(papers_dir) && (path.basename(pdf, ".pdf").endsWith("no_id") || pdf.includes("[jendeley no id]"))) {
         return {"doi": null, "isbn": null, "arxiv": null, "path": pdf.replace(papers_dir, "")};
     }
 
@@ -255,7 +255,7 @@ async function getDocID(pdf: string, papers_dir: string, is_book: boolean): Prom
 async function getDoiJSON(doi: string): Promise<Object> {
     let {got} = await import('got');
 
-    const URL = 'https://api.crossref.org/v1/works/' + encodeURIComponent(doi) + "/transform"
+    const URL = 'https://api.crossref.org/v1/works/' + doi + "/transform"
     const options = {'headers': {'Accept': 'application/json'}}
     try {
         const data = await got(URL, options).json() as Object;
@@ -358,6 +358,10 @@ async function getJson(docID: DocID, path: string): Promise<[Object, string] | n
     }
 }
 
+function isValidJsonEntry(json: Object) {
+    return json["title"] != null && json["path"] != null;
+}
+
 async function genDB(papers_dir: string, book_dirs_str: string, output: string, only_append: boolean) {
     const book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
 
@@ -405,7 +409,7 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
                     const json = t[0];
                     book_db[bd][p] = json;
                     book_db[bd]["id"] = t[1];
-                }else{
+                } else {
                     book_db[bd][p] = new Object();
                 }
             }
@@ -420,7 +424,7 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
                 if (json_db.hasOwnProperty(dbID)) {
                     console.warn(p, " is duplicated. You can find another file in ", json_db[dbID]["path"], ".");
                     console.warn("mv ", "\"" + p + "\" duplicated");
-                } else {
+                } else if (isValidJsonEntry(json)) {
                     json_db[dbID] = json;
                 }
             }
@@ -445,8 +449,10 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
                 chapter_info["path"] = chapter_path;
                 if (json_db.hasOwnProperty(chapter_id)) {
                     console.warn(chapter_id, " is already registered.");
+                } 
+                if (isValidJsonEntry(chapter_info)) {
+                    json_db[chapter_id] = chapter_info;
                 }
-                json_db[chapter_id] = chapter_info;
             }
         }
     }
@@ -476,4 +482,4 @@ async function genDB(papers_dir: string, book_dirs_str: string, output: string, 
     }
 }
 
-export {genDB, getDocID, getDocIDFromTexts, getJson, getTitleFromPath, getDocIDFromTitle};
+export {genDB, getDocID, getDocIDFromTexts, getJson, getDoiJSON, getTitleFromPath, getDocIDFromTitle};

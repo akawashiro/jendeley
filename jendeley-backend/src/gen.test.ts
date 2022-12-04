@@ -1,15 +1,27 @@
-import {getDocID, getDocIDFromTexts, getJson, getTitleFromPath, getDocIDFromTitle} from './gen'
+import {getDocID, getDocIDFromTexts, getJson, getTitleFromPath, getDoiJSON, getDocIDFromTitle} from './gen'
 
-test.skip('DOI from title', async() => {
+test.skip('DOI from title', async () => {
     const pdf = "/papers/[Thomas van Noort, Peter Achten, Rinus Plasmeijer]Ad-hoc Polymorphism and Dynamic Typing in a Statically Typed Functional Language.pdf";
     const docID = await getDocIDFromTitle(pdf);
     expect(docID?.doi).toBe("10.1145/1863495.1863505");
 });
 
-test('Title from path', async() => {
+test('Title from path', async () => {
     const pdf = "/hoge/DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation.pdf";
     const title = getTitleFromPath(pdf);
     expect(title).toBe("Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation");
+});
+
+test('JSON from path', async () => {
+    const pdf = "/home/akira/Dropbox/papers/DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf";
+    const docID = await getDocID(pdf, "/home/akira/Dropbox/papers/", false);
+    const t = await getJson(docID, pdf);
+    expect(t).toBeTruthy();
+    if (t == null) return;
+    const json = t[0];
+    expect(json).toBeTruthy();
+    if (json == null) return;
+    expect(json["title"]).toBe("DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf");
 });
 
 test('ISBN from text', async () => {
