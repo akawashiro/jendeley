@@ -1,6 +1,9 @@
 node_modules/*
+coverage/*
 dist/*
 db.json
 db*.json
+*.log
 ./coverage/*
 ./arXivPDFs/*
+edit_and_run.sh
