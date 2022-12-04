@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client'
 import base_64 from 'base-64'
 import './App.css';
 import {Entry, DB} from './schema';
-import MaterialReactTable, {MRT_ColumnDef} from 'material-react-table';
+import MaterialReactTable, {MaterialReactTableProps, MRT_ColumnDef} from 'material-react-table';
 import sanitizeHTML from 'sanitize-html';
 
 function authorChips(authors: string[]) {
@@ -29,20 +29,19 @@ function tagChips(tags: string[]) {
     )
 }
 
-function abstractHTML(abstract: string){
+function abstractHTML(abstract: string) {
     const __html = sanitizeHTML(abstract.replaceAll("<jats:", "<"));
-    console.log("html = ", __html);
-    return <div dangerouslySetInnerHTML={{ __html }}></div>;
+    return <div dangerouslySetInnerHTML={{__html}}></div>;
 }
 
 function App() {
-    const [data, setData] = React.useState<DB>([])
+    const [tableData, setTableData] = React.useState<DB>([])
 
     React.useEffect(() => {
         console.log("Fetching from DB");
         fetch("http://localhost:5000/api/get_db")
             .then(response => response.json())
-            .then(json => setData(() => json));
+            .then(json => setTableData(() => json));
     }, []);
 
     const columns = useMemo<MRT_ColumnDef<Entry>[]>(
@@ -91,9 +90,31 @@ function App() {
         [],
     );
 
+    const handleSaveRow: MaterialReactTableProps<Entry>['onEditingRowSave'] =
+        async ({exitEditingMode, row, values}) => {
+            // TODO: Ban editing fields other than "tags" and "comments".
+            const edittedTags = values.tags.split(",");
+            const edittedComments = values.comments;
+            tableData[row.index]["tags"] = edittedTags;
+            tableData[row.index]["comments"] = edittedComments;
+
+            const e: Entry = {abstract: "", authors: [], id: values.id, title: "", path: "", tags: edittedTags, comments: edittedComments, year: 0, publisher: ""};
+            const response = await fetch("http://localhost:5000/api/update_entry", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(e)
+            });
+            console.log("response of update_entry:", response);
+            //send/receive api updates here
+            setTableData([...tableData]);
+            exitEditingMode(); //required to exit editing mode
+        };
+
     return <MaterialReactTable
         columns={columns}
-        data={data}
+        data={tableData}
         enablePagination={false}
         initialState={{
             showColumnFilters: true,
@@ -106,6 +127,9 @@ function App() {
         globalFilterFn="contains"
         enableColumnResizing
         columnResizeMode="onEnd"
+        editingMode="modal" //default
+        enableEditing
+        onEditingRowSave={handleSaveRow}
     />;
 }
 
