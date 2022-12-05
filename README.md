@@ -24,3 +24,10 @@ npm run run_test_server
 Then you can see a screen like this!
 <img width="958" alt="スクリーンショット_20221202_173459" src="https://user-images.githubusercontent.com/3770618/205250967-6308e96a-a0f0-4a3b-aa77-50e50cc23bfd.png">
 
+## Check performance related issues
+```
+cd jendeley-backend
+npm run dummy_and_server
+cd jendeley-frontend
+npm run start
+```
