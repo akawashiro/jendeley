@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import base_64 from "base-64";
 import "./App.css";
 import { Entry, DB } from "./schema";
@@ -156,14 +156,5 @@ function App() {
     />
   );
 }
-
-const rootElement = document.getElementById("root");
-if (!rootElement) throw new Error("Failed to find the root element");
-
-ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
 
 export default App;
