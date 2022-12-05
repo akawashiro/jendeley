@@ -440,11 +440,7 @@ async function getJson(
 }
 
 function isValidJsonEntry(json: Object) {
-  return (
-    json["title"] != null &&
-    json["path"] != null &&
-    json["path"].startsWith("/")
-  );
+  return json["title"] != null && json["path"] != null;
 }
 
 function genDummyDB(output: string) {
@@ -537,6 +533,8 @@ async function genDB(
           console.warn("mv ", '"' + p + '" duplicated');
         } else if (isValidJsonEntry(json)) {
           json_db[dbID] = json;
+        } else {
+          console.log(json, " is not valid.");
         }
       }
     }

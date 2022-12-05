@@ -1,6 +1,7 @@
 jendeley-backend/built-frontend
 jendeley-backend/coverage
 jendeley-backend/dist
+jendeley-backend/edit_and_run.sh
 jendeley-backend/node_modules
 jendeley-frontend/build
 jendeley-frontend/node_modules

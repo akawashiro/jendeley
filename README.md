@@ -17,7 +17,7 @@ npm run build # Generated file are copied to jendeley-backend/built-frontend aut
 Run backend server
 ```
 cd jendeley-backend
-npm run run_test_server
+npm run gen_test_pdfs_and_serve
 ```
 
 
@@ -27,7 +27,7 @@ Then you can see a screen like this!
 ## Check performance related issues
 ```
 cd jendeley-backend
-npm run dummy_and_server
+npm run gen_dummy_and_serve
 cd jendeley-frontend
 npm run start
 ```
