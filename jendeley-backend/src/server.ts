@@ -140,7 +140,7 @@ function getEntry(id: string, json: any): Entry {
     const comments =
       json[id]["comments"] != undefined ? json[id]["comments"] : [];
     const authors = [];
-    const abstract = "";
+    const abstract = json[id]["abstract"] != null ? json[id]["abstract"] : "";
     const year = null;
     const publisher = "";
     const e = {

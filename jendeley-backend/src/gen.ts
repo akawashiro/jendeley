@@ -3,6 +3,7 @@ import path from "path";
 import pdfparse from "pdf-parse";
 import node_isbn from "node-isbn";
 import xml2js from "xml2js";
+import crypto from "crypto";
 
 function walkPDF(dir: string): Array<string> {
   if (!fs.existsSync(dir)) {
@@ -439,7 +440,27 @@ async function getJson(
 }
 
 function isValidJsonEntry(json: Object) {
-  return json["title"] != null && json["path"] != null;
+  return (
+    json["title"] != null &&
+    json["path"] != null &&
+    json["path"].startsWith("/")
+  );
+}
+
+function genDummyDB(output: string) {
+  const n_entry = 500;
+
+  let json_db = new Object();
+  for (let i = 0; i < n_entry; i++) {
+    const id = "path_" + crypto.randomBytes(20).toString("hex");
+    json_db[id] = new Object();
+    json_db[id]["title"] = crypto.randomBytes(40).toString("hex");
+    json_db[id]["path"] = crypto.randomBytes(40).toString("hex");
+    json_db[id]["abstract"] = crypto.randomBytes(280).toString("hex");
+    json_db[id]["comments"] = crypto.randomBytes(280).toString("hex");
+  }
+
+  fs.writeFileSync(output, JSON.stringify(json_db));
 }
 
 async function genDB(
@@ -583,6 +604,7 @@ async function genDB(
 export {
   genDB,
   getDocID,
+  genDummyDB,
   getDocIDFromTexts,
   getJson,
   getDoiJSON,

@@ -138,7 +138,7 @@ function App() {
     <MaterialReactTable
       columns={columns}
       data={tableData}
-      enablePagination={true}
+      enablePagination={false}
       initialState={{
         showColumnFilters: true,
         sorting: [{ id: "year", desc: true }],

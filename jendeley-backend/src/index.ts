@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { startServer } from "./server";
-import { genDB } from "./gen";
+import { genDB, genDummyDB } from "./gen";
 
 async function main() {
   const program = new Command();
@@ -27,6 +27,13 @@ async function main() {
         options._optionValues.output,
         options._optionValues.only_append
       );
+    });
+
+  program
+    .command("gen-dummy")
+    .requiredOption("--output <out>", "Output DB to this file.")
+    .action((cmd, options) => {
+      genDummyDB(options._optionValues.output);
     });
 
   program
