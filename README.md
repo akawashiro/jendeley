@@ -17,7 +17,7 @@ npm run build # Generated file are copied to jendeley-backend/built-frontend aut
 Run backend server
 ```
 cd jendeley-backend
-npm run run_test_server
+npm run gen_test_pdfs_and_serve
 ```
 
 
