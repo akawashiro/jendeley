@@ -191,8 +191,8 @@ function startServer(db_path: string) {
     app.get("/api/get_pdf", (request, response) => {
       console.log("Get a get_pdf request", request.url);
       const params = url.parse(request.url, true).query;
-      const path = unescape(base_64.decode(params.file as string));
-      const pdf = fs.readFileSync(path);
+      const pdf_path = unescape(base_64.decode(params.file as string));
+      const pdf = fs.readFileSync(path.join(path.dirname(db_path), pdf_path));
 
       response.writeHead(200, {
         "Content-Type": "application/pdf",
