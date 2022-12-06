@@ -12,8 +12,8 @@ async function main() {
     .requiredOption("--papers_dir <dir>", "Root directory of your papers")
     .option("--book_dirs <dirs>", "Comma separated directories of books")
     .option(
-      "--output <out>",
-      "Output DB to this file. By default, <papers_dir>/db.json."
+      "--DB_name <db_name>",
+      "Name of DB. DB is created under <papers_dir>. By default, <papers_dir>/db.json."
     )
     .option("--only_append", "Do not overwrite existing entries in DB")
     .action((cmd, options) => {
@@ -21,10 +21,15 @@ async function main() {
         options._optionValues.book_dirs == undefined
           ? ""
           : options._optionValues.book_dirs;
+      // TODO: Get OS independent path delimiter.
+      const pd =
+        options._optionValues.papers_dir.slice(-1) == "/"
+          ? options._optionValues.papers_dir
+          : options._optionValues.papers_dir + "/";
       genDB(
-        options._optionValues.papers_dir,
+        pd,
         book_dirs_str,
-        options._optionValues.output,
+        options._optionValues.db_name,
         options._optionValues.only_append
       );
     });

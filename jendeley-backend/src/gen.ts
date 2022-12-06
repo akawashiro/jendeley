@@ -5,14 +5,14 @@ import node_isbn from "node-isbn";
 import xml2js from "xml2js";
 import crypto from "crypto";
 
-function walkPDF(dir: string): Array<string> {
+function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
     return [];
   } else if (fs.lstatSync(dir).isDirectory()) {
     const ds = fs.readdirSync(dir, { withFileTypes: true });
     var ret: Array<string> = [];
     ds.forEach((d) => {
-      ret = ret.concat(walkPDF(path.join(dir, d.name)));
+      ret = ret.concat(walkPDFDFS(path.join(dir, d.name)));
     });
     return ret;
   } else if (path.extname(dir) == ".pdf" && !dir.includes("_Note")) {
@@ -21,6 +21,16 @@ function walkPDF(dir: string): Array<string> {
   } else {
     return [];
   }
+}
+
+// All paths returned from walkPDF are relative path from papers_dir.
+function walkPDF(papers_dir: string): string[] {
+  let r: string[] = [];
+  const pdfs = walkPDFDFS(papers_dir);
+  for (const pd of pdfs) {
+    r.push(pd.replace(papers_dir, ""));
+  }
+  return r;
 }
 
 type DocID = {
@@ -124,10 +134,7 @@ function getDocIDFromTexts(texts: [string]): DocID {
   return { doi: doi, isbn: isbn, arxiv: arxiv, path: null };
 }
 
-function getDocIDManuallyWritten(
-  pdf: string,
-  papers_dir: string
-): DocID | null {
+function getDocIDManuallyWritten(pdf: string): DocID | null {
   const regexpDOI1 = new RegExp(
     "(doi_10_[0-9]{4}_[0-9]{4,}([_-][0-9()-]{6,})?)",
     "g"
@@ -231,15 +238,14 @@ function getDocIDManuallyWritten(
   }
 
   if (
-    pdf.startsWith(papers_dir) &&
-    (path.basename(pdf, ".pdf").endsWith("no_id") ||
-      pdf.includes("[jendeley no id]"))
+    path.basename(pdf, ".pdf").endsWith("no_id") ||
+    pdf.includes("[jendeley no id]")
   ) {
     return {
       doi: null,
       isbn: null,
       arxiv: null,
-      path: pdf.replace(papers_dir, ""),
+      path: pdf,
     };
   }
 
@@ -289,20 +295,21 @@ async function getDocID(
   papers_dir: string,
   is_book: boolean
 ): Promise<DocID> {
-  const manuallyWrittenDocID = getDocIDManuallyWritten(pdf, papers_dir);
+  const pdf_fullpath = path.join(papers_dir, pdf);
+  const manuallyWrittenDocID = getDocIDManuallyWritten(pdf);
   if (manuallyWrittenDocID != null) {
     return manuallyWrittenDocID;
   }
 
   // Titles of chapters are sometimes confusing such as "Reference".
   if (!is_book) {
-    const docIDFromTitle = await getDocIDFromTitle(pdf);
+    const docIDFromTitle = await getDocIDFromTitle(pdf_fullpath);
     if (docIDFromTitle != null) {
       return docIDFromTitle;
     }
   }
 
-  let dataBuffer = fs.readFileSync(pdf);
+  let dataBuffer = fs.readFileSync(pdf_fullpath);
 
   const texts = await pdfparse(dataBuffer)
     .then((data) => {
@@ -462,7 +469,7 @@ function genDummyDB(output: string) {
 async function genDB(
   papers_dir: string,
   book_dirs_str: string,
-  output: string,
+  db_name: string,
   only_append: boolean
 ) {
   const book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
@@ -478,13 +485,13 @@ async function genDB(
     }
   }
 
-  console.log("papers_dir = ", papers_dir);
-
   let book_db = new Object();
   let json_db = new Object();
   let exsting_pdfs: string[] = [];
-  if (only_append && fs.existsSync(output)) {
-    json_db = JSON.parse(fs.readFileSync(output).toString());
+  if (only_append && fs.existsSync(path.join(papers_dir, db_name))) {
+    json_db = JSON.parse(
+      fs.readFileSync(path.join(papers_dir, db_name)).toString()
+    );
     for (const id of Object.keys(json_db)) {
       exsting_pdfs.push(json_db[id]["path"]);
     }
@@ -592,7 +599,9 @@ async function genDB(
 
   try {
     const db_path =
-      output == undefined ? path.join(papers_dir, "db.json") : output;
+      db_name == undefined
+        ? path.join(papers_dir, "db.json")
+        : path.join(papers_dir, db_name);
     fs.writeFileSync(db_path, JSON.stringify(json_db));
   } catch (err) {
     console.warn(err);
