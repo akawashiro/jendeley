@@ -124,8 +124,7 @@ test("Complicated doi from path", async () => {
     path: null,
   });
 
-  const pdf7 =
-    "[Peter Dybjer] Inductive families_doi_10_1007_BF01211308.pdf";
+  const pdf7 = "[Peter Dybjer] Inductive families_doi_10_1007_BF01211308.pdf";
   const docID7 = await getDocID(pdf7, "/hoge/", false);
   expect(docID7).toStrictEqual({
     arxiv: null,
