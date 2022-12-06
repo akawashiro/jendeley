@@ -18,7 +18,8 @@
     "server_all": "npm run build && node dist/index.js server --db db_all.json",
     "server_test": "npm run build && node dist/index.js server --db test_pdfs/db.json",
     "server_tapl": "npm run build && node dist/index.js server --db db_tapl.json",
-    "fix:prettier": "prettier --write src"
+    "fix:prettier": "prettier --write src",
+    "check:prettier": "prettier --check src"
   },
   "repository": {
     "type": "git",
