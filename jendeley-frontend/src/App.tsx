@@ -64,37 +64,45 @@ function App() {
           >{`${cell.getValue()}`}</a>
         ),
         header: "title",
+        filterFn: "includesString",
       },
       {
         accessorKey: "path",
         header: "path",
+        filterFn: "includesString",
       },
       {
         accessorKey: "authors",
         Cell: ({ cell }) => authorChips(cell.getValue<string[]>()),
         header: "authors",
+        filterFn: "includesString",
       },
       {
         accessorKey: "tags",
         Cell: ({ cell }) => tagChips(cell.getValue<string[]>()),
         header: "tags",
+        filterFn: "includesString",
       },
       {
         accessorKey: "comments",
         header: "comments",
+        filterFn: "includesString",
       },
       {
         accessorKey: "year",
         header: "year",
+        filterFn: "betweenInclusive",
       },
       {
         accessorKey: "publisher",
         header: "publisher",
+        filterFn: "includesString",
       },
       {
         accessorKey: "abstract",
         Cell: ({ cell }) => abstractHTML(cell.getValue<string>()),
         header: "abstract",
+        filterFn: "includesString",
       },
     ],
     []
@@ -144,8 +152,9 @@ function App() {
       }}
       enablePagination={true}
       initialState={{
+        showColumnFilters: true,
         sorting: [{ id: "year", desc: true }],
-        showGlobalFilter: true,
+        // showGlobalFilter: true,
         columnVisibility: { id: false, path: false },
         pagination: { pageSize: 20, pageIndex: 0 },
         density: "compact",
