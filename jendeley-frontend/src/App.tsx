@@ -148,7 +148,7 @@ function App() {
         showGlobalFilter: true,
         columnVisibility: { id: false, path: false },
         pagination: { pageSize: 20, pageIndex: 0 },
-        density: 'compact'
+        density: "compact",
       }}
       positionGlobalFilter="left"
       enableStickyHeader
