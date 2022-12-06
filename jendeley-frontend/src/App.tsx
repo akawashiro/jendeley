@@ -138,16 +138,21 @@ function App() {
     <MaterialReactTable
       columns={columns}
       data={tableData}
-      enablePagination={false}
+      filterFns={{
+        titleFilterFn: (row, id, filterValue) =>
+          row.original.title.includes(filterValue),
+      }}
+      enablePagination={true}
       initialState={{
-        showColumnFilters: true,
         sorting: [{ id: "year", desc: true }],
         showGlobalFilter: true,
         columnVisibility: { id: false, path: false },
+        pagination: { pageSize: 20, pageIndex: 0 },
+        density: 'compact'
       }}
       positionGlobalFilter="left"
       enableStickyHeader
-      globalFilterFn="contains"
+      globalFilterFn="titleFilterFn"
       enableColumnResizing
       columnResizeMode="onEnd"
       editingMode="modal" //default
