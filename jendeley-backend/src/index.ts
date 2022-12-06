@@ -12,7 +12,7 @@ async function main() {
     .requiredOption("--papers_dir <dir>", "Root directory of your papers")
     .option("--book_dirs <dirs>", "Comma separated directories of books")
     .option(
-      "--DB_name <db_name>",
+      "--db_name <db_name>",
       "Name of DB. DB is created under <papers_dir>. By default, <papers_dir>/db.json."
     )
     .option("--only_append", "Do not overwrite existing entries in DB")
