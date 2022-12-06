@@ -296,7 +296,7 @@ async function getDocID(
   is_book: boolean
 ): Promise<DocID> {
   const pdf_fullpath = path.join(papers_dir, pdf);
-  const manuallyWrittenDocID = getDocIDManuallyWritten(pdf_fullpath);
+  const manuallyWrittenDocID = getDocIDManuallyWritten(pdf);
   if (manuallyWrittenDocID != null) {
     return manuallyWrittenDocID;
   }

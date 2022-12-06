@@ -16,7 +16,7 @@ test.skip("DOI from title", async () => {
 
 test("Title from path", async () => {
   const pdf =
-    "/hoge/DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation.pdf";
+    "DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation.pdf";
   const title = getTitleFromPath(pdf);
   expect(title).toBe(
     "Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation"
@@ -25,8 +25,8 @@ test("Title from path", async () => {
 
 test("JSON from path", async () => {
   const pdf =
-    "/home/akira/Dropbox/papers/DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf";
-  const docID = await getDocID(pdf, "/home/akira/Dropbox/papers/", false);
+    "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf";
+  const docID = await getDocID(pdf, "/hoge/", false);
   const t = await getJson(docID, pdf);
   expect(t).toBeTruthy();
   if (t == null) return;
@@ -51,7 +51,7 @@ test("ISBN from text", async () => {
 });
 
 test("no_id from path", async () => {
-  const pdf4 = "/hoge/hoge_no_id.pdf";
+  const pdf4 = "hoge_no_id.pdf";
   const docID4 = await getDocID(pdf4, "/hoge/", false);
   expect(docID4).toStrictEqual({
     arxiv: null,
@@ -62,7 +62,7 @@ test("no_id from path", async () => {
 });
 
 test("ISBN from path", async () => {
-  const pdf5 = "/hoge/hoge_isbn_9781467330763.pdf";
+  const pdf5 = "hoge_isbn_9781467330763.pdf";
   const docID5 = await getDocID(pdf5, "/hoge/", false);
   expect(docID5).toStrictEqual({
     arxiv: null,
@@ -73,7 +73,7 @@ test("ISBN from path", async () => {
 });
 
 test("DOI from path", async () => {
-  const pdf6 = "/hoge/hoge_doi_10_1145_3290364.pdf";
+  const pdf6 = "hoge_doi_10_1145_3290364.pdf";
   const docID6 = await getDocID(pdf6, "/hoge/", false);
   expect(docID6).toStrictEqual({
     arxiv: null,
@@ -83,7 +83,7 @@ test("DOI from path", async () => {
   });
 
   const pdf7 =
-    "/hoge/A Dependently Typed Assembly Language_doi_10_1145_507635_507657.pdf";
+    "A Dependently Typed Assembly Language_doi_10_1145_507635_507657.pdf";
   const docID7 = await getDocID(pdf7, "/hoge/", false);
   expect(docID7).toStrictEqual({
     arxiv: null,
@@ -95,7 +95,7 @@ test("DOI from path", async () => {
 
 test("Complicated doi from path", async () => {
   const pdf2 =
-    "/hoge/DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation_doi_10_1017_S095679681300018X.pdf";
+    "DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation_doi_10_1017_S095679681300018X.pdf";
   const docID2 = await getDocID(pdf2, "/hoge/", false);
   expect(docID2).toStrictEqual({
     arxiv: null,
@@ -105,7 +105,7 @@ test("Complicated doi from path", async () => {
   });
 
   const pdf4 =
-    "/hoge/MemoryModel/[Scott Owens, Susmit Sarkar, Peter Sewell] A Better x86 Memory Model x86-TSO_doi_10_1007_978-3-642-03359-9_27.pdf";
+    "MemoryModel/[Scott Owens, Susmit Sarkar, Peter Sewell] A Better x86 Memory Model x86-TSO_doi_10_1007_978-3-642-03359-9_27.pdf";
   const docID4 = await getDocID(pdf4, "/hoge/", false);
   expect(docID4).toStrictEqual({
     arxiv: null,
@@ -115,7 +115,7 @@ test("Complicated doi from path", async () => {
   });
 
   const pdf5 =
-    "/hoge/Riffle An Efficient Communication System with Strong Anonymity_doi_10_1515_popets-2016-0008.pdf";
+    "Riffle An Efficient Communication System with Strong Anonymity_doi_10_1515_popets-2016-0008.pdf";
   const docID5 = await getDocID(pdf5, "/hoge/", false);
   expect(docID5).toStrictEqual({
     arxiv: null,
@@ -125,7 +125,7 @@ test("Complicated doi from path", async () => {
   });
 
   const pdf7 =
-    "/hoge/[Peter Dybjer] Inductive families_doi_10_1007_BF01211308.pdf";
+    "[Peter Dybjer] Inductive families_doi_10_1007_BF01211308.pdf";
   const docID7 = await getDocID(pdf7, "/hoge/", false);
   expect(docID7).toStrictEqual({
     arxiv: null,
@@ -135,7 +135,7 @@ test("Complicated doi from path", async () => {
   });
 
   const pdf9 =
-    "/hoge/[Henk Barendregt] Lambda Calculus with Types_doi_10_1017_CBO9781139032636.pdf";
+    "[Henk Barendregt] Lambda Calculus with Types_doi_10_1017_CBO9781139032636.pdf";
   const docID9 = await getDocID(pdf9, "/hoge/", false);
   expect(docID9).toStrictEqual({
     arxiv: null,
@@ -147,7 +147,7 @@ test("Complicated doi from path", async () => {
 
 test("Complicated journal-like doi from path", async () => {
   const pdf1 =
-    "/hoge/Call-by-name, call-by-value and the λ-calculus_doi_10_1016_0304-3975(75)90017-1.pdf";
+    "Call-by-name, call-by-value and the λ-calculus_doi_10_1016_0304-3975(75)90017-1.pdf";
   const docID1 = await getDocID(pdf1, "/hoge/", false);
   expect(docID1).toStrictEqual({
     arxiv: null,
@@ -157,7 +157,7 @@ test("Complicated journal-like doi from path", async () => {
   });
 
   const pdf3 =
-    "/hoge/Emerging-MPEG-Standards-for-Point-Cloud-Compression_doi_10_1109_JETCAS_2018_2885981.pdf";
+    "Emerging-MPEG-Standards-for-Point-Cloud-Compression_doi_10_1109_JETCAS_2018_2885981.pdf";
   const docID3 = await getDocID(pdf3, "/hoge/", false);
   expect(docID3).toStrictEqual({
     arxiv: null,
@@ -167,7 +167,7 @@ test("Complicated journal-like doi from path", async () => {
   });
 
   const pdf10 =
-    "/hoge/[John C. Reynolds] Separation Logic A Logic for Shared Mutable Data Structures_doi_10_1109_LICS_2002_1029817.pdf";
+    "[John C. Reynolds] Separation Logic A Logic for Shared Mutable Data Structures_doi_10_1109_LICS_2002_1029817.pdf";
   const docID10 = await getDocID(pdf10, "/hoge/", false);
   expect(docID10).toStrictEqual({
     arxiv: null,
@@ -179,7 +179,7 @@ test("Complicated journal-like doi from path", async () => {
 
 test("Complicated book-like doi from path", async () => {
   const pdf6 =
-    "/hoge/MultistageProgramming/[Oleg Kiselyov] The Design and Implementation of BER MetaOCaml_doi_10_1007_978-3-319-07151-0_6.pdf";
+    "MultistageProgramming/[Oleg Kiselyov] The Design and Implementation of BER MetaOCaml_doi_10_1007_978-3-319-07151-0_6.pdf";
   const docID6 = await getDocID(pdf6, "/hoge/", false);
   expect(docID6).toStrictEqual({
     arxiv: null,
@@ -189,7 +189,7 @@ test("Complicated book-like doi from path", async () => {
   });
 
   const pdf11 =
-    "/hoge/[Paul Blain Levy] Call By Push Value_doi_10_1007_978-94-007-0954-6.pdf";
+    "[Paul Blain Levy] Call By Push Value_doi_10_1007_978-94-007-0954-6.pdf";
   const docID11 = await getDocID(pdf11, "/hoge/", false);
   expect(docID11).toStrictEqual({
     arxiv: null,
@@ -200,7 +200,7 @@ test("Complicated book-like doi from path", async () => {
 });
 
 test.skip("Lonely planet China", async () => {
-  const pdf8 = "/hoge/lonelyplanet-china-15-full-book.pdf";
+  const pdf8 = "lonelyplanet-china-15-full-book.pdf";
   const docID8 = await getDocID(pdf8, "/hoge/", false);
   expect(docID8).toStrictEqual({
     arxiv: null,
