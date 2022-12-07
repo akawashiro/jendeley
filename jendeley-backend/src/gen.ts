@@ -472,15 +472,23 @@ async function genDB(
   db_name: string,
   only_append: boolean
 ) {
-  const book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
+  let book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
+  for (let i = 0; i < book_dirs.length; i++) {
+    if (book_dirs[i].slice(-1) != "/") {
+      book_dirs[i] = book_dirs[i] + "/";
+    }
+    if (book_dirs[i].startsWith(papers_dir)) {
+      book_dirs[i] = book_dirs[i].replace(papers_dir, "");
+    }
+  }
 
   if (!fs.existsSync(papers_dir)) {
-    console.log(papers_dir + " is not exist.");
+    console.log("papers_dir:", papers_dir + " is not exist.");
     return;
   }
   for (const bd of book_dirs) {
-    if (!fs.existsSync(bd)) {
-      console.log(bd + " is not exist.");
+    if (!fs.existsSync(path.join(papers_dir, bd))) {
+      console.log("bd:", path.join(papers_dir, bd) + " is not exist.");
       return;
     }
   }
