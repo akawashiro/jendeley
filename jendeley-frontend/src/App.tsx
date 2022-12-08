@@ -40,7 +40,7 @@ function hashString(s: string) {
   return h;
 }
 
-function getAuthorChipColor(author: string) {
+function getColorFromString(author: string) {
   const colorList = [
     { color: "white", bgcolor: red[900] },
     { color: "white", bgcolor: pink[900] },
@@ -77,8 +77,8 @@ function authorChips(authors: string[]) {
             navigator.clipboard.writeText(a);
           }}
           sx={{
-            color: getAuthorChipColor(a).color,
-            bgcolor: getAuthorChipColor(a).bgcolor,
+            color: getColorFromString(a).color,
+            bgcolor: getColorFromString(a).bgcolor,
           }}
         />
       ))}
@@ -91,7 +91,14 @@ function tagChips(tags: string[]) {
   return (
     <div>
       {tags.map((a) => (
-        <Chip label={`${a}`} size="small" />
+        <Chip
+          label={`${a}`}
+          size="small"
+          sx={{
+            color: getColorFromString(a).color,
+            bgcolor: getColorFromString(a).bgcolor,
+          }}
+        />
       ))}
     </div>
   );
