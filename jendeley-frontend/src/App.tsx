@@ -90,13 +90,16 @@ function tagChips(tags: string[]) {
   // TODO padding or margine
   return (
     <div>
-      {tags.map((a) => (
+      {tags.map((t) => (
         <Chip
-          label={`${a}`}
+          label={`${t}`}
           size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(t);
+          }}
           sx={{
-            color: getColorFromString(a).color,
-            bgcolor: getColorFromString(a).bgcolor,
+            color: getColorFromString(t).color,
+            bgcolor: getColorFromString(t).bgcolor,
           }}
         />
       ))}
