@@ -212,14 +212,15 @@ function App() {
         titleFilterFn: (row, id, filterValue) =>
           row.original.title.includes(filterValue),
       }}
-      enablePagination={true}
+      enableRowVirtualization
+      enablePagination={false}
       initialState={{
         showColumnFilters: true,
         sorting: [{ id: "year", desc: true }],
-        // showGlobalFilter: true,
         columnVisibility: { id: false, path: false },
-        pagination: { pageSize: 20, pageIndex: 0 },
         density: "compact",
+        // pagination: { pageSize: 20, pageIndex: 0 },
+        // showGlobalFilter: true,
       }}
       positionGlobalFilter="left"
       enableStickyHeader
