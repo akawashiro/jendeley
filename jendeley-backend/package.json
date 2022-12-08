@@ -17,7 +17,7 @@
     "gen_mini_tapl": "npm run build && node --require source-map-support/register dist/index.js gen --papers_dir /home/akira/miniTapl --db_name db_tapl.json --book_dirs /home/akira/miniTapl",
     "gen_lchi": "npm run build && node --require source-map-support/register dist/index.js gen --papers_dir /home/akira/Dropbox/papers/books/LecturesOnTheCurry-HowardIsomorphism --db_name db_lchi.json --book_dirs /home/akira/Dropbox/papers/books/LecturesOnTheCurry-HowardIsomorphism/",
     "server": "npm run build && node --require source-map-support/register dist/index.js server --db db.json",
-    "server_all": "npm run build && node --require source-map-support/register dist/index.js server --db db_all.json",
+    "server_all": "npm run build && node --require source-map-support/register dist/index.js server --db /home/akira/Dropbox/papers/jendeley_db.json",
     "server_test": "npm run build && node --require source-map-support/register dist/index.js server --db test_pdfs/db.json",
     "server_tapl": "npm run build && node --require source-map-support/register dist/index.js server --db db_tapl.json",
     "fix:prettier": "prettier --write src",
