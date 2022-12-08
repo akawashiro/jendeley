@@ -95,7 +95,11 @@ function tagChips(tags: string[]) {
 }
 
 function abstractHTML(abstract: string) {
-  const __html = sanitizeHTML(abstract.replaceAll("<jats:", "<"));
+  const shortendAbstract =
+    abstract.length > 200
+      ? abstract.replaceAll("<jats:", "<").substring(0, 200) + "..."
+      : abstract.replaceAll("<jats:", "<");
+  const __html = sanitizeHTML(shortendAbstract);
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
 }
 
