@@ -235,7 +235,7 @@ function App() {
         showColumnFilters: true,
         sorting: [{ id: "year", desc: true }],
         columnVisibility: { id: false, path: false },
-        density: "compact",
+        density: "comfortable",
         // pagination: { pageSize: 20, pageIndex: 0 },
         // showGlobalFilter: true,
       }}
