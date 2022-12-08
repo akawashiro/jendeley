@@ -73,6 +73,9 @@ function authorChips(authors: string[]) {
         <Chip
           label={`${a}`}
           size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(a);
+          }}
           sx={{
             color: getAuthorChipColor(a).color,
             bgcolor: getAuthorChipColor(a).bgcolor,
