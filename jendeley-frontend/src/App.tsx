@@ -99,6 +99,16 @@ function abstractHTML(abstract: string) {
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
 }
 
+function authorsFilterFn(row: any, id: string, filterValue: string | number) {
+  const authors = row.getValue(id) as string[];
+  const fv =
+    typeof filterValue === "number" ? filterValue.toString() : filterValue;
+  for (const a of authors) {
+    if (a.includes(fv)) return true;
+  }
+  return false;
+}
+
 function App() {
   const [tableData, setTableData] = React.useState<DB>([]);
 
@@ -137,7 +147,7 @@ function App() {
         accessorKey: "authors",
         Cell: ({ cell }) => authorChips(cell.getValue<string[]>()),
         header: "authors",
-        filterFn: "includesString",
+        filterFn: authorsFilterFn,
       },
       {
         accessorKey: "tags",
