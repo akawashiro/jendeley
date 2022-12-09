@@ -40,7 +40,7 @@ function hashString(s: string) {
   return h;
 }
 
-function getAuthorChipColor(author: string) {
+function getColorFromString(author: string) {
   const colorList = [
     { color: "white", bgcolor: red[900] },
     { color: "white", bgcolor: pink[900] },
@@ -73,9 +73,12 @@ function authorChips(authors: string[]) {
         <Chip
           label={`${a}`}
           size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(a);
+          }}
           sx={{
-            color: getAuthorChipColor(a).color,
-            bgcolor: getAuthorChipColor(a).bgcolor,
+            color: getColorFromString(a).color,
+            bgcolor: getColorFromString(a).bgcolor,
           }}
         />
       ))}
@@ -87,8 +90,18 @@ function tagChips(tags: string[]) {
   // TODO padding or margine
   return (
     <div>
-      {tags.map((a) => (
-        <Chip label={`${a}`} size="small" />
+      {tags.map((t) => (
+        <Chip
+          label={`${t}`}
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(t);
+          }}
+          sx={{
+            color: getColorFromString(t).color,
+            bgcolor: getColorFromString(t).bgcolor,
+          }}
+        />
       ))}
     </div>
   );
@@ -103,7 +116,11 @@ function abstractHTML(abstract: string) {
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
 }
 
-function authorsFilterFn(row: any, id: string, filterValue: string | number) {
+function stringArrayFilterFn(
+  row: any,
+  id: string,
+  filterValue: string | number
+) {
   const authors = row.getValue(id) as string[];
   const fv =
     typeof filterValue === "number" ? filterValue.toString() : filterValue;
@@ -151,13 +168,13 @@ function App() {
         accessorKey: "authors",
         Cell: ({ cell }) => authorChips(cell.getValue<string[]>()),
         header: "authors",
-        filterFn: authorsFilterFn,
+        filterFn: stringArrayFilterFn,
       },
       {
         accessorKey: "tags",
         Cell: ({ cell }) => tagChips(cell.getValue<string[]>()),
         header: "tags",
-        filterFn: "includesString",
+        filterFn: stringArrayFilterFn,
       },
       {
         accessorKey: "comments",
@@ -184,10 +201,14 @@ function App() {
     []
   );
 
+  function splitTag(s: string) {
+    return s.split(",").filter((w) => w.length > 0);
+  }
+
   const handleSaveRow: MaterialReactTableProps<Entry>["onEditingRowSave"] =
     async ({ exitEditingMode, row, values }) => {
       // TODO: Ban editing fields other than "tags" and "comments".
-      const edittedTags = values.tags.split(/[\s,]+/);
+      const edittedTags = splitTag(values.tags);
       const edittedComments = values.comments;
       tableData[row.index]["tags"] = edittedTags;
       tableData[row.index]["comments"] = edittedComments;
@@ -232,7 +253,7 @@ function App() {
         showColumnFilters: true,
         sorting: [{ id: "year", desc: true }],
         columnVisibility: { id: false, path: false },
-        density: "compact",
+        density: "comfortable",
         // pagination: { pageSize: 20, pageIndex: 0 },
         // showGlobalFilter: true,
       }}
