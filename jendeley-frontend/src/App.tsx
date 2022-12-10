@@ -154,6 +154,7 @@ function App() {
               "http://localhost:5000/api/get_pdf/?file=" +
               base_64.encode(escape(row.original.path))
             }`}
+            target="_blank" rel="noopener noreferrer"
           >{`${cell.getValue()}`}</a>
         ),
         header: "title",
