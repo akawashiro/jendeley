@@ -3,7 +3,7 @@ import url from "url";
 import path from "path";
 import cors from "cors";
 import fs from "fs";
-import { Entry, DB } from "./schema";
+import { Entry, DB, RequestGetFromURL } from "./schema";
 import express from "express";
 import bodyParser from "body-parser";
 import pino from "pino";
@@ -211,10 +211,20 @@ function startServer(db_path: string) {
       logger.info("Sent a response");
     });
 
+    app.put("/api/add_from_url", (request, response) => {
+      const req = request.body as RequestGetFromURL;
+      logger.info(
+        "Get a add_from_url request url = " +
+          request.url +
+          " req = " +
+          JSON.stringify(req)
+      );
+      logger.info("Sent a response");
+    });
+
     let jsonParser = bodyParser.json();
     app.put("/api/update_entry", jsonParser, (request, response) => {
-      logger.info("Get a update_entry request", request.url);
-      const params = url.parse(request.url, true).query;
+      logger.info("Get a update_entry request url = " + request.url);
       const entry_o = request.body;
 
       // TODO: Is there any more sophisticated way to check user defined type?
