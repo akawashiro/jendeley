@@ -4,6 +4,7 @@ import pdfparse from "pdf-parse";
 import node_isbn from "node-isbn";
 import xml2js from "xml2js";
 import crypto from "crypto";
+import { logger } from "./logger";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -285,7 +286,7 @@ async function getDocIDFromTitle(pdf: string): Promise<DocID | null> {
     }
     return null;
   } catch {
-    console.warn("Failed to get information from doi: ", URL);
+    logger.warn("Failed to get information from doi: " + URL);
     return null;
   }
 }
@@ -317,7 +318,7 @@ async function getDocID(
       return data.text.split(/\r?\n/);
     })
     .catch((e) => {
-      console.warn(e.message);
+      logger.warn(e.message);
       return null;
     });
 
@@ -343,7 +344,7 @@ async function getDoiJSON(doi: string): Promise<Object> {
     const data = (await got(URL, options).json()) as Object;
     return data;
   } catch {
-    console.warn("Failed to get information from doi: ", URL);
+    logger.warn("Failed to get information from doi: " + URL);
     return new Object();
   }
 }
@@ -355,7 +356,7 @@ async function getIsbnJson(isbn: string) {
       return book;
     })
     .catch(function (err) {
-      console.warn("Failed to get information from ISBN: ", isbn);
+      logger.warn("Failed to get information from ISBN: " + isbn);
       return null;
     });
   return b;
@@ -377,13 +378,17 @@ async function getArxivJson(arxiv: string) {
       jsonData = json;
     });
     if (jsonData.feed.entry == undefined) {
-      console.warn("Failed to get information from arXiv: ", URL, jsonData);
+      logger.warn(
+        "Failed to get information from arXiv: " +
+          URL +
+          JSON.stringify(jsonData)
+      );
       return new Object();
     } else {
       return jsonData.feed.entry;
     }
   } catch {
-    console.warn("Failed to get information from arXiv: ", URL);
+    logger.warn("Failed to get information from arXiv: " + URL);
     return new Object();
   }
 }
@@ -404,7 +409,7 @@ async function getJson(
       json_r = json;
       db_id = "arxiv_" + docID.arxiv;
     } else {
-      console.warn("Failed to get info of ", docID, " using arxiv ", path);
+      logger.warn("Failed to get info of " + docID + " using arxiv " + path);
     }
   }
   if (docID.doi != null && (json_r == null || json_r["title"] == null)) {
@@ -415,7 +420,7 @@ async function getJson(
       json_r = json;
       db_id = "doi_" + docID.doi;
     } else {
-      console.warn("Failed to get info of ", docID, " using doi ", path);
+      logger.warn("Failed to get info of " + docID + " using doi " + path);
     }
   }
   if (docID.isbn != null && (json_r == null || json_r["title"] == null)) {
@@ -426,7 +431,7 @@ async function getJson(
       json_r = json;
       db_id = "isbn_" + docID.isbn;
     } else {
-      console.warn("Failed to get info of ", docID, " using isbn ", path);
+      logger.warn("Failed to get info of " + docID + " using isbn " + path);
     }
   }
   if (docID.path != null && (json_r == null || json_r["title"] == null)) {
@@ -439,7 +444,7 @@ async function getJson(
   }
 
   if (json_r == null || db_id == null) {
-    console.warn("Failed to get info of ", docID, path);
+    logger.warn("Failed to get info of " + docID + path);
     return null;
   } else {
     return [json_r, db_id];
@@ -471,15 +476,15 @@ async function registerNonBookPDF(
   pdf: string,
   json_db: any
 ) {
-  console.log("papers_dir = " + papers_dir + " pdf = " + pdf);
+  logger.info("papers_dir = " + papers_dir + " pdf = " + pdf);
   const docID = await getDocID(pdf, papers_dir, false);
-  console.log("docID = ", docID);
+  logger.info("docID = " + JSON.stringify(docID));
   const t = await getJson(docID, pdf);
   if (t != null) {
     const json = t[0];
     const dbID = t[1];
     if (json_db.hasOwnProperty(dbID)) {
-      console.warn(
+      logger.warn(
         pdf,
         " is duplicated. You can find another file in ",
         json_db[dbID]["path"],
@@ -489,7 +494,7 @@ async function registerNonBookPDF(
     } else if (isValidJsonEntry(json)) {
       json_db[dbID] = json;
     } else {
-      console.log(json, " is not valid.");
+      logger.info(json, " is not valid.");
     }
   }
 
@@ -513,12 +518,12 @@ async function genDB(
   }
 
   if (!fs.existsSync(papers_dir)) {
-    console.log("papers_dir:", papers_dir + " is not exist.");
+    logger.warn("papers_dir:", papers_dir + " is not exist.");
     return;
   }
   for (const bd of book_dirs) {
     if (!fs.existsSync(path.join(papers_dir, bd))) {
-      console.log("bd:", path.join(papers_dir, bd) + " is not exist.");
+      logger.warn("bd:", path.join(papers_dir, bd) + " is not exist.");
       return;
     }
   }
@@ -542,7 +547,7 @@ async function genDB(
       continue;
     }
 
-    console.log("Processing ", p);
+    logger.info("Processing " + p);
     let is_book = false;
     for (const bd of book_dirs) {
       if (book_db[bd] == undefined) {
@@ -588,7 +593,7 @@ async function genDB(
         chapter_info["id_type"] = "book";
         chapter_info["path"] = chapter_path;
         if (json_db.hasOwnProperty(chapter_id)) {
-          console.warn(chapter_id, " is already registered.");
+          logger.warn(chapter_id, " is already registered.");
         }
         if (isValidJsonEntry(chapter_info)) {
           json_db[chapter_id] = chapter_info;
@@ -605,7 +610,7 @@ async function genDB(
   const not_registerd_pdfs = pdfs.filter((x) => !registered_pdfs.includes(x));
 
   if (not_registerd_pdfs.length > 0) {
-    console.warn(
+    logger.warn(
       not_registerd_pdfs.length,
       " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
     );
@@ -618,13 +623,10 @@ async function genDB(
   }
 
   try {
-    const db_path =
-      db_name == undefined
-        ? path.join(papers_dir, "db.json")
-        : path.join(papers_dir, db_name);
+    const db_path = path.join(papers_dir, db_name);
     fs.writeFileSync(db_path, JSON.stringify(json_db));
   } catch (err) {
-    console.warn(err);
+    logger.warn(err);
   }
 }
 

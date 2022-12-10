@@ -6,15 +6,9 @@ import fs from "fs";
 import { Entry, DB, RequestGetFromURL } from "./schema";
 import express from "express";
 import bodyParser from "body-parser";
-import pino from "pino";
 import https from "https";
 import { registerNonBookPDF } from "./gen";
-
-const logger = pino({
-  transport: {
-    target: "pino-pretty",
-  },
-});
+import { logger } from "./logger";
 
 function checkEntry(entry: Entry) {
   console.assert(
