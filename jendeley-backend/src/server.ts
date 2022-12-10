@@ -226,15 +226,15 @@ function startServer(db_path: string) {
         const entry = entry_o as Entry;
         let json = JSON.parse(fs.readFileSync(db_path).toString());
         if (json[entry.id] != undefined) {
-          logger.info("Update DB with entry =" + JSON.stringify(entry));
+          logger.info("Update DB with entry = " + JSON.stringify(entry));
           json[entry.id]["tags"] = entry.tags;
           json[entry.id]["comments"] = entry.comments;
         }
         fs.writeFileSync(db_path, JSON.stringify(json));
       } else {
-        console.warn(
-          "Object from the client is not legitimated. entry_o = ",
-          entry_o
+        logger.warn(
+          "Object from the client is not legitimated. entry_o = " +
+            JSON.stringify(entry_o)
         );
       }
 
