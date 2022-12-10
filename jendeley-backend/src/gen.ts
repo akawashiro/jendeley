@@ -493,7 +493,7 @@ async function registerNonBookPDF(
     }
   }
 
-  return json_db
+  return json_db;
 }
 
 async function genDB(
