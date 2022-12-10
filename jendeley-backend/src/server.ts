@@ -226,7 +226,7 @@ function startServer(db_path: string) {
         const entry = entry_o as Entry;
         let json = JSON.parse(fs.readFileSync(db_path).toString());
         if (json[entry.id] != undefined) {
-          logger.info("Update DB with entry =", JSON.stringify(entry));
+          logger.info("Update DB with entry =" + JSON.stringify(entry));
           json[entry.id]["tags"] = entry.tags;
           json[entry.id]["comments"] = entry.comments;
         }
