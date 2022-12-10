@@ -623,10 +623,7 @@ async function genDB(
   }
 
   try {
-    const db_path =
-      db_name == undefined
-        ? path.join(papers_dir, "db.json")
-        : path.join(papers_dir, db_name);
+    const db_path = path.join(papers_dir, db_name);
     fs.writeFileSync(db_path, JSON.stringify(json_db));
   } catch (err) {
     logger.warn(err);
