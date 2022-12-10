@@ -211,7 +211,8 @@ function startServer(db_path: string) {
       logger.info("Sent a response");
     });
 
-    app.put("/api/add_from_url", (request, response) => {
+    let jsonParser = bodyParser.json();
+    app.put("/api/add_from_url", jsonParser, (request, response) => {
       const req = request.body as RequestGetFromURL;
       logger.info(
         "Get a add_from_url request url = " +
@@ -219,10 +220,18 @@ function startServer(db_path: string) {
           " req = " +
           JSON.stringify(req)
       );
+
+      response.writeHead(200, {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+      });
+
+      response.end();
+
       logger.info("Sent a response");
     });
 
-    let jsonParser = bodyParser.json();
     app.put("/api/update_entry", jsonParser, (request, response) => {
       logger.info("Get a update_entry request url = " + request.url);
       const entry_o = request.body;
