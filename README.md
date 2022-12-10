@@ -22,7 +22,8 @@ npm run gen_test_pdfs_and_serve
 
 
 Then you can see a screen like this!
-![image](https://user-images.githubusercontent.com/3770618/206180644-f9f6001a-c3aa-41dc-985a-1318e50a5f7b.png)
+![image](https://user-images.githubusercontent.com/3770618/206854796-142b6b89-126c-4045-934b-5f9ab1eb6f72.png)
+
 
 ## Check performance related issues
 ```
