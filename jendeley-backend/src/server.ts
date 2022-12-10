@@ -6,6 +6,13 @@ import fs from "fs";
 import { Entry, DB } from "./schema";
 import express from "express";
 import bodyParser from "body-parser";
+import pino from "pino";
+
+const logger = pino({
+  transport: {
+    target: "pino-pretty",
+  },
+});
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -168,7 +175,7 @@ function startServer(db_path: string) {
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
     app.get("/api/get_db", (request, response) => {
-      console.log("Get a get_db request", request.url);
+      logger.info("Get a get_db request", request.url);
       const json = JSON.parse(fs.readFileSync(db_path).toString());
       let db_response: DB = [];
 
@@ -185,11 +192,11 @@ function startServer(db_path: string) {
       });
 
       response.end(JSON.stringify(db_response));
-      console.log("Sent a response");
+      logger.info("Sent a response");
     });
 
     app.get("/api/get_pdf", (request, response) => {
-      console.log("Get a get_pdf request", request.url);
+      logger.info("Get a get_pdf request", request.url);
       const params = url.parse(request.url, true).query;
       const pdf_path = unescape(base_64.decode(params.file as string));
       const pdf = fs.readFileSync(path.join(path.dirname(db_path), pdf_path));
@@ -201,12 +208,12 @@ function startServer(db_path: string) {
       });
 
       response.end(pdf);
-      console.log("Sent a response");
+      logger.info("Sent a response");
     });
 
     let jsonParser = bodyParser.json();
     app.put("/api/update_entry", jsonParser, (request, response) => {
-      console.log("Get a update_entry request", request.url);
+      logger.info("Get a update_entry request", request.url);
       const params = url.parse(request.url, true).query;
       const entry_o = request.body;
 
@@ -219,7 +226,7 @@ function startServer(db_path: string) {
         const entry = entry_o as Entry;
         let json = JSON.parse(fs.readFileSync(db_path).toString());
         if (json[entry.id] != undefined) {
-          console.log("Update DB with entry =", JSON.stringify(entry));
+          logger.info("Update DB with entry =" + JSON.stringify(entry));
           json[entry.id]["tags"] = entry.tags;
           json[entry.id]["comments"] = entry.comments;
         }
@@ -239,14 +246,14 @@ function startServer(db_path: string) {
 
       response.end();
 
-      console.log("Sent a response");
+      logger.info("Sent a response");
     });
 
     app.listen(port, () => {
-      console.log(`Example app listening on port ${port}`);
+      logger.info(`jendeley backend server is listening on port ${port}`);
     });
   } else {
-    console.warn(db_path + " is not exist.");
+    logger.error(db_path + " is not exist.");
   }
 }
 

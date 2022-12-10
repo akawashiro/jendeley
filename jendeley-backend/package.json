@@ -51,6 +51,8 @@
     "node-isbn": "^1.6.1",
     "pdf-parse": "^1.1.1",
     "pdf2doi": "^1.0.4",
+    "pino": "^8.7.0",
+    "pino-pretty": "^9.1.1",
     "prettier": "2.8.0",
     "sanitize-html": "^2.7.3",
     "source-map-support": "^0.5.21",
