@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
+import Button from "@mui/material/Button";
 import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
 import "./App.css";
-import { Entry, DB } from "./schema";
+import { Entry, DB, RequestGetFromURL } from "./schema";
 import MaterialReactTable, {
   MaterialReactTableProps,
   MRT_ColumnDef,
@@ -154,6 +155,8 @@ function App() {
               "http://localhost:5000/api/get_pdf/?file=" +
               base_64.encode(escape(row.original.path))
             }`}
+            target="_blank"
+            rel="noopener noreferrer"
           >{`${cell.getValue()}`}</a>
         ),
         header: "title",
@@ -240,32 +243,56 @@ function App() {
     };
 
   return (
-    <MaterialReactTable
-      columns={columns}
-      data={tableData}
-      filterFns={{
-        titleFilterFn: (row, id, filterValue) =>
-          row.original.title.includes(filterValue),
-      }}
-      enableRowVirtualization
-      enablePagination={false}
-      initialState={{
-        showColumnFilters: true,
-        sorting: [{ id: "year", desc: true }],
-        columnVisibility: { id: false, path: false },
-        density: "comfortable",
-        // pagination: { pageSize: 20, pageIndex: 0 },
-        // showGlobalFilter: true,
-      }}
-      positionGlobalFilter="left"
-      enableStickyHeader
-      globalFilterFn="titleFilterFn"
-      enableColumnResizing
-      columnResizeMode="onEnd"
-      editingMode="modal" //default
-      enableEditing
-      onEditingRowSave={handleSaveRow}
-    />
+    <div>
+      <Button
+        variant="contained"
+        onClick={async () => {
+          console.log("Register new PDF.");
+          const r: RequestGetFromURL = {
+            url: "https://arxiv.org/pdf/2212.03938.pdf",
+            isbn: null,
+            doi: null,
+          };
+          await fetch("http://localhost:5000/api/add_from_url", {
+            method: "PUT",
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(r),
+          });
+        }}
+      >
+        Register
+      </Button>
+      <MaterialReactTable
+        columns={columns}
+        data={tableData}
+        filterFns={{
+          titleFilterFn: (row, id, filterValue) =>
+            row.original.title.includes(filterValue),
+        }}
+        enableRowVirtualization
+        enablePagination={false}
+        initialState={{
+          showColumnFilters: true,
+          sorting: [{ id: "year", desc: true }],
+          columnVisibility: { id: false, path: false },
+          density: "comfortable",
+          // pagination: { pageSize: 20, pageIndex: 0 },
+          // showGlobalFilter: true,
+        }}
+        positionGlobalFilter="left"
+        enableStickyHeader
+        globalFilterFn="titleFilterFn"
+        enableColumnResizing
+        columnResizeMode="onEnd"
+        editingMode="modal" //default
+        enableEditing
+        onEditingRowSave={handleSaveRow}
+      />
+    </div>
   );
 }
 

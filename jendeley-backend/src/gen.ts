@@ -466,6 +466,36 @@ function genDummyDB(output: string) {
   fs.writeFileSync(output, JSON.stringify(json_db));
 }
 
+async function registerNonBookPDF(
+  papers_dir: string,
+  pdf: string,
+  json_db: any
+) {
+  console.log("papers_dir = " + papers_dir + " pdf = " + pdf);
+  const docID = await getDocID(pdf, papers_dir, false);
+  console.log("docID = ", docID);
+  const t = await getJson(docID, pdf);
+  if (t != null) {
+    const json = t[0];
+    const dbID = t[1];
+    if (json_db.hasOwnProperty(dbID)) {
+      console.warn(
+        pdf,
+        " is duplicated. You can find another file in ",
+        json_db[dbID]["path"],
+        "."
+      );
+      console.warn("mv ", '"' + pdf + '" duplicated');
+    } else if (isValidJsonEntry(json)) {
+      json_db[dbID] = json;
+    } else {
+      console.log(json, " is not valid.");
+    }
+  }
+
+  return json_db;
+}
+
 async function genDB(
   papers_dir: string,
   book_dirs_str: string,
@@ -533,25 +563,7 @@ async function genDB(
     }
 
     if (!is_book) {
-      const docID = await getDocID(p, papers_dir, false);
-      const t = await getJson(docID, p);
-      if (t != null) {
-        const json = t[0];
-        const dbID = t[1];
-        if (json_db.hasOwnProperty(dbID)) {
-          console.warn(
-            p,
-            " is duplicated. You can find another file in ",
-            json_db[dbID]["path"],
-            "."
-          );
-          console.warn("mv ", '"' + p + '" duplicated');
-        } else if (isValidJsonEntry(json)) {
-          json_db[dbID] = json;
-        } else {
-          console.log(json, " is not valid.");
-        }
-      }
+      json_db = await registerNonBookPDF(papers_dir, p, json_db);
     }
   }
 
@@ -625,4 +637,5 @@ export {
   getDoiJSON,
   getTitleFromPath,
   getDocIDFromTitle,
+  registerNonBookPDF,
 };

@@ -3,10 +3,12 @@ import url from "url";
 import path from "path";
 import cors from "cors";
 import fs from "fs";
-import { Entry, DB } from "./schema";
+import { Entry, DB, RequestGetFromURL } from "./schema";
 import express from "express";
 import bodyParser from "body-parser";
 import pino from "pino";
+import https from "https";
+import { registerNonBookPDF } from "./gen";
 
 const logger = pino({
   transport: {
@@ -212,9 +214,55 @@ function startServer(db_path: string) {
     });
 
     let jsonParser = bodyParser.json();
+    app.put("/api/add_from_url", jsonParser, async (request, response) => {
+      const req = request.body as RequestGetFromURL;
+      logger.info(
+        "Get a add_from_url request url = " +
+          request.url +
+          " req = " +
+          JSON.stringify(req)
+      );
+
+      // TODO: Generate better filename
+      const filename = "jendeley_" + Date.now().toString() + ".pdf";
+      const download = (uri: string, filename: string) => {
+        const options = {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+          },
+        };
+
+        return new Promise<void>((resolve, reject) =>
+          https
+            .request(uri, options, (res) => {
+              res
+                .pipe(fs.createWriteStream(filename))
+                .on("close", resolve)
+                .on("error", reject);
+            })
+            .end()
+        );
+      };
+
+      await download(req.url, path.join(path.dirname(db_path), filename));
+      let json = JSON.parse(fs.readFileSync(db_path).toString());
+      json = await registerNonBookPDF(path.dirname(db_path), filename, json);
+      fs.writeFileSync(db_path, JSON.stringify(json));
+
+      response.writeHead(200, {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+      });
+
+      response.end();
+
+      logger.info("Sent a response");
+    });
+
     app.put("/api/update_entry", jsonParser, (request, response) => {
-      logger.info("Get a update_entry request", request.url);
-      const params = url.parse(request.url, true).query;
+      logger.info("Get a update_entry request url = " + request.url);
       const entry_o = request.body;
 
       // TODO: Is there any more sophisticated way to check user defined type?
@@ -226,15 +274,15 @@ function startServer(db_path: string) {
         const entry = entry_o as Entry;
         let json = JSON.parse(fs.readFileSync(db_path).toString());
         if (json[entry.id] != undefined) {
-          logger.info("Update DB with entry =" + JSON.stringify(entry));
+          logger.info("Update DB with entry = " + JSON.stringify(entry));
           json[entry.id]["tags"] = entry.tags;
           json[entry.id]["comments"] = entry.comments;
         }
         fs.writeFileSync(db_path, JSON.stringify(json));
       } else {
-        console.warn(
-          "Object from the client is not legitimated. entry_o = ",
-          entry_o
+        logger.warn(
+          "Object from the client is not legitimated. entry_o = " +
+            JSON.stringify(entry_o)
         );
       }
 

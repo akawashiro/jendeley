@@ -13,5 +13,11 @@ type Entry = {
 
 type DB = Entry[];
 
-export type { Entry, DB };
+type RequestGetFromURL = {
+  url: string;
+  doi: string | null;
+  isbn: string | null;
+};
+
+export type { Entry, DB, RequestGetFromURL };
 export {};
