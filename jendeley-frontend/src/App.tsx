@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
 import "./App.css";
@@ -242,17 +243,41 @@ function App() {
       exitEditingMode(); //required to exit editing mode
     };
 
+  const [pdfUrl, setPdfUrl] = React.useState("");
+  const [isRegisterable, setIsRegisterable] = React.useState(true);
+
+  const handlePdfUrlFieldChange = (event: any) => {
+    setPdfUrl(event.target.value);
+    setIsRegisterable(isValidUrl(pdfUrl));
+  };
+
+  function isValidUrl(urlString: string) {
+    try {
+      return Boolean(new URL(urlString));
+    } catch (e) {
+      return false;
+    }
+  }
+
   return (
     <div>
+      <TextField
+        label="URL of PDF"
+        variant="outlined"
+        value={pdfUrl}
+        onChange={handlePdfUrlFieldChange}
+      />
       <Button
         variant="contained"
+        disabled={isRegisterable}
         onClick={async () => {
           console.log("Register new PDF.");
           const r: RequestGetFromURL = {
-            url: "https://arxiv.org/pdf/2212.03938.pdf",
+            url: pdfUrl,
             isbn: null,
             doi: null,
           };
+          setPdfUrl("");
           await fetch("http://localhost:5000/api/add_from_url", {
             method: "PUT",
             headers: {
