@@ -26,10 +26,11 @@ async function main() {
         options._optionValues.papers_dir.slice(-1) == "/"
           ? options._optionValues.papers_dir
           : options._optionValues.papers_dir + "/";
+      const db_name = options._optionValues.db_name == undefined ? "db.json" : options._optionValues.db_name;
       genDB(
         pd,
         book_dirs_str,
-        options._optionValues.db_name,
+        db_name,
         options._optionValues.only_append
       );
     });
