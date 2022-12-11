@@ -217,8 +217,7 @@ function startServer(db_path: string) {
           JSON.stringify(req)
       );
 
-      // TODO: Generate better filename
-      const filename = "jendeley_" + Date.now().toString() + ".pdf";
+      const filename = "[jendeley download " + Date.now().toString() + "].pdf";
       const download = (uri: string, filename: string) => {
         const options = {
           headers: {
@@ -241,7 +240,12 @@ function startServer(db_path: string) {
 
       await download(req.url, path.join(path.dirname(db_path), filename));
       let json = JSON.parse(fs.readFileSync(db_path).toString());
-      json = await registerNonBookPDF(path.dirname(db_path), filename, json);
+      json = await registerNonBookPDF(
+        path.dirname(db_path),
+        filename,
+        json,
+        true
+      );
       fs.writeFileSync(db_path, JSON.stringify(json));
 
       response.writeHead(200, {
