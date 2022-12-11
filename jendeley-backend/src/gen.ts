@@ -474,7 +474,8 @@ function genDummyDB(output: string) {
 async function registerNonBookPDF(
   papers_dir: string,
   pdf: string,
-  json_db: any
+  json_db: any,
+  rename_using_title: boolean
 ) {
   logger.info("papers_dir = " + papers_dir + " pdf = " + pdf);
   const docID = await getDocID(pdf, papers_dir, false);
@@ -491,14 +492,39 @@ async function registerNonBookPDF(
         "."
       );
       console.warn("mv ", '"' + pdf + '" duplicated');
-    } else if (isValidJsonEntry(json)) {
+      return json_db;
+    }
+
+    if (isValidJsonEntry(json)) {
+      // TODO: Condition of json["id_type"] != "path" is not good
+      if (rename_using_title && json["id_type"] != "path") {
+        const new_filename = path.join(
+          path.dirname(pdf),
+          json["title"].replace(/[/\\?%*:|"<>.]/g, "") +
+            " " +
+            path.basename(pdf)
+        );
+        const old_fileneme = json["path"];
+        json["path"] = new_filename;
+
+        if (fs.existsSync(path.join(papers_dir, new_filename))) {
+          logger.warn(new_filename + " already exists. Skip registration.");
+          return json_db;
+        }
+        fs.renameSync(
+          path.join(papers_dir, old_fileneme),
+          path.join(papers_dir, new_filename)
+        );
+        logger.info("Rename " + old_fileneme + " to " + new_filename);
+      }
+
       json_db[dbID] = json;
+      return json_db;
     } else {
       logger.info(json, " is not valid.");
+      return json_db;
     }
   }
-
-  return json_db;
 }
 
 async function genDB(
@@ -568,7 +594,7 @@ async function genDB(
     }
 
     if (!is_book) {
-      json_db = await registerNonBookPDF(papers_dir, p, json_db);
+      json_db = await registerNonBookPDF(papers_dir, p, json_db, false);
     }
   }
 
