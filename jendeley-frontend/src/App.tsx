@@ -88,6 +88,7 @@ function authorChips(authors: string[]) {
           sx={{
             color: getColorFromString(a).color,
             bgcolor: getColorFromString(a).bgcolor,
+            m: 0.1,
           }}
         />
       ))}
@@ -109,6 +110,7 @@ function tagChips(tags: string[]) {
           sx={{
             color: getColorFromString(t).color,
             bgcolor: getColorFromString(t).bgcolor,
+            m: 0.1,
           }}
         />
       ))}
@@ -143,7 +145,7 @@ function QuickRegisterFromUrl() {
   }
 
   return (
-    <Box>
+    <Stack direction="row" spacing={2}>
       <TextField
         label="URL of PDF"
         variant="outlined"
@@ -176,7 +178,7 @@ function QuickRegisterFromUrl() {
       >
         Quick Register from URL
       </Button>
-    </Box>
+    </Stack>
   );
 }
 
