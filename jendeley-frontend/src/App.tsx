@@ -1,6 +1,11 @@
 import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
+import Dialog, { DialogProps } from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -118,6 +123,190 @@ function abstractHTML(abstract: string) {
       : abstract.replaceAll("<jats:", "<");
   const __html = sanitizeHTML(shortendAbstract);
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
+}
+
+function QuickRegisterFromUrl() {
+  const [pdfUrl, setPdfUrl] = React.useState("");
+  const [isRegisterable, setIsRegisterable] = React.useState(true);
+
+  const handlePdfUrlFieldChange = (event: any) => {
+    setPdfUrl(event.target.value);
+    setIsRegisterable(isValidUrl(pdfUrl));
+  };
+
+  function isValidUrl(urlString: string) {
+    try {
+      return Boolean(new URL(urlString));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  return (
+    <Box>
+      <TextField
+        label="URL of PDF"
+        variant="outlined"
+        size="small"
+        value={pdfUrl}
+        onChange={handlePdfUrlFieldChange}
+        sx={{ width: 500 }}
+      />
+      <Button
+        variant="contained"
+        disabled={isRegisterable}
+        onClick={async () => {
+          console.log("Register new PDF.");
+          const r: RequestGetFromURL = {
+            url: pdfUrl,
+            isbn: null,
+            doi: null,
+          };
+          setPdfUrl("");
+          await fetch("http://localhost:5000/api/add_from_url", {
+            method: "PUT",
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(r),
+          });
+        }}
+      >
+        Quick Register from URL
+      </Button>
+    </Box>
+  );
+}
+
+function RegisterWithDialog() {
+  const [pdfUrl, setPdfUrl] = React.useState("");
+  const [doi, setDoi] = React.useState("");
+  const [isbn, setIsbn] = React.useState("");
+  const [title, setTitle] = React.useState("");
+  const [tags, setTags] = React.useState("");
+  const [comments, setComments] = React.useState("");
+  const [isRegisterable, setIsRegisterable] = React.useState(true);
+
+  const handlePdfUrlFieldChange = (event: any) => {
+    setPdfUrl(event.target.value);
+    setIsRegisterable(isValidUrl(pdfUrl));
+  };
+
+  const handleTitleChange = (event: any) => {
+    setTitle(event.target.value);
+  };
+
+  const handleDoiChange = (event: any) => {
+    setDoi(event.target.value);
+  };
+
+  const handleIsbnChange = (event: any) => {
+    setIsbn(event.target.value);
+  };
+
+  const handleTagsChange = (event: any) => {
+    setTags(event.target.value);
+  };
+
+  const handleCommentsChange = (event: any) => {
+    setComments(event.target.value);
+  };
+
+  function isValidUrl(urlString: string) {
+    try {
+      return Boolean(new URL(urlString));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Box>
+      <Button variant="contained" onClick={handleClickOpen}>
+        Register
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Register new PDF</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            <TextField
+              label="URL of PDF"
+              variant="outlined"
+              size="small"
+              value={pdfUrl}
+              onChange={handlePdfUrlFieldChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="Title"
+              variant="outlined"
+              size="small"
+              value={title}
+              onChange={handleTitleChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="Digital Object Identifier"
+              variant="outlined"
+              size="small"
+              value={doi}
+              onChange={handleDoiChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="ISBN"
+              variant="outlined"
+              size="small"
+              value={isbn}
+              onChange={handleIsbnChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="tags"
+              variant="outlined"
+              size="small"
+              value={tags}
+              onChange={handleTagsChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="comments"
+              variant="outlined"
+              size="small"
+              value={comments}
+              onChange={handleCommentsChange}
+              sx={{ width: 500 }}
+              multiline={true}
+              rows={5}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            disabled={isRegisterable}
+            onClick={handleClose}
+          >
+            Register
+          </Button>
+          <Button variant="contained" onClick={handleClose}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
 }
 
 function stringArrayFilterFn(
@@ -245,59 +434,12 @@ function App() {
       exitEditingMode(); //required to exit editing mode
     };
 
-  const [pdfUrl, setPdfUrl] = React.useState("");
-  const [isRegisterable, setIsRegisterable] = React.useState(true);
-
-  const handlePdfUrlFieldChange = (event: any) => {
-    setPdfUrl(event.target.value);
-    setIsRegisterable(isValidUrl(pdfUrl));
-  };
-
-  function isValidUrl(urlString: string) {
-    try {
-      return Boolean(new URL(urlString));
-    } catch (e) {
-      return false;
-    }
-  }
-
   return (
     <Box component="main" sx={{ m: 2 }}>
       <Stack direction="row" spacing={2} sx={{ m: 1 }}>
-        <TextField
-          label="URL of PDF"
-          variant="outlined"
-          size="small"
-          value={pdfUrl}
-          onChange={handlePdfUrlFieldChange}
-          sx={{ width: 500 }}
-        />
-        <Button
-          variant="contained"
-          disabled={isRegisterable}
-          onClick={async () => {
-            console.log("Register new PDF.");
-            const r: RequestGetFromURL = {
-              url: pdfUrl,
-              isbn: null,
-              doi: null,
-            };
-            setPdfUrl("");
-            await fetch("http://localhost:5000/api/add_from_url", {
-              method: "PUT",
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(r),
-            });
-          }}
-        >
-          Quick Register from URL
-        </Button>
+        <QuickRegisterFromUrl />
         <div style={{ flexGrow: 1 }}></div>
-        <Button variant="contained">Register</Button>
+        <RegisterWithDialog />
       </Stack>
       <MaterialReactTable
         columns={columns}
