@@ -183,7 +183,7 @@ function QuickRegisterFromUrl() {
         disabled={isRegisterable}
         onClick={handleOnClick}
       >
-        Quick Register from URL
+        Register from URL
       </Button>
     </Stack>
   );
