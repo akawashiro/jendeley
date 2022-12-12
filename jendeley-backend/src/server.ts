@@ -208,11 +208,12 @@ function startServer(db_path: string) {
     });
 
     let jsonParser = bodyParser.json();
-    app.put("/api/add_from_url", jsonParser, async (request, response) => {
-      const req = request.body as RequestGetFromURL;
+    app.put("/api/add_from_url", jsonParser, async (httpRequest, response) => {
+      // TODO: Handle RequestGetFromURL.isbn/doi/comments/tags
+      const req = httpRequest.body as RequestGetFromURL;
       logger.info(
         "Get a add_from_url request url = " +
-          request.url +
+          httpRequest.url +
           " req = " +
           JSON.stringify(req)
       );
@@ -244,6 +245,8 @@ function startServer(db_path: string) {
         path.dirname(db_path),
         filename,
         json,
+        req.comments,
+        req.tags,
         true
       );
       fs.writeFileSync(db_path, JSON.stringify(json));

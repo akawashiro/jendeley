@@ -1,9 +1,8 @@
 import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
-import Dialog, { DialogProps } from "@mui/material/Dialog";
+import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
@@ -39,6 +38,10 @@ import {
   grey,
   blueGrey,
 } from "@mui/material/colors";
+
+function splitTagsStr(s: string) {
+  return s.split(",").filter((w) => w.length > 0);
+}
 
 function hashString(s: string) {
   let h = 0;
@@ -144,6 +147,27 @@ function QuickRegisterFromUrl() {
     }
   }
 
+  async function handleOnClick() {
+    console.log("Register new PDF.");
+    const r: RequestGetFromURL = {
+      url: pdfUrl,
+      isbn: null,
+      doi: null,
+      tags: [],
+      comments: "",
+    };
+    setPdfUrl("");
+    await fetch("http://localhost:5000/api/add_from_url", {
+      method: "PUT",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(r),
+    });
+  }
+
   return (
     <Stack direction="row" spacing={2}>
       <TextField
@@ -157,24 +181,7 @@ function QuickRegisterFromUrl() {
       <Button
         variant="contained"
         disabled={isRegisterable}
-        onClick={async () => {
-          console.log("Register new PDF.");
-          const r: RequestGetFromURL = {
-            url: pdfUrl,
-            isbn: null,
-            doi: null,
-          };
-          setPdfUrl("");
-          await fetch("http://localhost:5000/api/add_from_url", {
-            method: "PUT",
-            headers: {
-              "Access-Control-Allow-Origin": "*",
-              "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(r),
-          });
-        }}
+        onClick={handleOnClick}
       >
         Quick Register from URL
       </Button>
@@ -232,6 +239,28 @@ function RegisterWithDialog() {
   const handleClose = () => {
     setOpen(false);
   };
+
+  async function handleRegister() {
+    console.log("Register new PDF.");
+    const r: RequestGetFromURL = {
+      url: pdfUrl,
+      isbn: isbn === "" ? null : isbn,
+      doi: doi === "" ? null : doi,
+      tags: splitTagsStr(tags),
+      comments: comments,
+    };
+    setPdfUrl("");
+    await fetch("http://localhost:5000/api/add_from_url", {
+      method: "PUT",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(r),
+    });
+    setOpen(false);
+  }
 
   return (
     <Box>
@@ -298,7 +327,7 @@ function RegisterWithDialog() {
           <Button
             variant="contained"
             disabled={isRegisterable}
-            onClick={handleClose}
+            onClick={handleRegister}
           >
             Register
           </Button>
@@ -398,14 +427,10 @@ function App() {
     []
   );
 
-  function splitTag(s: string) {
-    return s.split(",").filter((w) => w.length > 0);
-  }
-
   const handleSaveRow: MaterialReactTableProps<Entry>["onEditingRowSave"] =
     async ({ exitEditingMode, row, values }) => {
       // TODO: Ban editing fields other than "tags" and "comments".
-      const edittedTags = splitTag(values.tags);
+      const edittedTags = splitTagsStr(values.tags);
       const edittedComments = values.comments;
       tableData[row.index]["tags"] = edittedTags;
       tableData[row.index]["comments"] = edittedComments;
