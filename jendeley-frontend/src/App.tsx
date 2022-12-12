@@ -2,6 +2,8 @@ import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
 import "./App.css";
@@ -260,37 +262,43 @@ function App() {
   }
 
   return (
-    <div>
-      <TextField
-        label="URL of PDF"
-        variant="outlined"
-        value={pdfUrl}
-        onChange={handlePdfUrlFieldChange}
-      />
-      <Button
-        variant="contained"
-        disabled={isRegisterable}
-        onClick={async () => {
-          console.log("Register new PDF.");
-          const r: RequestGetFromURL = {
-            url: pdfUrl,
-            isbn: null,
-            doi: null,
-          };
-          setPdfUrl("");
-          await fetch("http://localhost:5000/api/add_from_url", {
-            method: "PUT",
-            headers: {
-              "Access-Control-Allow-Origin": "*",
-              "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(r),
-          });
-        }}
-      >
-        Register
-      </Button>
+    <Box component="main" sx={{ m: 2 }}>
+      <Stack direction="row" spacing={2} sx={{ m: 1 }}>
+        <TextField
+          label="URL of PDF"
+          variant="outlined"
+          size="small"
+          value={pdfUrl}
+          onChange={handlePdfUrlFieldChange}
+          sx={{ width: 500 }}
+        />
+        <Button
+          variant="contained"
+          disabled={isRegisterable}
+          onClick={async () => {
+            console.log("Register new PDF.");
+            const r: RequestGetFromURL = {
+              url: pdfUrl,
+              isbn: null,
+              doi: null,
+            };
+            setPdfUrl("");
+            await fetch("http://localhost:5000/api/add_from_url", {
+              method: "PUT",
+              headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(r),
+            });
+          }}
+        >
+          Quick Register from URL
+        </Button>
+        <div style={{ flexGrow: 1 }}></div>
+        <Button variant="contained">Register</Button>
+      </Stack>
       <MaterialReactTable
         columns={columns}
         data={tableData}
@@ -317,7 +325,7 @@ function App() {
         enableEditing
         onEditingRowSave={handleSaveRow}
       />
-    </div>
+    </Box>
   );
 }
 
