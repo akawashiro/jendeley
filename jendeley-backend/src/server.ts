@@ -188,7 +188,7 @@ function startServer(db_path: string) {
       });
 
       response.end(JSON.stringify(db_response));
-      logger.info("Sent a response");
+      logger.info("Sent a response from get_db");
     });
 
     app.get("/api/get_pdf", (request, response) => {
@@ -204,7 +204,7 @@ function startServer(db_path: string) {
       });
 
       response.end(pdf);
-      logger.info("Sent a response");
+      logger.info("Sent a response from get_pdf");
     });
 
     let jsonParser = bodyParser.json();
@@ -256,7 +256,7 @@ function startServer(db_path: string) {
 
       response.end();
 
-      logger.info("Sent a response");
+      logger.info("Sent a response from add_from_url");
     });
 
     app.put("/api/update_entry", jsonParser, (request, response) => {
@@ -292,7 +292,7 @@ function startServer(db_path: string) {
 
       response.end();
 
-      logger.info("Sent a response");
+      logger.info("Sent a response from update_entry");
     });
 
     app.listen(port, () => {

@@ -486,9 +486,9 @@ async function registerNonBookPDF(
     const dbID = t[1];
     if (json_db.hasOwnProperty(dbID)) {
       logger.warn(
-        pdf,
-        " is duplicated. You can find another file in ",
-        json_db[dbID]["path"],
+        pdf + 
+        " is duplicated. You can find another file in " +
+        json_db[dbID]["path"] +
         "."
       );
       console.warn("mv ", '"' + pdf + '" duplicated');
