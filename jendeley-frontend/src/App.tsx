@@ -265,7 +265,7 @@ function RegisterWithDialog() {
   return (
     <Box>
       <Button variant="contained" onClick={handleClickOpen}>
-        Register
+        Open registration form
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Register new PDF</DialogTitle>
