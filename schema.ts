@@ -17,6 +17,8 @@ type RequestGetFromURL = {
   url: string;
   doi: string | null;
   isbn: string | null;
+  tags: string[];
+  comments: string;
 };
 
 export type { Entry, DB, RequestGetFromURL };

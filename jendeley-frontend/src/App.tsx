@@ -163,6 +163,8 @@ function QuickRegisterFromUrl() {
             url: pdfUrl,
             isbn: null,
             doi: null,
+            tags: [],
+            comments: "",
           };
           setPdfUrl("");
           await fetch("http://localhost:5000/api/add_from_url", {
