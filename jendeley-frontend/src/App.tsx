@@ -259,6 +259,7 @@ function RegisterWithDialog() {
       },
       body: JSON.stringify(r),
     });
+    setOpen(false);
   }
 
   return (
