@@ -22,4 +22,4 @@ npm run gen_test_pdfs_and_serve
 
 
 Then you can see a screen like this!
-![image](https://user-images.githubusercontent.com/3770618/206854796-142b6b89-126c-4045-934b-5f9ab1eb6f72.png)
+![image](https://user-images.githubusercontent.com/3770618/207363753-e8f16a6e-9c5d-4943-a7de-11fbcdda935e.png)
