@@ -416,7 +416,7 @@ function App() {
       {
         accessorKey: "year",
         header: "year",
-        filterFn: "betweenInclusive",
+        size: 50,
       },
       {
         accessorKey: "publisher",
@@ -496,7 +496,7 @@ function App() {
         globalFilterFn="titleFilterFn"
         enableColumnResizing
         columnResizeMode="onEnd"
-        editingMode="modal" //default
+        editingMode="modal"
         enableEditing
         onEditingRowSave={handleSaveRow}
       />
