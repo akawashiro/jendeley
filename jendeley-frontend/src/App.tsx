@@ -161,7 +161,7 @@ function QuickRegisterFromUrl() {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Access-Control-Allow-Methods": "PUT",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(r),
@@ -256,7 +256,7 @@ function RegisterWithDialog(props: any) {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Access-Control-Allow-Methods": "PUT",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(r),
@@ -407,12 +407,14 @@ function App() {
         header: "tags",
         filterFn: stringArrayFilterFn,
         enableEditing: true,
+        size: 100,
       },
       {
         accessorKey: "comments",
         header: "comments",
         filterFn: "includesString",
         enableEditing: true,
+        size: 200,
       },
       {
         accessorKey: "year",
@@ -461,7 +463,7 @@ function App() {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Access-Control-Allow-Methods": "PUT",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(e),
@@ -507,6 +509,9 @@ function App() {
             handleSaveCell(cell, event.target.value);
           },
           variant: "outlined",
+          multiline: true,
+          margin: "none",
+          minRows: 7,
         })}
       />
     </Box>
