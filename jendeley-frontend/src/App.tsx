@@ -13,7 +13,7 @@ import base_64 from "base-64";
 import "./App.css";
 import { Entry, DB, RequestGetFromURL } from "./schema";
 import MaterialReactTable, {
-  MaterialReactTableProps,
+  MRT_Cell,
   MRT_ColumnDef,
 } from "material-react-table";
 import sanitizeHTML from "sanitize-html";
@@ -80,7 +80,7 @@ function getColorFromString(author: string) {
 function authorChips(authors: string[]) {
   // TODO padding or margine
   return (
-    <div>
+    <Box>
       {authors.map((a) => (
         <Chip
           label={`${a}`}
@@ -95,14 +95,14 @@ function authorChips(authors: string[]) {
           }}
         />
       ))}
-    </div>
+    </Box>
   );
 }
 
 function tagChips(tags: string[]) {
   // TODO padding or margine
   return (
-    <div>
+    <Box>
       {tags.map((t) => (
         <Chip
           label={`${t}`}
@@ -117,7 +117,7 @@ function tagChips(tags: string[]) {
           }}
         />
       ))}
-    </div>
+    </Box>
   );
 }
 
@@ -261,7 +261,7 @@ function RegisterWithDialog(props: any) {
       },
       body: JSON.stringify(r),
     });
-    console.log("Fetching from DB");
+    console.log("Fetching from DB in registration");
     fetch("http://localhost:5000/api/get_db")
       .then((response) => response.json())
       .then((json) => props.setTableData(() => json));
@@ -359,12 +359,11 @@ function stringArrayFilterFn(
   return false;
 }
 
-
 function App() {
   const [tableData, setTableData] = React.useState<DB>([]);
 
   React.useEffect(() => {
-    console.log("Fetching from DB");
+    console.log("Fetching from DB in loading");
     fetch("http://localhost:5000/api/get_db")
       .then((response) => response.json())
       .then((json) => setTableData(() => json));
@@ -407,11 +406,13 @@ function App() {
         Cell: ({ cell }) => tagChips(cell.getValue<string[]>()),
         header: "tags",
         filterFn: stringArrayFilterFn,
+        enableEditing: true,
       },
       {
         accessorKey: "comments",
         header: "comments",
         filterFn: "includesString",
+        enableEditing: true,
       },
       {
         accessorKey: "year",
@@ -433,39 +434,42 @@ function App() {
     []
   );
 
-  const handleSaveRow: MaterialReactTableProps<Entry>["onEditingRowSave"] =
-    async ({ exitEditingMode, row, values }) => {
-      // TODO: Ban editing fields other than "tags" and "comments".
-      const edittedTags = splitTagsStr(values.tags);
-      const edittedComments = values.comments;
-      tableData[row.index]["tags"] = edittedTags;
-      tableData[row.index]["comments"] = edittedComments;
+  const handleSaveCell = async (cell: MRT_Cell<Entry>, value: any) => {
+    let tags = tableData[cell.row.index]["tags"];
+    let comments = tableData[cell.row.index]["comments"];
 
-      const e: Entry = {
-        abstract: "",
-        authors: [],
-        id: values.id,
-        title: "",
-        path: "",
-        tags: edittedTags,
-        comments: edittedComments,
-        year: 0,
-        publisher: "",
-      };
-      const response = await fetch("http://localhost:5000/api/update_entry", {
-        method: "PUT",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(e),
-      });
-      console.log("response of update_entry:", response);
-      //send/receive api updates here
-      setTableData([...tableData]);
-      exitEditingMode(); //required to exit editing mode
+    if (cell.column.id === "comments") {
+      comments = value;
+      tableData[cell.row.index]["comments"] = comments;
+    } else if (cell.column.id === "tags") {
+      tags = splitTagsStr(value);
+      tableData[cell.row.index]["tags"] = tags;
+    }
+
+    const e: Entry = {
+      abstract: "",
+      authors: [],
+      id: tableData[cell.row.index]["id"],
+      title: "",
+      path: "",
+      tags: tags,
+      comments: comments,
+      year: 0,
+      publisher: "",
     };
+    const response = await fetch("http://localhost:5000/api/update_entry", {
+      method: "PUT",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(e),
+    });
+    console.log("response of update_entry:", response);
+    //send/receive api updates here
+    setTableData([...tableData]);
+  };
 
   return (
     <Box component="main" sx={{ m: 2 }}>
@@ -496,9 +500,14 @@ function App() {
         globalFilterFn="titleFilterFn"
         enableColumnResizing
         columnResizeMode="onEnd"
-        editingMode="modal"
-        enableEditing
-        onEditingRowSave={handleSaveRow}
+        editingMode="cell"
+        muiTableBodyCellEditTextFieldProps={({ cell }) => ({
+          //onBlur is more efficient, but could use onChange instead
+          onBlur: (event) => {
+            handleSaveCell(cell, event.target.value);
+          },
+          variant: "outlined",
+        })}
       />
     </Box>
   );
