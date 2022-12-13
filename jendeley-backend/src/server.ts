@@ -168,6 +168,13 @@ function startServer(db_path: string) {
     const port = 5000;
 
     app.use(cors());
+
+    const built_frontend_dir = path.join(__dirname, "..", "built-frontend");
+    if (!fs.existsSync(built_frontend_dir)) {
+      logger.warn(
+        built_frontend_dir + " doesn't exist. Are you jendeley developer?"
+      );
+    }
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
     app.get("/api/get_db", (request, response) => {
