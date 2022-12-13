@@ -248,12 +248,16 @@ function startServer(db_path: string) {
 
       await download(req.url, path.join(path.dirname(db_path), filename));
       let json = JSON.parse(fs.readFileSync(db_path).toString());
+      const date = new Date();
+      const date_tag = date.toISOString().split('T')[0];
+      const tags = req.tags;
+      tags.push(date_tag);
       json = await registerNonBookPDF(
         path.dirname(db_path),
         filename,
         json,
         req.comments,
-        req.tags,
+        tags,
         true
       );
       fs.writeFileSync(db_path, JSON.stringify(json));

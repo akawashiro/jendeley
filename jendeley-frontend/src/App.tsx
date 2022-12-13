@@ -189,7 +189,7 @@ function QuickRegisterFromUrl() {
   );
 }
 
-function RegisterWithDialog() {
+function RegisterWithDialog(props: any) {
   const [pdfUrl, setPdfUrl] = React.useState("");
   const [doi, setDoi] = React.useState("");
   const [isbn, setIsbn] = React.useState("");
@@ -250,6 +250,8 @@ function RegisterWithDialog() {
       comments: comments,
     };
     setPdfUrl("");
+    console.log("Add from URL");
+    setOpen(false);
     await fetch("http://localhost:5000/api/add_from_url", {
       method: "PUT",
       headers: {
@@ -259,7 +261,10 @@ function RegisterWithDialog() {
       },
       body: JSON.stringify(r),
     });
-    setOpen(false);
+    console.log("Fetching from DB");
+    fetch("http://localhost:5000/api/get_db")
+      .then((response) => response.json())
+      .then((json) => props.setTableData(() => json));
   }
 
   return (
@@ -353,6 +358,7 @@ function stringArrayFilterFn(
   }
   return false;
 }
+
 
 function App() {
   const [tableData, setTableData] = React.useState<DB>([]);
@@ -466,7 +472,7 @@ function App() {
       <Stack direction="row" spacing={2} sx={{ m: 1 }}>
         <QuickRegisterFromUrl />
         <div style={{ flexGrow: 1 }}></div>
-        <RegisterWithDialog />
+        <RegisterWithDialog setTableData={setTableData} />
       </Stack>
       <MaterialReactTable
         columns={columns}
