@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/akawashiro/jendeley/issues"
   },
-  "homepage": "https://github.com/akawashiro/jendeley#readme",
+  "homepage": "https://github.com/akawashiro/jendeley/jendeley-backend#readme",
   "dependencies": {
     "@types/base-64": "^1.0.0",
     "@types/jest": "^29.2.3",
