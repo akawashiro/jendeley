@@ -30,7 +30,7 @@ async function main() {
           : options._optionValues.papers_dir + "/";
       const db_name =
         options._optionValues.db_name == undefined
-          ? "db.json"
+          ? "jendeley_db.json"
           : options._optionValues.db_name;
       genDB(pd, book_dirs_str, db_name);
     });
