@@ -14,7 +14,7 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 
 ## Launch jendeley UI
 ```
-jendeley Launch --db <YOUR PDFs DIR>/jendeley_db.JSON
+jendeley launch --db <YOUR PDFs DIR>/jendeley_db.JSON
 ```
 Then you can see a screen like this!
 ![image](https://user-images.githubusercontent.com/3770618/207363753-e8f16a6e-9c5d-4943-a7de-11fbcdda935e.png)
