@@ -43,7 +43,9 @@ async function main() {
 
   program
     .command("generate-dummy-db")
-    .usage("This subcommand is only for developpers. Generate a dummy database.")
+    .usage(
+      "This subcommand is only for developpers. Generate a dummy database."
+    )
     .requiredOption("--output <out>", "Output DB to this file.")
     .action((cmd, options) => {
       genDummyDB(options._optionValues.output);

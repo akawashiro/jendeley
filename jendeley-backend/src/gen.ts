@@ -544,7 +544,7 @@ async function registerNonBookPDF(
 async function genDB(
   papers_dir: string,
   book_dirs_str: string,
-  db_name: string,
+  db_name: string
 ) {
   let book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
   for (let i = 0; i < book_dirs.length; i++) {
