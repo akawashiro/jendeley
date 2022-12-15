@@ -544,8 +544,7 @@ async function registerNonBookPDF(
 async function genDB(
   papers_dir: string,
   book_dirs_str: string,
-  db_name: string,
-  only_append: boolean
+  db_name: string
 ) {
   let book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
   for (let i = 0; i < book_dirs.length; i++) {
@@ -571,7 +570,7 @@ async function genDB(
   let book_db = new Object();
   let json_db = new Object();
   let exsting_pdfs: string[] = [];
-  if (only_append && fs.existsSync(path.join(papers_dir, db_name))) {
+  if (fs.existsSync(path.join(papers_dir, db_name))) {
     json_db = JSON.parse(
       fs.readFileSync(path.join(papers_dir, db_name)).toString()
     );
@@ -583,7 +582,7 @@ async function genDB(
   let pdfs = walkPDF(papers_dir);
   pdfs.sort();
   for (const p of pdfs) {
-    if (exsting_pdfs.includes(p) && only_append) {
+    if (exsting_pdfs.includes(p)) {
       continue;
     }
 

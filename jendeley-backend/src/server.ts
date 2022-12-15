@@ -311,6 +311,7 @@ function startServer(db_path: string) {
 
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
+      logger.info(`Open http://localhost:${port} with your browser`);
     });
   } else {
     logger.error(db_path + " is not exist.");
