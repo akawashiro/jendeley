@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from "commander";
 import { startServer } from "./server";
 import { genDB, genDummyDB } from "./gen";

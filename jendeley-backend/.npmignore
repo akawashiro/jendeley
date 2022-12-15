@@ -8,3 +8,4 @@ src/*
 edit_and_run.sh
 test_pdfs/*
 .git/*
+jest.config.js
