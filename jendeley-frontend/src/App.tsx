@@ -1,18 +1,24 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import Chip from "@mui/material/Chip";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import "./App.css";
 import { Entry, DB, RequestGetFromURL } from "./schema";
+import { Delete } from "@mui/icons-material";
 import MaterialReactTable, {
+  MRT_Row,
   MRT_Cell,
   MRT_ColumnDef,
 } from "material-react-table";
@@ -75,6 +81,46 @@ function getColorFromString(author: string) {
     { color: "white", bgcolor: blueGrey[900] },
   ];
   return colorList[hashString(author) % colorList.length];
+}
+
+async function deleteRow(id: string, tableData: any, setTableData: any) {
+  console.log("Delete " + id);
+
+  const e: Entry = {
+    abstract: "",
+    authors: [],
+    id: id,
+    title: "",
+    path: "",
+    tags: [],
+    comments: "",
+    year: 0,
+    publisher: "",
+  };
+  const response = await fetch("http://localhost:5000/api/delete_entry", {
+    method: "DELETE",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "PUT",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(e),
+  });
+  console.log("response of update_entry:", response);
+
+  fetch("http://localhost:5000/api/get_db")
+    .then((response) => response.json())
+    .then((json) => setTableData(() => json));
+}
+
+function DeleteButton(props: any) {
+  return (
+    <IconButton
+      onClick={() => deleteRow(props.id, props.tableData, props.setTableData)}
+    >
+      <Delete />
+    </IconButton>
+  );
 }
 
 function authorChips(authors: string[]) {
@@ -373,7 +419,15 @@ function App() {
     () => [
       {
         accessorKey: "id",
-        header: "id",
+        Cell: ({ cell }) => (
+          <DeleteButton
+            id={`${cell.getValue<string>()}`}
+            setTableData={setTableData}
+            tableData={tableData}
+          />
+        ),
+        header: "actions",
+        size: 3,
       },
       {
         accessorKey: "title",
@@ -473,6 +527,39 @@ function App() {
     setTableData([...tableData]);
   };
 
+  const handleDeleteRow = useCallback(
+    async (row: MRT_Row<Entry>) => {
+      // TODO: Confirm here
+
+      //send api delete request here, then refetch or update local table data for re-render
+      const e: Entry = {
+        abstract: "",
+        authors: [],
+        id: tableData[row.index]["id"],
+        title: "",
+        path: "",
+        tags: [],
+        comments: "",
+        year: 0,
+        publisher: "",
+      };
+      const response = await fetch("http://localhost:5000/api/delete_entry", {
+        method: "DELETE",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "PUT",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(e),
+      });
+      console.log("response of update_entry:", response);
+
+      tableData.splice(row.index, 1);
+      setTableData([...tableData]);
+    },
+    [tableData]
+  );
+
   return (
     <Box component="main" sx={{ m: 2 }}>
       <Stack direction="row" spacing={2} sx={{ m: 1 }}>
@@ -481,6 +568,15 @@ function App() {
         <RegisterWithDialog setTableData={setTableData} />
       </Stack>
       <MaterialReactTable
+        displayColumnDefOptions={{
+          "mrt-row-actions": {
+            muiTableHeadCellProps: {
+              align: "center",
+            },
+            size: 10,
+          },
+        }}
+        enableEditing
         columns={columns}
         data={tableData}
         filterFns={{
@@ -492,7 +588,7 @@ function App() {
         initialState={{
           showColumnFilters: true,
           sorting: [{ id: "year", desc: true }],
-          columnVisibility: { id: false, path: false },
+          columnVisibility: { id: true, path: false },
           density: "comfortable",
           // pagination: { pageSize: 20, pageIndex: 0 },
           // showGlobalFilter: true,
