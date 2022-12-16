@@ -3,7 +3,6 @@ import {
   getDocIDFromTexts,
   getJson,
   getTitleFromPath,
-  getDoiJSON,
   getDocIDFromTitle,
 } from "./gen";
 
