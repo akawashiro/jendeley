@@ -135,6 +135,18 @@ function getDocIDFromTexts(texts: [string]): DocID {
   return { doi: doi, isbn: isbn, arxiv: arxiv, path: null };
 }
 
+function getDocIDFromUrl(url: string): DocID | null {
+  const regexpArxiv = new RegExp(
+    "https://arxiv[.]org/pdf/([0-9]{4}[.][0-9]{4,5})[.]pdf",
+    "g"
+  );
+  const foundArxiv = [...url.matchAll(regexpArxiv)];
+  for (const f of foundArxiv) {
+    return { doi: null, isbn: null, arxiv: f[1], path: null };
+  }
+  return null;
+}
+
 function getDocIDManuallyWritten(pdf: string): DocID | null {
   const regexpDOI1 = new RegExp(
     "(doi_10_[0-9]{4}_[0-9]{4,}([_-][0-9()-]{6,})?)",

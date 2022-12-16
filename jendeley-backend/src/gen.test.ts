@@ -60,6 +60,18 @@ test("no_id from path", async () => {
   });
 });
 
+test("arXiv from URL", async () => {
+  const pdf = "hoge.pdf";
+  const url = "https://arxiv.org/pdf/2212.07677.pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, url);
+  expect(docID).toStrictEqual({
+    arxiv: "2212.07677",
+    doi: null,
+    isbn: null,
+    path: null,
+  });
+});
+
 test("ISBN from path", async () => {
   const pdf5 = "hoge_isbn_9781467330763.pdf";
   const docID5 = await getDocID(pdf5, "/hoge/", false);
