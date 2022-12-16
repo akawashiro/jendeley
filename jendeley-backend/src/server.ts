@@ -310,6 +310,36 @@ function startServer(db_path: string) {
       logger.info("Sent a response from update_entry");
     });
 
+    app.delete("/api/delete_entry", jsonParser, (request, response) => {
+      logger.info("Get a delete_entry request url = " + request.url);
+      const entry_o = request.body;
+
+      if (entry_o["id"] != undefined) {
+        const entry = entry_o as Entry;
+        let json = JSON.parse(fs.readFileSync(db_path).toString());
+        if (json[entry.id] != undefined && json["path"] != undefined) {
+          logger.info("Delete " + json["path"]);
+          // TODO: Fill here
+        }
+        fs.writeFileSync(db_path, JSON.stringify(json));
+      } else {
+        logger.warn(
+          "Object from the client is not legitimated. entry_o = " +
+            JSON.stringify(entry_o)
+        );
+      }
+
+      response.writeHead(200, {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+      });
+
+      response.end();
+
+      logger.info("Sent a response from delete_entry");
+    });
+
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
       logger.info(`Open http://localhost:${port} with your browser`);

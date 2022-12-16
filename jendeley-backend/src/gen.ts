@@ -5,6 +5,7 @@ import node_isbn from "node-isbn";
 import xml2js from "xml2js";
 import crypto from "crypto";
 import { logger } from "./logger";
+import { JENDELEY_NO_ID, JENDELEY_NO_TRACK } from "./constants";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -252,7 +253,7 @@ function getDocIDManuallyWritten(pdf: string): DocID | null {
 
   if (
     path.basename(pdf, ".pdf").endsWith("no_id") ||
-    pdf.includes("[jendeley no id]")
+    pdf.includes(JENDELEY_NO_ID)
   ) {
     return {
       doi: null,
@@ -604,6 +605,9 @@ async function genDB(
   pdfs.sort();
   for (const p of pdfs) {
     if (exsting_pdfs.includes(p)) {
+      continue;
+    }
+    if (p.includes(JENDELEY_NO_TRACK)) {
       continue;
     }
 
