@@ -258,7 +258,8 @@ function startServer(db_path: string) {
         json,
         req.comments,
         tags,
-        true
+        true,
+        req.url
       );
       fs.writeFileSync(db_path, JSON.stringify(json));
 

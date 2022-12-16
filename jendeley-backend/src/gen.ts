@@ -306,12 +306,20 @@ async function getDocIDFromTitle(pdf: string): Promise<DocID | null> {
 async function getDocID(
   pdf: string,
   papers_dir: string,
-  is_book: boolean
+  is_book: boolean,
+  download_url: string | null
 ): Promise<DocID> {
   const pdf_fullpath = path.join(papers_dir, pdf);
   const manuallyWrittenDocID = getDocIDManuallyWritten(pdf);
   if (manuallyWrittenDocID != null) {
     return manuallyWrittenDocID;
+  }
+
+  if (download_url != null) {
+    const docIDFromUrl = getDocIDFromUrl(download_url);
+    if (docIDFromUrl != null) {
+      return docIDFromUrl;
+    }
   }
 
   // Titles of chapters are sometimes confusing such as "Reference".
@@ -489,7 +497,8 @@ async function registerNonBookPDF(
   json_db: any,
   comments: string,
   tags: string[],
-  rename_using_title: boolean
+  rename_using_title: boolean,
+  download_url: string | null
 ) {
   logger.info(
     "papers_dir = " +
@@ -501,7 +510,7 @@ async function registerNonBookPDF(
       " comments = " +
       comments
   );
-  const docID = await getDocID(pdf, papers_dir, false);
+  const docID = await getDocID(pdf, papers_dir, false, download_url);
   logger.info("docID = " + JSON.stringify(docID));
   const t = await getJson(docID, pdf);
 
@@ -606,7 +615,7 @@ async function genDB(
       }
       if (p.startsWith(bd)) {
         is_book = true;
-        const docID = await getDocID(p, papers_dir, true);
+        const docID = await getDocID(p, papers_dir, true, null);
         const t = await getJson(docID, p);
         if (t != null && t[0]["id_type"] == "isbn") {
           const json = t[0];
@@ -619,7 +628,15 @@ async function genDB(
     }
 
     if (!is_book) {
-      json_db = await registerNonBookPDF(papers_dir, p, json_db, "", [], false);
+      json_db = await registerNonBookPDF(
+        papers_dir,
+        p,
+        json_db,
+        "",
+        [],
+        false,
+        null
+      );
     }
   }
 
