@@ -12,9 +12,9 @@
   "scripts": {
     "build": "npx tsc",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "test_scan_test_pdfs": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs",
+    "scan_test_pdfs": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs",
     "profile_scan_test_pdfs": "npm run build && node --require source-map-support/register --prof dist/index.js scan --papers_dir test_pdfs",
-    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs && node --require source-map-support/register dist/index.js launch --db test_pdfs/db.json",
+    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json",
     "fix:prettier": "prettier --write src",
     "check:prettier": "prettier --check src"
   },
