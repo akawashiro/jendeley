@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
@@ -12,13 +12,11 @@ import {
   IconButton,
   Stack,
   TextField,
-  Tooltip,
 } from "@mui/material";
 import "./App.css";
 import { Entry, DB, RequestGetFromURL } from "./schema";
 import { Delete } from "@mui/icons-material";
 import MaterialReactTable, {
-  MRT_Row,
   MRT_Cell,
   MRT_ColumnDef,
 } from "material-react-table";
@@ -487,7 +485,7 @@ function App() {
         filterFn: "includesString",
       },
     ],
-    []
+    [tableData]
   );
 
   const handleSaveCell = async (cell: MRT_Cell<Entry>, value: any) => {
@@ -526,39 +524,6 @@ function App() {
     //send/receive api updates here
     setTableData([...tableData]);
   };
-
-  const handleDeleteRow = useCallback(
-    async (row: MRT_Row<Entry>) => {
-      // TODO: Confirm here
-
-      //send api delete request here, then refetch or update local table data for re-render
-      const e: Entry = {
-        abstract: "",
-        authors: [],
-        id: tableData[row.index]["id"],
-        title: "",
-        path: "",
-        tags: [],
-        comments: "",
-        year: 0,
-        publisher: "",
-      };
-      const response = await fetch("http://localhost:5000/api/delete_entry", {
-        method: "DELETE",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "PUT",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(e),
-      });
-      console.log("response of update_entry:", response);
-
-      tableData.splice(row.index, 1);
-      setTableData([...tableData]);
-    },
-    [tableData]
-  );
 
   return (
     <Box component="main" sx={{ m: 2 }}>
