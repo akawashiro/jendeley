@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/akawashiro/jendeley/issues"
   },
-  "homepage": "https://github.com/akawashiro/jendeley/jendeley-backend#readme",
+  "homepage": "https://github.com/akawashiro/jendeley/tree/main/jendeley-backend#readme",
   "devDependencies": {
     "@types/base-64": "^1.0.0",
     "@types/jest": "^29.2.3",
