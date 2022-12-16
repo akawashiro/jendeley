@@ -9,6 +9,7 @@ import bodyParser from "body-parser";
 import https from "https";
 import { registerNonBookPDF } from "./gen";
 import { logger } from "./logger";
+import { JENDELEY_NO_TRACK } from "./constants";
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -178,7 +179,7 @@ function startServer(db_path: string) {
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
     app.get("/api/get_db", (request, response) => {
-      logger.info("Get a get_db request", request.url);
+      logger.info("Get a get_db request" + request.url);
       const json = JSON.parse(fs.readFileSync(db_path).toString());
       let db_response: DB = [];
 
@@ -258,7 +259,8 @@ function startServer(db_path: string) {
         json,
         req.comments,
         tags,
-        true
+        true,
+        req.url
       );
       fs.writeFileSync(db_path, JSON.stringify(json));
 
@@ -307,6 +309,53 @@ function startServer(db_path: string) {
       response.end();
 
       logger.info("Sent a response from update_entry");
+    });
+
+    app.delete("/api/delete_entry", jsonParser, (request, response) => {
+      logger.info("Get a delete_entry request url = " + request.url);
+      const entry_o = request.body;
+
+      if (entry_o["id"] != undefined) {
+        const entry = entry_o as Entry;
+        let json = JSON.parse(fs.readFileSync(db_path).toString());
+        if (
+          json[entry.id] != undefined &&
+          json[entry.id]["path"] != undefined
+        ) {
+          logger.info("Delete " + json[entry.id]["path"]);
+          const old_filename = path.join(
+            path.dirname(db_path),
+            json[entry.id]["path"]
+          );
+          const dir = path.dirname(old_filename);
+          const new_filename = path.join(
+            dir,
+            path.basename(old_filename, ".pdf") +
+              " " +
+              JENDELEY_NO_TRACK +
+              ".pdf"
+          );
+          logger.info("Rename " + old_filename + " to " + new_filename);
+          fs.renameSync(old_filename, new_filename);
+          delete json[entry.id];
+        }
+        fs.writeFileSync(db_path, JSON.stringify(json));
+      } else {
+        logger.warn(
+          "Object from the client is not legitimated. entry_o = " +
+            JSON.stringify(entry_o)
+        );
+      }
+
+      response.writeHead(200, {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+      });
+
+      response.end();
+
+      logger.info("Sent a response from delete_entry");
     });
 
     app.listen(port, () => {
