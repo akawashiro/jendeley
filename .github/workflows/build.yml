@@ -3,10 +3,8 @@ name: Build and test
 on: [pull_request]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: docker build
@@ -14,3 +12,12 @@ jobs:
       with:
         context: .
         file: ./Dockerfile
+  release-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: docker build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Releasable.Dockerfile
