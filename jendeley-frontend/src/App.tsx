@@ -104,6 +104,8 @@ function App() {
           />
         ),
         header: "actions",
+        enableColumnFilter: false,
+        enableSorting: false,
         size: 3,
       },
       {
@@ -223,10 +225,6 @@ function App() {
         enableEditing
         columns={columns}
         data={tableData}
-        filterFns={{
-          titleFilterFn: (row, id, filterValue) =>
-            row.original.title.includes(filterValue),
-        }}
         enableRowVirtualization
         enablePagination={false}
         initialState={{
@@ -234,12 +232,8 @@ function App() {
           sorting: [{ id: "year", desc: true }],
           columnVisibility: { id: true, path: false },
           density: "comfortable",
-          // pagination: { pageSize: 20, pageIndex: 0 },
-          // showGlobalFilter: true,
         }}
-        positionGlobalFilter="left"
         enableStickyHeader
-        globalFilterFn="titleFilterFn"
         enableColumnResizing
         columnResizeMode="onEnd"
         editingMode="cell"
