@@ -106,6 +106,7 @@ function App() {
         header: "actions",
         enableColumnFilter: false,
         enableSorting: false,
+        enableEditing: false,
         size: 3,
       },
       {
@@ -121,17 +122,20 @@ function App() {
           >{`${cell.getValue()}`}</a>
         ),
         header: "title",
+        enableEditing: false,
         filterFn: "includesString",
       },
       {
         accessorKey: "path",
         header: "path",
+        enableEditing: false,
         filterFn: "includesString",
       },
       {
         accessorKey: "authors",
         Cell: ({ cell }) => authorChips(cell.getValue<string[]>()),
         header: "authors",
+        enableEditing: false,
         filterFn: stringArrayFilterFn,
       },
       {
@@ -152,18 +156,21 @@ function App() {
       {
         accessorKey: "year",
         header: "year",
+        enableEditing: false,
         size: 50,
       },
       {
         accessorKey: "publisher",
         header: "publisher",
         filterFn: "includesString",
+        enableEditing: false,
       },
       {
         accessorKey: "abstract",
         Cell: ({ cell }) => abstractHTML(cell.getValue<string>()),
         header: "abstract",
         filterFn: "includesString",
+        enableEditing: false,
       },
     ],
     [tableData]
