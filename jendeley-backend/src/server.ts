@@ -3,6 +3,7 @@ import url from "url";
 import path from "path";
 import cors from "cors";
 import fs from "fs";
+import open from "open";
 import { Entry, DB, RequestGetFromURL } from "./schema";
 import express from "express";
 import bodyParser from "body-parser";
@@ -335,8 +336,14 @@ function startServer(db_path: string) {
               JENDELEY_NO_TRACK +
               ".pdf"
           );
-          logger.info("Rename " + old_filename + " to " + new_filename);
-          fs.renameSync(old_filename, new_filename);
+          if (!fs.existsSync(old_filename)) {
+            logger.info("Rename " + old_filename + " to " + new_filename);
+            fs.renameSync(old_filename, new_filename);
+          } else {
+            logger.warn(
+              "Failed to rename " + old_filename + " to " + new_filename
+            );
+          }
           delete json[entry.id];
         }
         fs.writeFileSync(db_path, JSON.stringify(json));
@@ -361,6 +368,7 @@ function startServer(db_path: string) {
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
       logger.info(`Open http://localhost:${port} with your browser`);
+      open(`http://localhost:${port}`);
     });
   } else {
     logger.error(db_path + " is not exist.");
