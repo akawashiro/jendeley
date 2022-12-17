@@ -20,7 +20,7 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
 Then you can see a screen like this!
-![image](https://user-images.githubusercontent.com/3770618/207363753-e8f16a6e-9c5d-4943-a7de-11fbcdda935e.png)
+![image](https://user-images.githubusercontent.com/3770618/208243833-b6745337-6f7e-4df2-ae7f-575fe940dffe.png)
 
 If you don't have any PDFs, please use [Deep Residual Learning for Image Recognition](https://arxiv.org/pdf/1512.03385.pdf).
 
