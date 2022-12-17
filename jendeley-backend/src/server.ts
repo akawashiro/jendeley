@@ -335,8 +335,14 @@ function startServer(db_path: string) {
               JENDELEY_NO_TRACK +
               ".pdf"
           );
-          logger.info("Rename " + old_filename + " to " + new_filename);
-          fs.renameSync(old_filename, new_filename);
+          if (!fs.existsSync(old_filename)) {
+            logger.info("Rename " + old_filename + " to " + new_filename);
+            fs.renameSync(old_filename, new_filename);
+          } else {
+            logger.warn(
+              "Failed to rename " + old_filename + " to " + new_filename
+            );
+          }
           delete json[entry.id];
         }
         fs.writeFileSync(db_path, JSON.stringify(json));
