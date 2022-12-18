@@ -72,7 +72,137 @@ function QuickRegisterFromUrl() {
   );
 }
 
-function RegisterWithDialog(props: any) {
+function RegisterWebWithDialog(props: any) {
+  const [webUrl, setWebUrl] = React.useState("");
+  const [title, setTitle] = React.useState("");
+  const [tags, setTags] = React.useState("");
+  const [comments, setComments] = React.useState("");
+  const [isRegisterable, setIsRegisterable] = React.useState(true);
+
+  const handlePdfUrlFieldChange = (event: any) => {
+    setWebUrl(event.target.value);
+    setIsRegisterable(isValidUrl(webUrl));
+  };
+
+  const handleTitleChange = (event: any) => {
+    setTitle(event.target.value);
+  };
+
+  const handleTagsChange = (event: any) => {
+    setTags(event.target.value);
+  };
+
+  const handleCommentsChange = (event: any) => {
+    setComments(event.target.value);
+  };
+
+  function isValidUrl(urlString: string) {
+    try {
+      return Boolean(new URL(urlString));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  async function handleRegister() {
+    console.log("Register new PDF.");
+    const r: RequestGetFromURL = {
+      url: webUrl,
+      isbn: null,
+      doi: null,
+      tags: splitTagsStr(tags),
+      comments: comments,
+    };
+    setWebUrl("");
+    console.log("Add an web article from URL");
+    setOpen(false);
+    await fetch("http://localhost:5000/api/add_from_url", {
+      method: "PUT",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "PUT",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(r),
+    });
+    console.log("Fetching from DB in registration");
+    fetch("http://localhost:5000/api/get_db")
+      .then((response) => response.json())
+      .then((json) => props.setTableData(() => json));
+  }
+
+  return (
+    <Box>
+      <Button variant="contained" onClick={handleClickOpen}>
+        Register web article
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Register new PDF</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            <TextField
+              label="URL of PDF"
+              variant="outlined"
+              size="small"
+              value={webUrl}
+              onChange={handlePdfUrlFieldChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="Title"
+              variant="outlined"
+              size="small"
+              value={title}
+              onChange={handleTitleChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="tags"
+              variant="outlined"
+              size="small"
+              value={tags}
+              onChange={handleTagsChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="comments"
+              variant="outlined"
+              size="small"
+              value={comments}
+              onChange={handleCommentsChange}
+              sx={{ width: 500 }}
+              multiline={true}
+              rows={5}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            disabled={isRegisterable}
+            onClick={handleRegister}
+          >
+            Register
+          </Button>
+          <Button variant="contained" onClick={handleClose}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+}
+
+function RegisterPDFWithDialog(props: any) {
   const [pdfUrl, setPdfUrl] = React.useState("");
   const [doi, setDoi] = React.useState("");
   const [isbn, setIsbn] = React.useState("");
@@ -153,7 +283,7 @@ function RegisterWithDialog(props: any) {
   return (
     <Box>
       <Button variant="contained" onClick={handleClickOpen}>
-        Open registration form
+        Register PDF
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Register new PDF</DialogTitle>
@@ -228,4 +358,4 @@ function RegisterWithDialog(props: any) {
   );
 }
 
-export { QuickRegisterFromUrl, RegisterWithDialog };
+export { QuickRegisterFromUrl, RegisterWebWithDialog, RegisterPDFWithDialog };
