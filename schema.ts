@@ -13,7 +13,7 @@ type Entry = {
 
 type DB = Entry[];
 
-type RequestGetFromURL = {
+type RequestGetPdfFromUrl = {
   url: string;
   doi: string | null;
   isbn: string | null;
@@ -21,5 +21,11 @@ type RequestGetFromURL = {
   comments: string;
 };
 
-export type { Entry, DB, RequestGetFromURL };
+type RequestGetWebFromUrl = {
+  url: string;
+  tags: string[];
+  comments: string;
+};
+
+export type { Entry, DB, RequestGetPdfFromUrl, RequestGetWebFromUrl };
 export {};

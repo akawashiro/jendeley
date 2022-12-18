@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import "./App.css";
-import { RequestGetFromURL } from "./schema";
+import { RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./schema";
 import { splitTagsStr } from "./stringUtils";
 
 function QuickRegisterFromUrl() {
@@ -32,7 +32,7 @@ function QuickRegisterFromUrl() {
 
   async function handleOnClick() {
     console.log("Register new PDF.");
-    const r: RequestGetFromURL = {
+    const r: RequestGetPdfFromUrl = {
       url: pdfUrl,
       isbn: null,
       doi: null,
@@ -115,17 +115,15 @@ function RegisterWebWithDialog(props: any) {
 
   async function handleRegister() {
     console.log("Register new PDF.");
-    const r: RequestGetFromURL = {
+    const r: RequestGetWebFromUrl = {
       url: webUrl,
-      isbn: null,
-      doi: null,
       tags: splitTagsStr(tags),
       comments: comments,
     };
     setWebUrl("");
     console.log("Add an web article from URL");
     setOpen(false);
-    await fetch("http://localhost:5000/api/add_from_url", {
+    await fetch("http://localhost:5000/api/add_web_from_url", {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -255,7 +253,7 @@ function RegisterPDFWithDialog(props: any) {
 
   async function handleRegister() {
     console.log("Register new PDF.");
-    const r: RequestGetFromURL = {
+    const r: RequestGetPdfFromUrl = {
       url: pdfUrl,
       isbn: isbn === "" ? null : isbn,
       doi: doi === "" ? null : doi,
@@ -265,7 +263,7 @@ function RegisterPDFWithDialog(props: any) {
     setPdfUrl("");
     console.log("Add from URL");
     setOpen(false);
-    await fetch("http://localhost:5000/api/add_from_url", {
+    await fetch("http://localhost:5000/api/add_pdf_from_url", {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",
