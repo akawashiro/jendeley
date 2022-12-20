@@ -430,7 +430,12 @@ async function getJson(
       json_r = json;
       db_id = "arxiv_" + docID.arxiv;
     } else {
-      logger.warn("Failed to get info of " + docID + " using arxiv " + path);
+      logger.warn(
+        "Failed to get information of " +
+          JSON.stringify(docID) +
+          " using arxiv " +
+          path
+      );
     }
   }
   if (docID.doi != null && (json_r == null || json_r["title"] == null)) {
@@ -441,7 +446,12 @@ async function getJson(
       json_r = json;
       db_id = "doi_" + docID.doi;
     } else {
-      logger.warn("Failed to get info of " + docID + " using doi " + path);
+      logger.warn(
+        "Failed to get information of " +
+          JSON.stringify(docID) +
+          " using doi " +
+          path
+      );
     }
   }
   if (docID.isbn != null && (json_r == null || json_r["title"] == null)) {
@@ -452,7 +462,12 @@ async function getJson(
       json_r = json;
       db_id = "isbn_" + docID.isbn;
     } else {
-      logger.warn("Failed to get info of " + docID + " using isbn " + path);
+      logger.warn(
+        "Failed to get information of " +
+          JSON.stringify(docID) +
+          " using isbn " +
+          path
+      );
     }
   }
   if (docID.path != null && (json_r == null || json_r["title"] == null)) {
@@ -465,7 +480,15 @@ async function getJson(
   }
 
   if (json_r == null || db_id == null) {
-    logger.warn("Failed to get info of " + docID + path);
+    logger.warn(
+      "Failed to get information of " +
+        JSON.stringify(docID) +
+        " path = " + path +
+        " json_r = " +
+        JSON.stringify(json_r) +
+        " db_id = " +
+        JSON.stringify(db_id)
+    );
     return null;
   } else {
     return [json_r, db_id];
