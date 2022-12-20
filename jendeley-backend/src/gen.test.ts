@@ -9,7 +9,7 @@ import {
 test.skip("DOI from title", async () => {
   const pdf =
     "/papers/[Thomas van Noort, Peter Achten, Rinus Plasmeijer]Ad-hoc Polymorphism and Dynamic Typing in a Statically Typed Functional Language.pdf";
-  const docID = await getDocIDFromTitle(pdf);
+  const docID = await getDocIDFromTitle(pdf, "hoge");
   expect(docID?.doi).toBe("10.1145/1863495.1863505");
 });
 
