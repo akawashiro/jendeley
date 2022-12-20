@@ -350,9 +350,9 @@ async function getDocIDFromTitle(
 
 function is_valid_docID(docID: DocID) {
   if (
-    docID.arxiv != null &&
-    docID.doi != null &&
-    docID.isbn != null &&
+    docID.arxiv != null ||
+    docID.doi != null ||
+    docID.isbn != null ||
     docID.path != null
   )
     return true;
@@ -407,6 +407,7 @@ async function getDocID(
     return { doi: null, isbn: null, arxiv: null, path: null };
   }
   let id = getDocIDFromTexts(texts);
+  logger.info("getDocIDFromTexts(texts) = " + JSON.stringify(id));
   if (is_book) {
     id.doi = null;
     id.arxiv = null;
