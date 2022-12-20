@@ -23,16 +23,11 @@ async function main() {
         options._optionValues.book_dirs == undefined
           ? ""
           : options._optionValues.book_dirs;
-      // TODO: Get OS independent path delimiter.
-      const pd =
-        options._optionValues.papers_dir.slice(-1) == "/"
-          ? options._optionValues.papers_dir
-          : options._optionValues.papers_dir + "/";
       const db_name =
         options._optionValues.db_name == undefined
           ? "jendeley_db.json"
           : options._optionValues.db_name;
-      genDB(pd, book_dirs_str, db_name);
+      genDB(options._optionValues.papers_dir, book_dirs_str, db_name);
     });
 
   program
