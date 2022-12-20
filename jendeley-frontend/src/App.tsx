@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
-import { Box, Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import "./App.css";
 import { Entry, DB } from "./schema";
 import MaterialReactTable, {
@@ -10,7 +10,7 @@ import MaterialReactTable, {
   MRT_ColumnDef,
 } from "material-react-table";
 import sanitizeHTML from "sanitize-html";
-import { QuickRegisterFromUrl, RegisterWithDialog } from "./register";
+import { RegisterWebWithDialog, RegisterPDFWithDialog } from "./register";
 import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 
@@ -215,11 +215,6 @@ function App() {
 
   return (
     <Box component="main" sx={{ m: 2 }}>
-      <Stack direction="row" spacing={2} sx={{ m: 1 }}>
-        <QuickRegisterFromUrl />
-        <div style={{ flexGrow: 1 }}></div>
-        <RegisterWithDialog setTableData={setTableData} />
-      </Stack>
       <MaterialReactTable
         displayColumnDefOptions={{
           "mrt-row-actions": {
@@ -254,6 +249,14 @@ function App() {
           margin: "none",
           minRows: 7,
         })}
+        renderTopToolbarCustomActions={({ table }) => {
+          return (
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <RegisterWebWithDialog setTableData={setTableData} />
+              <RegisterPDFWithDialog setTableData={setTableData} />
+            </div>
+          );
+        }}
       />
     </Box>
   );
