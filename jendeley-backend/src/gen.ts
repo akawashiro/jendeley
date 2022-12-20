@@ -4,6 +4,7 @@ import pdfparse from "pdf-parse";
 import node_isbn from "node-isbn";
 import xml2js from "xml2js";
 import crypto from "crypto";
+import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
 import { logger } from "./logger";
 import { JENDELEY_NO_ID, JENDELEY_NO_TRACK } from "./constants";
 
@@ -278,30 +279,73 @@ function getTitleFromPath(pdf: string): string {
   return r;
 }
 
-async function getDocIDFromTitle(pdf: string): Promise<DocID | null> {
-  const title = getTitleFromPath(pdf);
+async function getTitleFromPDF(
+  pdf: string,
+  papers_dir: string
+): Promise<string | null> {
+  const pdfExtract = new PDFExtract();
+  const options: PDFExtractOptions = {}; /* see below */
+  const data = await pdfExtract.extract(path.join(papers_dir, pdf), options);
+  if (
+    data["meta"] != null &&
+    data["meta"]["metadata"] != null &&
+    data["meta"]["metadata"]["dc:title"] != null
+  ) {
+    const title = data["meta"]["metadata"]["dc:title"];
+    logger.info("getTitleFromPDF(" + pdf + ", " + papers_dir + ") = " + title);
+    return title;
+  } else if (
+    data["meta"] != null &&
+    data["meta"]["info"] != null &&
+    data["meta"]["info"]["Title"] != null
+  ) {
+    const title = data["meta"]["info"]["Title"];
+    logger.info("getTitleFromPDF(" + pdf + ", " + papers_dir + ") = " + title);
+    return title;
+  } else {
+    logger.info("getTitleFromPDF(" + pdf + ", " + papers_dir + ") = null");
+    return null;
+  }
+}
+
+async function getDocIDFromTitle(
+  pdf: string,
+  papers_dir: string
+): Promise<DocID | null> {
+  let titles: string[] = [];
+  const title_from_pdf = await getTitleFromPDF(pdf, papers_dir);
+  if (
+    title_from_pdf != null &&
+    path.extname(title_from_pdf) != ".dvi" &&
+    path.extname(title_from_pdf) != ".pdf"
+  ) {
+    titles.push(title_from_pdf);
+  }
 
   let { got } = await import("got");
 
-  const URL =
-    "https://api.crossref.org/v1/works?query.bibliographic=" +
-    title.replaceAll(" ", "+");
-  const options = { headers: { Accept: "application/json" } };
-  try {
-    const data = (await got(URL, options).json()) as Object;
-    const n_item = data["message"]["items"].length;
-    for (let i = 0; i < n_item; i++) {
-      const t = data["message"]["items"][i]["title"][0].toLowerCase();
-      if (title.toLowerCase() == t) {
-        const doi = data["message"]["items"][i]["DOI"];
-        return { doi: doi, isbn: null, arxiv: null, path: null };
+  for (const title of titles) {
+    logger.info("getDocIDFromTitle title = " + title);
+    const URL =
+      "https://api.crossref.org/v1/works?query.bibliographic=" +
+      title.replaceAll(" ", "+");
+    const options = { headers: { Accept: "application/json" } };
+    try {
+      const data = (await got(URL, options).json()) as Object;
+      const n_item = data["message"]["items"].length;
+      for (let i = 0; i < n_item; i++) {
+        const t = data["message"]["items"][i]["title"][0].toLowerCase();
+        if (title.toLowerCase() == t) {
+          logger.info("title = " + title + " t = " + t);
+          const doi = data["message"]["items"][i]["DOI"];
+          return { doi: doi, isbn: null, arxiv: null, path: null };
+        }
       }
+    } catch {
+      logger.warn("Failed to get information from doi: " + URL);
     }
-    return null;
-  } catch {
-    logger.warn("Failed to get information from doi: " + URL);
-    return null;
   }
+  return null;
 }
 
 function is_valid_docID(docID: DocID) {
@@ -340,7 +384,7 @@ async function getDocID(
   // Try to get information using filename as title. Skip if `is_book` because
   // titles of chapters are sometimes confusing such as "Reference".
   if (!is_book) {
-    const docIDFromTitle = await getDocIDFromTitle(pdf_fullpath);
+    const docIDFromTitle = await getDocIDFromTitle(pdf, papers_dir);
     if (docIDFromTitle != null) {
       return docIDFromTitle;
     }
@@ -714,8 +758,10 @@ async function genDB(
       for (const chapter_path of Object.keys(book_db[book_dir])) {
         const chapter_id = book_id + "_" + path.basename(chapter_path);
         let chapter_info = JSON.parse(JSON.stringify(book_info));
-        chapter_info["title"] =
-          path.join(chapter_info["title"], path.basename(chapter_path, ".pdf"));
+        chapter_info["title"] = path.join(
+          chapter_info["title"],
+          path.basename(chapter_path, ".pdf")
+        );
         chapter_info["id_type"] = "book";
         chapter_info["path"] = chapter_path;
         if (json_db.hasOwnProperty(chapter_id)) {
@@ -738,7 +784,7 @@ async function genDB(
   if (not_registerd_pdfs.length > 0) {
     logger.warn(
       not_registerd_pdfs.length +
-      " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
+        " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
     );
     const register_shellscript = "edit_and_run.sh";
     let commands = "";
