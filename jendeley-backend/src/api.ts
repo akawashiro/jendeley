@@ -239,6 +239,11 @@ function get_db(request: Request, response: Response, db_path: string) {
   logger.info("Sent a response from get_db");
 }
 
+async function get_title_from_url(url: string) {
+  // TODO
+  return "hoge" + url;
+}
+
 async function add_web_from_url(
   httpRequest: Request,
   response: Response,
@@ -380,4 +385,5 @@ export {
   update_entry,
   add_pdf_from_url,
   get_pdf,
+  get_title_from_url,
 };
