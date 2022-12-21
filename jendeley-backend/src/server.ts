@@ -11,6 +11,7 @@ import {
   RequestGetWebFromUrl,
 } from "./schema";
 import express from "express";
+import { Request, Response } from "express";
 import bodyParser from "body-parser";
 import https from "https";
 import { registerNonBookPDF } from "./gen";
@@ -184,7 +185,7 @@ function startServer(db_path: string) {
     }
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
-    app.get("/api/get_db", (request, response) => {
+    app.get("/api/get_db", (request: Request, response: Response) => {
       logger.info("Get a get_db request" + request.url);
       const json = JSON.parse(fs.readFileSync(db_path).toString());
       let db_response: DB = [];
@@ -205,7 +206,7 @@ function startServer(db_path: string) {
       logger.info("Sent a response from get_db");
     });
 
-    app.get("/api/get_pdf", (request, response) => {
+    app.get("/api/get_pdf", (request: Request, response: Response) => {
       logger.info("Get a get_pdf request", request.url);
       const params = url.parse(request.url, true).query;
       const pdf_path = unescape(base_64.decode(params.file as string));
@@ -226,7 +227,7 @@ function startServer(db_path: string) {
     app.put(
       "/api/add_pdf_from_url",
       jsonParser,
-      async (httpRequest, response) => {
+      async (httpRequest: Request, response: Response) => {
         // TODO: Handle RequestGetPdfFromUrl.isbn/doi/comments/tags
         const req = httpRequest.body as RequestGetPdfFromUrl;
         logger.info(
@@ -290,7 +291,7 @@ function startServer(db_path: string) {
     app.put(
       "/api/add_web_from_url",
       jsonParser,
-      async (httpRequest, response) => {
+      async (httpRequest: Request, response: Response) => {
         const req = httpRequest.body as RequestGetWebFromUrl;
         logger.info(
           "Get a add_web_from_url request url = " +
@@ -313,94 +314,102 @@ function startServer(db_path: string) {
       }
     );
 
-    app.put("/api/update_entry", jsonParser, (request, response) => {
-      logger.info("Get a update_entry request url = " + request.url);
-      const entry_o = request.body;
+    app.put(
+      "/api/update_entry",
+      jsonParser,
+      (request: Request, response: Response) => {
+        logger.info("Get a update_entry request url = " + request.url);
+        const entry_o = request.body;
 
-      // TODO: Is there any more sophisticated way to check user defined type?
-      if (
-        entry_o["id"] != undefined &&
-        entry_o["tags"] != undefined &&
-        entry_o["comments"] != undefined
-      ) {
-        const entry = entry_o as Entry;
-        let json = JSON.parse(fs.readFileSync(db_path).toString());
-        if (json[entry.id] != undefined) {
-          logger.info("Update DB with entry = " + JSON.stringify(entry));
-          json[entry.id]["tags"] = entry.tags;
-          json[entry.id]["comments"] = entry.comments;
-        }
-        fs.writeFileSync(db_path, JSON.stringify(json));
-      } else {
-        logger.warn(
-          "Object from the client is not legitimated. entry_o = " +
-            JSON.stringify(entry_o)
-        );
-      }
-
-      response.writeHead(200, {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-      });
-
-      response.end();
-
-      logger.info("Sent a response from update_entry");
-    });
-
-    app.delete("/api/delete_entry", jsonParser, (request, response) => {
-      logger.info("Get a delete_entry request url = " + request.url);
-      const entry_o = request.body;
-
-      if (entry_o["id"] != undefined) {
-        const entry = entry_o as Entry;
-        let json = JSON.parse(fs.readFileSync(db_path).toString());
+        // TODO: Is there any more sophisticated way to check user defined type?
         if (
-          json[entry.id] != undefined &&
-          json[entry.id]["path"] != undefined
+          entry_o["id"] != undefined &&
+          entry_o["tags"] != undefined &&
+          entry_o["comments"] != undefined
         ) {
-          logger.info("Delete " + json[entry.id]["path"]);
-          const old_filename = path.join(
-            path.dirname(db_path),
-            json[entry.id]["path"]
-          );
-          const dir = path.dirname(old_filename);
-          const new_filename = path.join(
-            dir,
-            path.basename(old_filename, ".pdf") +
-              " " +
-              JENDELEY_NO_TRACK +
-              ".pdf"
-          );
-          if (!fs.existsSync(old_filename)) {
-            logger.info("Rename " + old_filename + " to " + new_filename);
-            fs.renameSync(old_filename, new_filename);
-          } else {
-            logger.warn(
-              "Failed to rename " + old_filename + " to " + new_filename
-            );
+          const entry = entry_o as Entry;
+          let json = JSON.parse(fs.readFileSync(db_path).toString());
+          if (json[entry.id] != undefined) {
+            logger.info("Update DB with entry = " + JSON.stringify(entry));
+            json[entry.id]["tags"] = entry.tags;
+            json[entry.id]["comments"] = entry.comments;
           }
-          delete json[entry.id];
+          fs.writeFileSync(db_path, JSON.stringify(json));
+        } else {
+          logger.warn(
+            "Object from the client is not legitimated. entry_o = " +
+              JSON.stringify(entry_o)
+          );
         }
-        fs.writeFileSync(db_path, JSON.stringify(json));
-      } else {
-        logger.warn(
-          "Object from the client is not legitimated. entry_o = " +
-            JSON.stringify(entry_o)
-        );
+
+        response.writeHead(200, {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        });
+
+        response.end();
+
+        logger.info("Sent a response from update_entry");
       }
+    );
 
-      response.writeHead(200, {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-      });
+    app.delete(
+      "/api/delete_entry",
+      jsonParser,
+      (request: Request, response: Response) => {
+        logger.info("Get a delete_entry request url = " + request.url);
+        const entry_o = request.body;
 
-      response.end();
+        if (entry_o["id"] != undefined) {
+          const entry = entry_o as Entry;
+          let json = JSON.parse(fs.readFileSync(db_path).toString());
+          if (
+            json[entry.id] != undefined &&
+            json[entry.id]["path"] != undefined
+          ) {
+            logger.info("Delete " + json[entry.id]["path"]);
+            const old_filename = path.join(
+              path.dirname(db_path),
+              json[entry.id]["path"]
+            );
+            const dir = path.dirname(old_filename);
+            const new_filename = path.join(
+              dir,
+              path.basename(old_filename, ".pdf") +
+                " " +
+                JENDELEY_NO_TRACK +
+                ".pdf"
+            );
+            if (!fs.existsSync(old_filename)) {
+              logger.info("Rename " + old_filename + " to " + new_filename);
+              fs.renameSync(old_filename, new_filename);
+            } else {
+              logger.warn(
+                "Failed to rename " + old_filename + " to " + new_filename
+              );
+            }
+            delete json[entry.id];
+          }
+          fs.writeFileSync(db_path, JSON.stringify(json));
+        } else {
+          logger.warn(
+            "Object from the client is not legitimated. entry_o = " +
+              JSON.stringify(entry_o)
+          );
+        }
 
-      logger.info("Sent a response from delete_entry");
-    });
+        response.writeHead(200, {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        });
+
+        response.end();
+
+        logger.info("Sent a response from delete_entry");
+      }
+    );
 
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
