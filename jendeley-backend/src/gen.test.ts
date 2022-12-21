@@ -1,10 +1,6 @@
-import {
-  getDocID,
-  getDocIDFromTexts,
-  getJson,
-  getTitleFromPath,
-  getDocIDFromTitle,
-} from "./gen";
+import { getDocID, getJson, getTitleFromPath, getDocIDFromTitle } from "./gen";
+
+import { getDocIDFromTexts } from "./docid";
 
 test.skip("DOI from title", async () => {
   const pdf =
