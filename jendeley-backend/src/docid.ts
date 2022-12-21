@@ -1,4 +1,6 @@
 import path from "path";
+import fs from "fs";
+import pdfparse from "pdf-parse";
 import { JENDELEY_NO_ID } from "./constants";
 import { logger } from "./logger";
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
@@ -303,8 +305,83 @@ async function getDocIDFromTitle(
   return null;
 }
 
+function is_valid_docID(docID: DocID) {
+  if (
+    docID.arxiv != null ||
+    docID.doi != null ||
+    docID.isbn != null ||
+    docID.path != null
+  )
+    return true;
+  else return false;
+}
+
+async function getDocID(
+  pdf: string,
+  papers_dir: string,
+  is_book: boolean,
+  download_url: string | null
+): Promise<DocID> {
+  const pdf_fullpath = path.join(papers_dir, pdf);
+
+  // Handle docIDs embedded in filenames.
+  const manuallyWrittenDocID = getDocIDManuallyWritten(pdf);
+  if (manuallyWrittenDocID != null) {
+    return manuallyWrittenDocID;
+  }
+
+  // Download link gives you additional information
+  if (download_url != null) {
+    const docIDFromUrl = getDocIDFromUrl(download_url);
+    if (docIDFromUrl != null) {
+      return docIDFromUrl;
+    }
+  }
+
+  // Try to get information using filename as title. Skip if `is_book` because
+  // titles of chapters are sometimes confusing such as "Reference".
+  if (!is_book) {
+    const docIDFromTitle = await getDocIDFromTitle(pdf, papers_dir);
+    if (docIDFromTitle != null) {
+      return docIDFromTitle;
+    }
+  }
+
+  // Parse the contents of PDF and try to extract DOI, ISBN or arXiv ID.
+  let dataBuffer = fs.readFileSync(pdf_fullpath);
+  const texts = await pdfparse(dataBuffer)
+    .then((data) => {
+      // See https://www.npmjs.com/package/pdf-parse for usage
+      return data.text.split(/\r?\n/);
+    })
+    .catch((e) => {
+      logger.warn(e.message);
+      return null;
+    });
+
+  if (texts == null) {
+    logger.warn("Failed to extract text from " + pdf_fullpath);
+    return { doi: null, isbn: null, arxiv: null, path: null };
+  }
+  let id = getDocIDFromTexts(texts);
+  logger.info("getDocIDFromTexts(texts) = " + JSON.stringify(id));
+  if (is_book) {
+    id.doi = null;
+    id.arxiv = null;
+    id.path = null;
+  }
+  if (is_book || is_valid_docID(id)) {
+    return id;
+  }
+
+  // The fallback case.
+  logger.warn("Cannot decide docID of " + pdf);
+  return { doi: null, arxiv: null, path: null, isbn: null };
+}
+
 export {
   DocID,
+  getDocID,
   getDocIDFromTexts,
   getDocIDFromUrl,
   getDocIDManuallyWritten,
