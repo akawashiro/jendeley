@@ -14,7 +14,7 @@ import {
 } from "./schema";
 import https from "https";
 import { registerWeb, registerNonBookPDF } from "./gen";
-import {title} from "process";
+import { title } from "process";
 
 function checkEntry(entry: Entry) {
   console.assert(
