@@ -388,6 +388,13 @@ function delete_entry(request: Request, response: Response, db_path: string) {
         logger.warn("Failed to rename " + old_filename + " to " + new_filename);
       }
       delete json[entry.id];
+    } else if (
+      json[entry.id] != undefined &&
+      json[entry.id]["path"] == undefined &&
+      json[entry.id]["id_type"] == "url"
+    ) {
+      logger.info("Delete " + entry.id);
+      delete json[entry.id];
     }
     fs.writeFileSync(db_path, JSON.stringify(json));
   } else {

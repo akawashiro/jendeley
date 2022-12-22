@@ -6,7 +6,6 @@ import crypto from "crypto";
 import { logger } from "./logger";
 import { JENDELEY_NO_TRACK } from "./constants";
 import { DocID, getDocID } from "./docid";
-import { Doc } from "prettier";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -279,7 +278,7 @@ async function registerNonBookPDF(
     docID.isbn == null &&
     docID.path == null
   ) {
-    logger.fatal("Cannot get docID of " + pdf);
+    logger.warn("Cannot get docID of " + pdf);
   }
   const t = await getJson(docID, pdf);
 
@@ -459,10 +458,20 @@ async function genDB(
       not_registerd_pdfs.length +
         " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
     );
+
+    // For Windows.
     const register_shellscript = "edit_and_run.sh";
     let commands = "";
     for (const nr of not_registerd_pdfs) {
-      commands = commands + "mv " + '"' + nr + '"' + ' "' + nr + '"\n';
+      commands =
+        commands +
+        "mv " +
+        '"' +
+        path.join(papers_dir, nr) +
+        '"' +
+        ' "' +
+        path.join(papers_dir, nr) +
+        '"\n';
     }
     fs.writeFileSync(register_shellscript, commands);
   }
