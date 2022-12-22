@@ -237,6 +237,7 @@ function registerWeb(
 
   let json = new Object();
   json["title"] = title;
+  json["url"] = url;
   json["comments"] = comments;
   json["tags"] = tags;
   json["id_type"] = "url";

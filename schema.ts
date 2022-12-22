@@ -1,6 +1,8 @@
 // Share with client and server
 type Entry = {
   id: string;
+  id_type: string;
+  url: string;
   title: string;
   path: string;
   tags: string[];

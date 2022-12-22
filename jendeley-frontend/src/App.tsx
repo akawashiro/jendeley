@@ -8,6 +8,7 @@ import { Entry, DB } from "./schema";
 import MaterialReactTable, {
   MRT_Cell,
   MRT_ColumnDef,
+  MRT_Row,
 } from "material-react-table";
 import sanitizeHTML from "sanitize-html";
 import { RegisterWebWithDialog, RegisterPDFWithDialog } from "./register";
@@ -81,6 +82,29 @@ function stringArrayFilterFn(
   return false;
 }
 
+function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
+  if (row.original.id_type === "url") {
+    return (
+      <a
+        href={`${row.original.url}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >{`${cell.getValue()}`}</a>
+    );
+  } else {
+    return (
+      <a
+        href={`${
+          "http://localhost:5000/api/get_pdf/?file=" +
+          base_64.encode(escape(row.original.path))
+        }`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >{`${cell.getValue()}`}</a>
+    );
+  }
+}
+
 function App() {
   const [tableData, setTableData] = React.useState<DB>([]);
 
@@ -111,16 +135,7 @@ function App() {
       },
       {
         accessorKey: "title",
-        Cell: ({ cell, row }) => (
-          <a
-            href={`${
-              "http://localhost:5000/api/get_pdf/?file=" +
-              base_64.encode(escape(row.original.path))
-            }`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >{`${cell.getValue()}`}</a>
-        ),
+        Cell: ({ cell, row }) => cellHref(cell, row),
         header: "title",
         enableEditing: false,
         filterFn: "includesString",
@@ -192,6 +207,8 @@ function App() {
       abstract: "",
       authors: [],
       id: tableData[cell.row.index]["id"],
+      id_type: tableData[cell.row.index]["id_type"],
+      url: "",
       title: "",
       path: "",
       tags: tags,

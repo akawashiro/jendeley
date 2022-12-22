@@ -29,6 +29,8 @@ function DeleteButton(props: any) {
       abstract: "",
       authors: [],
       id: id,
+      url: "",
+      id_type: "",
       title: "",
       path: "",
       tags: [],
