@@ -6,6 +6,7 @@ import crypto from "crypto";
 import { logger } from "./logger";
 import { JENDELEY_NO_TRACK } from "./constants";
 import { DocID, getDocID } from "./docid";
+import { Doc } from "prettier";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -188,7 +189,9 @@ async function getJson(
 }
 
 function isValidJsonEntry(json: Object) {
-  return json["title"] != null && json["path"] != null;
+  return (
+    json["title"] != null && (json["path"] != null || json["id_type"] == "url")
+  );
 }
 
 function genDummyDB(output: string) {
@@ -205,6 +208,48 @@ function genDummyDB(output: string) {
   }
 
   fs.writeFileSync(output, JSON.stringify(json_db));
+}
+
+function registerWeb(
+  json_db: any,
+  url: string,
+  title: string,
+  comments: string,
+  tags: string[]
+) {
+  logger.info(
+    "url = " +
+      url +
+      " title = " +
+      title +
+      " tags = " +
+      tags +
+      " comments = " +
+      comments
+  );
+  const docID: DocID = {
+    url: url,
+    doi: null,
+    isbn: null,
+    path: null,
+    arxiv: null,
+  };
+  logger.info("docID = " + JSON.stringify(docID));
+
+  let json = new Object();
+  json["title"] = title;
+  json["comments"] = comments;
+  json["tags"] = tags;
+  json["id_type"] = "url";
+
+  if (isValidJsonEntry(json)) {
+    json_db["url_" + url] = json;
+    logger.info("Register url_" + url);
+    return json_db;
+  } else {
+    logger.warn("Failed to register url_" + url);
+    return json_db;
+  }
 }
 
 async function registerNonBookPDF(
@@ -282,6 +327,8 @@ async function registerNonBookPDF(
     }
 
     json_db[dbID] = json;
+    return json_db;
+  } else {
     return json_db;
   }
 }
@@ -435,4 +482,5 @@ export {
   getDoiJSON,
   getTitleFromPath,
   registerNonBookPDF,
+  registerWeb,
 };

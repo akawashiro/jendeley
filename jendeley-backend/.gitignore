@@ -2,6 +2,7 @@ node_modules/*
 coverage/*
 dist/*
 db.json
+jendeley_db.json
 db*.json
 *.log
 ./coverage/*

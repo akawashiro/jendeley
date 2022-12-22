@@ -13,7 +13,7 @@ import {
   RequestGetWebFromUrl,
 } from "./schema";
 import https from "https";
-import { registerNonBookPDF } from "./gen";
+import { registerWeb, registerNonBookPDF } from "./gen";
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -28,7 +28,28 @@ function checkEntry(entry: Entry) {
 function getEntry(id: string, json: any): Entry {
   console.assert(json[id] != null, "json[" + id + "] != null");
 
-  if (json[id]["id_type"] == "isbn" || json[id]["id_type"] == "book") {
+  if (json[id]["id_type"] == "url") {
+    const title: string = json[id]["title"];
+    let authors: string[] = [];
+    const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+    const comments =
+      json[id]["comments"] != undefined ? json[id]["comments"] : [];
+    const abstract = "";
+
+    const e = {
+      id: id,
+      title: title,
+      authors: authors,
+      tags: tags,
+      comments: comments,
+      abstract: abstract,
+      path: "",
+      year: null,
+      publisher: "",
+    };
+    checkEntry(e);
+    return e;
+  } else if (json[id]["id_type"] == "isbn" || json[id]["id_type"] == "book") {
     const title: string = json[id]["title"];
     const path: string = json[id]["path"];
     let authors: string[] = [];
@@ -262,7 +283,10 @@ async function add_web_from_url(
       JSON.stringify(req)
   );
 
-  // TODO: Handle request here.
+  let json = JSON.parse(fs.readFileSync(db_path).toString());
+  const title = await get_title_from_url(req.url);
+  json = registerWeb(json, req.url, title, req.comments, req.tags);
+  fs.writeFileSync(db_path, JSON.stringify(json));
 
   response.writeHead(200, {
     "Content-Type": "application/json",
