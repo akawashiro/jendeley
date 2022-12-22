@@ -1,9 +1,6 @@
-# This README.md is for developpers. Please check jendeley-backend/README.md if you are user.
+# This README.md is for developpers. Please check [jendeley-backend/README.md](jendeley-backend/README.md) if you are user.
 
-# jendeley
-JSON-based paper organaizing software
-
-## How to use
+## How to build and test
 First, you must clone this repository.
 ```
 git clone https://github.com/akawashiro/jendeley.git
