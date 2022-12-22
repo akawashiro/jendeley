@@ -4,6 +4,7 @@ import { logger } from "./logger";
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
+import cheerio from "cheerio";
 import { JENDELEY_NO_TRACK } from "./constants";
 import {
   Entry,
@@ -12,7 +13,8 @@ import {
   RequestGetWebFromUrl,
 } from "./schema";
 import https from "https";
-import { registerNonBookPDF } from "./gen";
+import { registerWeb, registerNonBookPDF } from "./gen";
+import { title } from "process";
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -27,7 +29,28 @@ function checkEntry(entry: Entry) {
 function getEntry(id: string, json: any): Entry {
   console.assert(json[id] != null, "json[" + id + "] != null");
 
-  if (json[id]["id_type"] == "isbn" || json[id]["id_type"] == "book") {
+  if (json[id]["id_type"] == "url") {
+    const title: string = json[id]["title"];
+    let authors: string[] = [];
+    const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+    const comments =
+      json[id]["comments"] != undefined ? json[id]["comments"] : [];
+    const abstract = "";
+
+    const e = {
+      id: id,
+      title: title,
+      authors: authors,
+      tags: tags,
+      comments: comments,
+      abstract: abstract,
+      path: "",
+      year: null,
+      publisher: "",
+    };
+    checkEntry(e);
+    return e;
+  } else if (json[id]["id_type"] == "isbn" || json[id]["id_type"] == "book") {
     const title: string = json[id]["title"];
     const path: string = json[id]["path"];
     let authors: string[] = [];
@@ -239,6 +262,15 @@ function get_db(request: Request, response: Response, db_path: string) {
   logger.info("Sent a response from get_db");
 }
 
+async function get_title_from_url(url: string) {
+  let { got } = await import("got");
+
+  const res = await got(url);
+  const root = cheerio.load(res.body);
+  const title = root("title").text();
+  return title;
+}
+
 async function add_web_from_url(
   httpRequest: Request,
   response: Response,
@@ -252,7 +284,10 @@ async function add_web_from_url(
       JSON.stringify(req)
   );
 
-  // TODO: Handle request here.
+  let json = JSON.parse(fs.readFileSync(db_path).toString());
+  const title = req.title == "" ? await get_title_from_url(req.url) : req.title;
+  json = registerWeb(json, req.url, title, req.comments, req.tags);
+  fs.writeFileSync(db_path, JSON.stringify(json));
 
   response.writeHead(200, {
     "Content-Type": "application/json",
@@ -380,4 +415,5 @@ export {
   update_entry,
   add_pdf_from_url,
   get_pdf,
+  get_title_from_url,
 };

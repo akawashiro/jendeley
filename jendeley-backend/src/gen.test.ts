@@ -53,6 +53,7 @@ test("no_id from path", async () => {
     doi: null,
     isbn: null,
     path: "hoge_no_id.pdf",
+    url: null,
   });
 });
 
@@ -65,6 +66,7 @@ test("arXiv from URL", async () => {
     doi: null,
     isbn: null,
     path: null,
+    url: null,
   });
 });
 
@@ -76,6 +78,7 @@ test("ISBN from path", async () => {
     doi: null,
     isbn: "9781467330763",
     path: null,
+    url: null,
   });
 });
 
@@ -87,6 +90,7 @@ test("DOI from path", async () => {
     doi: "10.1145/3290364",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf7 =
@@ -97,6 +101,7 @@ test("DOI from path", async () => {
     doi: "10.1145/507635.507657",
     isbn: null,
     path: null,
+    url: null,
   });
 });
 
@@ -109,6 +114,7 @@ test("Complicated doi from path", async () => {
     doi: "10.1017/S095679681300018X",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf4 =
@@ -119,6 +125,7 @@ test("Complicated doi from path", async () => {
     doi: "10.1007/978-3-642-03359-9_27",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf5 =
@@ -129,6 +136,7 @@ test("Complicated doi from path", async () => {
     doi: "10.1515/popets-2016-0008",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf7 = "[Peter Dybjer] Inductive families_doi_10_1007_BF01211308.pdf";
@@ -138,6 +146,7 @@ test("Complicated doi from path", async () => {
     doi: "10.1007/BF01211308",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf9 =
@@ -148,6 +157,7 @@ test("Complicated doi from path", async () => {
     doi: "10.1017/CBO9781139032636",
     isbn: null,
     path: null,
+    url: null,
   });
 });
 
@@ -160,6 +170,7 @@ test("Complicated journal-like doi from path", async () => {
     doi: "10.1016/0304-3975(75)90017-1",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf3 =
@@ -170,6 +181,7 @@ test("Complicated journal-like doi from path", async () => {
     doi: "10.1109/JETCAS.2018.2885981",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf10 =
@@ -180,6 +192,7 @@ test("Complicated journal-like doi from path", async () => {
     doi: "10.1109/LICS.2002.1029817",
     isbn: null,
     path: null,
+    url: null,
   });
 });
 
@@ -192,6 +205,7 @@ test("Complicated book-like doi from path", async () => {
     doi: "10.1007/978-3-319-07151-0_6",
     isbn: null,
     path: null,
+    url: null,
   });
 
   const pdf11 =
@@ -202,6 +216,7 @@ test("Complicated book-like doi from path", async () => {
     doi: "10.1007/978-94-007-0954-6",
     isbn: null,
     path: null,
+    url: null,
   });
 });
 
@@ -213,5 +228,6 @@ test.skip("Lonely planet China", async () => {
     doi: null,
     isbn: "9781786575227",
     path: null,
+    url: null,
   });
 });

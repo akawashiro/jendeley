@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -49,6 +49,7 @@
   "dependencies": {
     "base-64": "^1.0.0",
     "body-parser": "^1.20.1",
+    "cheerio": "^1.0.0-rc.12",
     "commander": "^9.4.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
