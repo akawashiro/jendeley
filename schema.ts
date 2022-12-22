@@ -23,6 +23,7 @@ type RequestGetPdfFromUrl = {
 
 type RequestGetWebFromUrl = {
   url: string;
+  title: string;
   tags: string[];
   comments: string;
 };

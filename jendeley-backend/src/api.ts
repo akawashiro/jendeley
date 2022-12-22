@@ -14,6 +14,7 @@ import {
 } from "./schema";
 import https from "https";
 import { registerWeb, registerNonBookPDF } from "./gen";
+import {title} from "process";
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -284,7 +285,7 @@ async function add_web_from_url(
   );
 
   let json = JSON.parse(fs.readFileSync(db_path).toString());
-  const title = await get_title_from_url(req.url);
+  const title = req.title == "" ? await get_title_from_url(req.url) : req.title;
   json = registerWeb(json, req.url, title, req.comments, req.tags);
   fs.writeFileSync(db_path, JSON.stringify(json));
 

@@ -117,6 +117,7 @@ function RegisterWebWithDialog(props: any) {
     console.log("Register new PDF.");
     const r: RequestGetWebFromUrl = {
       url: webUrl,
+      title: title,
       tags: splitTagsStr(tags),
       comments: comments,
     };
