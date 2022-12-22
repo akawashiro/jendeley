@@ -4,6 +4,7 @@ import { logger } from "./logger";
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
+import cheerio from "cheerio";
 import { JENDELEY_NO_TRACK } from "./constants";
 import {
   Entry,
@@ -240,8 +241,12 @@ function get_db(request: Request, response: Response, db_path: string) {
 }
 
 async function get_title_from_url(url: string) {
-  // TODO
-  return "hoge" + url;
+  let { got } = await import("got");
+
+  const res = await got(url);
+  const root = cheerio.load(res.body);
+  const title = root("title").text();
+  return title;
 }
 
 async function add_web_from_url(
