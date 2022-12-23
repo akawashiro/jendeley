@@ -374,11 +374,9 @@ async function genDB(
 
   let pdfs = walkPDF(papers_dir);
   pdfs.sort();
+  pdfs = pdfs.filter((p) => !p.includes(JENDELEY_NO_TRACK));
   for (const p of pdfs) {
     if (exsting_pdfs.includes(p)) {
-      continue;
-    }
-    if (p.includes(JENDELEY_NO_TRACK)) {
       continue;
     }
 
