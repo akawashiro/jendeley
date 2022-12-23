@@ -355,6 +355,7 @@ async function add_pdf_from_url(
     path.dirname(db_path),
     filename,
     json,
+    req.title,
     req.comments,
     tags,
     true,

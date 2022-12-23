@@ -256,6 +256,7 @@ async function registerNonBookPDF(
   papers_dir: string,
   pdf: string,
   json_db: any,
+  user_specified_title: string | null,
   comments: string,
   tags: string[],
   rename_using_title: boolean,
@@ -291,6 +292,9 @@ async function registerNonBookPDF(
   const json = t[0];
   const dbID = t[1];
 
+  if (user_specified_title != null) {
+    json["title"] = user_specified_title;
+  }
   json["comments"] = comments;
   json["tags"] = tags;
 
@@ -405,6 +409,7 @@ async function genDB(
         papers_dir,
         p,
         json_db,
+        null,
         "",
         [],
         false,

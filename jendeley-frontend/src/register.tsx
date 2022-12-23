@@ -13,65 +13,6 @@ import "./App.css";
 import { RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./schema";
 import { splitTagsStr } from "./stringUtils";
 
-function QuickRegisterFromUrl() {
-  const [pdfUrl, setPdfUrl] = React.useState("");
-  const [isRegisterable, setIsRegisterable] = React.useState(true);
-
-  const handlePdfUrlFieldChange = (event: any) => {
-    setPdfUrl(event.target.value);
-    setIsRegisterable(isValidUrl(pdfUrl));
-  };
-
-  function isValidUrl(urlString: string) {
-    try {
-      return Boolean(new URL(urlString));
-    } catch (e) {
-      return false;
-    }
-  }
-
-  async function handleOnClick() {
-    console.log("Register new PDF.");
-    const r: RequestGetPdfFromUrl = {
-      url: pdfUrl,
-      isbn: null,
-      doi: null,
-      tags: [],
-      comments: "",
-    };
-    setPdfUrl("");
-    await fetch("http://localhost:5000/api/add_from_url", {
-      method: "PUT",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "PUT",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(r),
-    });
-  }
-
-  return (
-    <Stack direction="row" spacing={2}>
-      <TextField
-        label="URL of PDF"
-        variant="outlined"
-        size="small"
-        value={pdfUrl}
-        onChange={handlePdfUrlFieldChange}
-        sx={{ width: 500 }}
-      />
-      <Button
-        variant="contained"
-        disabled={isRegisterable}
-        onClick={handleOnClick}
-      >
-        Register from URL
-      </Button>
-    </Stack>
-  );
-}
-
 function RegisterWebWithDialog(props: any) {
   const [webUrl, setWebUrl] = React.useState("");
   const [title, setTitle] = React.useState("");
@@ -256,13 +197,14 @@ function RegisterPDFWithDialog(props: any) {
     console.log("Register new PDF.");
     const r: RequestGetPdfFromUrl = {
       url: pdfUrl,
+      title: title === "" ? null : title,
       isbn: isbn === "" ? null : isbn,
       doi: doi === "" ? null : doi,
       tags: splitTagsStr(tags),
       comments: comments,
     };
     setPdfUrl("");
-    console.log("Add from URL");
+    console.log("Add PDF from URL");
     setOpen(false);
     await fetch("http://localhost:5000/api/add_pdf_from_url", {
       method: "PUT",
@@ -305,22 +247,6 @@ function RegisterPDFWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="Digital Object Identifier"
-              variant="outlined"
-              size="small"
-              value={doi}
-              onChange={handleDoiChange}
-              sx={{ width: 500 }}
-            />
-            <TextField
-              label="ISBN"
-              variant="outlined"
-              size="small"
-              value={isbn}
-              onChange={handleIsbnChange}
-              sx={{ width: 500 }}
-            />
-            <TextField
               label="tags"
               variant="outlined"
               size="small"
@@ -355,6 +281,84 @@ function RegisterPDFWithDialog(props: any) {
       </Dialog>
     </Box>
   );
+
+  // TODO: Enable after implementation
+  // return (
+  //   <Box>
+  //     <Button variant="contained" onClick={handleClickOpen}>
+  //       Register PDF
+  //     </Button>
+  //     <Dialog open={open} onClose={handleClose}>
+  //       <DialogTitle>Register new PDF</DialogTitle>
+  //       <DialogContent>
+  //         <Stack spacing={2}>
+  //           <TextField
+  //             label="URL of PDF"
+  //             variant="outlined"
+  //             size="small"
+  //             value={pdfUrl}
+  //             onChange={handlePdfUrlFieldChange}
+  //             sx={{ width: 500 }}
+  //           />
+  //           <TextField
+  //             label="Title"
+  //             variant="outlined"
+  //             size="small"
+  //             value={title}
+  //             onChange={handleTitleChange}
+  //             sx={{ width: 500 }}
+  //           />
+  //           <TextField
+  //             label="Digital Object Identifier"
+  //             variant="outlined"
+  //             size="small"
+  //             value={doi}
+  //             onChange={handleDoiChange}
+  //             sx={{ width: 500 }}
+  //           />
+  //           <TextField
+  //             label="ISBN"
+  //             variant="outlined"
+  //             size="small"
+  //             value={isbn}
+  //             onChange={handleIsbnChange}
+  //             sx={{ width: 500 }}
+  //           />
+  //           <TextField
+  //             label="tags"
+  //             variant="outlined"
+  //             size="small"
+  //             value={tags}
+  //             onChange={handleTagsChange}
+  //             sx={{ width: 500 }}
+  //           />
+  //           <TextField
+  //             label="comments"
+  //             variant="outlined"
+  //             size="small"
+  //             value={comments}
+  //             onChange={handleCommentsChange}
+  //             sx={{ width: 500 }}
+  //             multiline={true}
+  //             rows={5}
+  //           />
+  //         </Stack>
+  //       </DialogContent>
+  //       <DialogActions>
+  //         <Button
+  //           variant="contained"
+  //           disabled={isRegisterable}
+  //           onClick={handleRegister}
+  //         >
+  //           Register
+  //         </Button>
+  //         <Button variant="contained" onClick={handleClose}>
+  //           Close
+  //         </Button>
+  //       </DialogActions>
+  //     </Dialog>
+  //   </Box>
+  // );
 }
 
-export { QuickRegisterFromUrl, RegisterWebWithDialog, RegisterPDFWithDialog };
+export { RegisterWebWithDialog, RegisterPDFWithDialog };

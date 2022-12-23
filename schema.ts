@@ -17,6 +17,7 @@ type DB = Entry[];
 
 type RequestGetPdfFromUrl = {
   url: string;
+  title: string | null;
   doi: string | null;
   isbn: string | null;
   tags: string[];
