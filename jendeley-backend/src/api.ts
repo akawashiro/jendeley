@@ -39,6 +39,8 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
+      id_type: json[id]["id_type"],
+      url: json[id]["url"],
       title: title,
       authors: authors,
       tags: tags,
@@ -75,7 +77,9 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
+      id_type: json[id]["id_type"],
       title: title,
+      url: "",
       authors: authors,
       tags: tags,
       comments: comments,
@@ -113,8 +117,10 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
+      id_type: json[id]["id_type"],
       title: title,
       authors: authors,
+      url: "",
       tags: tags,
       comments: comments,
       abstract: abstract,
@@ -152,7 +158,9 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
+      id_type: json[id]["id_type"],
       title: title,
+      url: "",
       authors: authors,
       tags: tags,
       abstract: abstract,
@@ -175,7 +183,9 @@ function getEntry(id: string, json: any): Entry {
     const publisher = "";
     const e = {
       id: id,
+      id_type: json[id]["id_type"],
       title: title,
+      url: "",
       authors: authors,
       tags: tags,
       abstract: abstract,
@@ -345,6 +355,7 @@ async function add_pdf_from_url(
     path.dirname(db_path),
     filename,
     json,
+    req.title,
     req.comments,
     tags,
     true,
@@ -387,6 +398,13 @@ function delete_entry(request: Request, response: Response, db_path: string) {
       } else {
         logger.warn("Failed to rename " + old_filename + " to " + new_filename);
       }
+      delete json[entry.id];
+    } else if (
+      json[entry.id] != undefined &&
+      json[entry.id]["path"] == undefined &&
+      json[entry.id]["id_type"] == "url"
+    ) {
+      logger.info("Delete " + entry.id);
       delete json[entry.id];
     }
     fs.writeFileSync(db_path, JSON.stringify(json));

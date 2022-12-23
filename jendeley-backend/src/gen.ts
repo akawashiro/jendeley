@@ -6,7 +6,6 @@ import crypto from "crypto";
 import { logger } from "./logger";
 import { JENDELEY_NO_TRACK } from "./constants";
 import { DocID, getDocID } from "./docid";
-import { Doc } from "prettier";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -238,6 +237,7 @@ function registerWeb(
 
   let json = new Object();
   json["title"] = title;
+  json["url"] = url;
   json["comments"] = comments;
   json["tags"] = tags;
   json["id_type"] = "url";
@@ -256,6 +256,7 @@ async function registerNonBookPDF(
   papers_dir: string,
   pdf: string,
   json_db: any,
+  user_specified_title: string | null,
   comments: string,
   tags: string[],
   rename_using_title: boolean,
@@ -279,7 +280,7 @@ async function registerNonBookPDF(
     docID.isbn == null &&
     docID.path == null
   ) {
-    logger.fatal("Cannot get docID of " + pdf);
+    logger.warn("Cannot get docID of " + pdf);
   }
   const t = await getJson(docID, pdf);
 
@@ -291,6 +292,9 @@ async function registerNonBookPDF(
   const json = t[0];
   const dbID = t[1];
 
+  if (user_specified_title != null) {
+    json["title"] = user_specified_title;
+  }
   json["comments"] = comments;
   json["tags"] = tags;
 
@@ -374,11 +378,9 @@ async function genDB(
 
   let pdfs = walkPDF(papers_dir);
   pdfs.sort();
+  pdfs = pdfs.filter((p) => !p.includes(JENDELEY_NO_TRACK));
   for (const p of pdfs) {
     if (exsting_pdfs.includes(p)) {
-      continue;
-    }
-    if (p.includes(JENDELEY_NO_TRACK)) {
       continue;
     }
 
@@ -407,6 +409,7 @@ async function genDB(
         papers_dir,
         p,
         json_db,
+        null,
         "",
         [],
         false,
@@ -459,10 +462,20 @@ async function genDB(
       not_registerd_pdfs.length +
         " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
     );
+
+    // For Windows.
     const register_shellscript = "edit_and_run.sh";
     let commands = "";
     for (const nr of not_registerd_pdfs) {
-      commands = commands + "mv " + '"' + nr + '"' + ' "' + nr + '"\n';
+      commands =
+        commands +
+        "mv " +
+        '"' +
+        path.join(papers_dir, nr) +
+        '"' +
+        ' "' +
+        path.join(papers_dir, nr) +
+        '"\n';
     }
     fs.writeFileSync(register_shellscript, commands);
   }
