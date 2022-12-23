@@ -13,6 +13,8 @@ import "./App.css";
 import { RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./schema";
 import { splitTagsStr } from "./stringUtils";
 
+const { REACT_APP_API_URL} = process.env;
+
 function RegisterWebWithDialog(props: any) {
   const [webUrl, setWebUrl] = React.useState("");
   const [title, setTitle] = React.useState("");
@@ -65,7 +67,7 @@ function RegisterWebWithDialog(props: any) {
     setWebUrl("");
     console.log("Add an web article from URL");
     setOpen(false);
-    await fetch("http://localhost:5000/api/add_web_from_url", {
+    await fetch(REACT_APP_API_URL + "/api/add_web_from_url", {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -75,7 +77,7 @@ function RegisterWebWithDialog(props: any) {
       body: JSON.stringify(r),
     });
     console.log("Fetching from DB in registration");
-    fetch("http://localhost:5000/api/get_db")
+    fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
       .then((json) => props.setTableData(() => json));
   }
@@ -206,7 +208,7 @@ function RegisterPDFWithDialog(props: any) {
     setPdfUrl("");
     console.log("Add PDF from URL");
     setOpen(false);
-    await fetch("http://localhost:5000/api/add_pdf_from_url", {
+    await fetch(REACT_APP_API_URL + "/api/add_pdf_from_url", {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -216,7 +218,7 @@ function RegisterPDFWithDialog(props: any) {
       body: JSON.stringify(r),
     });
     console.log("Fetching from DB in registration");
-    fetch("http://localhost:5000/api/get_db")
+    fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
       .then((json) => props.setTableData(() => json));
   }

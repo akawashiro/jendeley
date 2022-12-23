@@ -11,6 +11,8 @@ import "./App.css";
 import { IDType, Entry } from "./schema";
 import { Delete } from "@mui/icons-material";
 
+const { REACT_APP_API_URL} = process.env;
+
 function DeleteButton(props: any) {
   const [open, setOpen] = React.useState(false);
 
@@ -38,7 +40,7 @@ function DeleteButton(props: any) {
       year: 0,
       publisher: "",
     };
-    const response = await fetch("http://localhost:5000/api/delete_entry", {
+    const response = await fetch(REACT_APP_API_URL + "/api/delete_entry", {
       method: "DELETE",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -49,7 +51,7 @@ function DeleteButton(props: any) {
     });
     console.log("response of update_entry:", response);
 
-    fetch("http://localhost:5000/api/get_db")
+    fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
       .then((json) => setTableData(() => json));
 
