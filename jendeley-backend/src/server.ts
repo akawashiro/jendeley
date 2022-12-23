@@ -15,7 +15,7 @@ import {
   update_entry,
 } from "./api";
 
-function startServer(db_path: string) {
+function startServer(db_path: string, no_browser: boolean) {
   if (fs.existsSync(db_path)) {
     const app = express();
     const port = 5000;
@@ -75,7 +75,9 @@ function startServer(db_path: string) {
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
       logger.info(`Open http://localhost:${port} with your browser`);
-      open(`http://localhost:${port}`);
+      if (!no_browser) {
+        open(`http://localhost:${port}`);
+      }
     });
   } else {
     logger.error(db_path + " is not exist.");
