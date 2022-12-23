@@ -122,6 +122,7 @@ function App() {
         Cell: ({ cell, row }) => (
           <DeleteButton
             id={`${cell.getValue<string>()}`}
+            id_type={`${row.original.id_type}`}
             title={`${row.original.title}`}
             setTableData={setTableData}
             tableData={tableData}

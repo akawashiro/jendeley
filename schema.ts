@@ -1,7 +1,10 @@
-// Share with client and server
+// This file is shared between client and server
+
+type IDType = 'doi' | 'isbn' | 'url' | 'book';
+
 type Entry = {
   id: string;
-  id_type: string;
+  id_type: IDType;
   url: string;
   title: string;
   path: string;
@@ -31,5 +34,5 @@ type RequestGetWebFromUrl = {
   comments: string;
 };
 
-export type { Entry, DB, RequestGetPdfFromUrl, RequestGetWebFromUrl };
+export type { IDType, Entry, DB, RequestGetPdfFromUrl, RequestGetWebFromUrl };
 export {};

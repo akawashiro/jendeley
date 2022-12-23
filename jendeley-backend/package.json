@@ -36,6 +36,7 @@
   "homepage": "https://github.com/akawashiro/jendeley/tree/main/jendeley-backend#readme",
   "devDependencies": {
     "@types/base-64": "^1.0.0",
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.15",
     "@types/jest": "^29.2.3",
     "@types/node": "^18.11.9",
