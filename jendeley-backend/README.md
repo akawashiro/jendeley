@@ -13,6 +13,7 @@ npm install @a_kawashiro/jendeley -g
 ```
 jendeley scan --papers_dir <YOUR PDFs DIR>
 ```
+This command emits the database to `<YOUR PDFs DIR>/jendeley_db.json`.
 
 
 ## Launch jendeley UI
@@ -20,7 +21,7 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
 Then you can see a screen like this!
-![image](https://user-images.githubusercontent.com/3770618/208243833-b6745337-6f7e-4df2-ae7f-575fe940dffe.png)
+![image](https://user-images.githubusercontent.com/3770618/209427855-374e6523-8910-4c98-a9ec-05bd62ae9b8e.png)
 
 If you don't have any PDFs, please use [Deep Residual Learning for Image Recognition](https://arxiv.org/pdf/1512.03385.pdf).
 
