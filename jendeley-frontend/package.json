@@ -18,8 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build && rm -rf ../jendeley-backend/built-frontend && cp -r build ../jendeley-backend/built-frontend",
+    "start": "REACT_APP_API_URL=http://localhost:5001 react-scripts start",
+    "build": "REACT_APP_API_URL=http://localhost:5000 react-scripts build && rm -rf ../jendeley-backend/built-frontend && cp -r build ../jendeley-backend/built-frontend",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "fix:prettier": "prettier --write src",

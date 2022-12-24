@@ -15,6 +15,8 @@ import { RegisterWebWithDialog, RegisterPDFWithDialog } from "./register";
 import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 
+const { REACT_APP_API_URL } = process.env;
+
 function authorChips(authors: string[]) {
   // TODO padding or margine
   return (
@@ -95,7 +97,8 @@ function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
     return (
       <a
         href={`${
-          "http://localhost:5000/api/get_pdf/?file=" +
+          REACT_APP_API_URL +
+          "/api/get_pdf/?file=" +
           base_64.encode(escape(row.original.path))
         }`}
         target="_blank"
@@ -110,7 +113,7 @@ function App() {
 
   React.useEffect(() => {
     console.log("Fetching from DB in loading");
-    fetch("http://localhost:5000/api/get_db")
+    fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
       .then((json) => setTableData(() => json));
   }, []);
@@ -122,6 +125,7 @@ function App() {
         Cell: ({ cell, row }) => (
           <DeleteButton
             id={`${cell.getValue<string>()}`}
+            id_type={`${row.original.id_type}`}
             title={`${row.original.title}`}
             setTableData={setTableData}
             tableData={tableData}
@@ -216,7 +220,7 @@ function App() {
       year: 0,
       publisher: "",
     };
-    const response = await fetch("http://localhost:5000/api/update_entry", {
+    const response = await fetch(REACT_APP_API_URL + "/api/update_entry", {
       method: "PUT",
       headers: {
         "Access-Control-Allow-Origin": "*",

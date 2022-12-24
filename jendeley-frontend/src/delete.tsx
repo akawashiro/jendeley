@@ -8,8 +8,10 @@ import {
   IconButton,
 } from "@mui/material";
 import "./App.css";
-import { Entry } from "./schema";
+import { IDType, Entry } from "./schema";
 import { Delete } from "@mui/icons-material";
+
+const { REACT_APP_API_URL } = process.env;
 
 function DeleteButton(props: any) {
   const [open, setOpen] = React.useState(false);
@@ -22,7 +24,12 @@ function DeleteButton(props: any) {
     setOpen(false);
   };
 
-  async function deleteRow(id: string, tableData: any, setTableData: any) {
+  async function deleteRow(
+    id: string,
+    id_type: IDType,
+    tableData: any,
+    setTableData: any
+  ) {
     console.log("Delete " + id);
 
     const e: Entry = {
@@ -30,7 +37,7 @@ function DeleteButton(props: any) {
       authors: [],
       id: id,
       url: "",
-      id_type: "",
+      id_type: id_type,
       title: "",
       path: "",
       tags: [],
@@ -38,7 +45,7 @@ function DeleteButton(props: any) {
       year: 0,
       publisher: "",
     };
-    const response = await fetch("http://localhost:5000/api/delete_entry", {
+    const response = await fetch(REACT_APP_API_URL + "/api/delete_entry", {
       method: "DELETE",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -49,7 +56,7 @@ function DeleteButton(props: any) {
     });
     console.log("response of update_entry:", response);
 
-    fetch("http://localhost:5000/api/get_db")
+    fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
       .then((json) => setTableData(() => json));
 
@@ -69,7 +76,12 @@ function DeleteButton(props: any) {
           <Button onClick={handleClose}>Cancel</Button>
           <Button
             onClick={() =>
-              deleteRow(props.id, props.tableData, props.setTableData)
+              deleteRow(
+                props.id,
+                props.id_type,
+                props.tableData,
+                props.setTableData
+              )
             }
             autoFocus
           >

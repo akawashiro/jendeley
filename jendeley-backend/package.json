@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -14,7 +14,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "scan_test_pdfs": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs",
     "profile_scan_test_pdfs": "npm run build && node --require source-map-support/register --prof dist/index.js scan --papers_dir test_pdfs",
-    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json",
+    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json --use_dev_port --no_browser",
     "fix:prettier": "prettier --write src",
     "check:prettier": "prettier --check src"
   },
@@ -36,6 +36,7 @@
   "homepage": "https://github.com/akawashiro/jendeley/tree/main/jendeley-backend#readme",
   "devDependencies": {
     "@types/base-64": "^1.0.0",
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.15",
     "@types/jest": "^29.2.3",
     "@types/node": "^18.11.9",
