@@ -24,6 +24,19 @@ Then you can see a screen like this!
 
 If you don't have any PDFs, please use [Deep Residual Learning for Image Recognition](https://arxiv.org/pdf/1512.03385.pdf).
 
+## Launch automatically
+When you are using Linux, you can launch `jendeley` automatically using `systemd`. Please make `~/.config/systemd/user/jendeley.service` with the following contents, run `systemctl --user enable jendeley && systemctl --user start jendeley` and access [http://localhost:5000](http://localhost:5000). You can check log with `journalctl --user -f -u jendeley.service`.
+```
+[Unit]
+Description=jendeley JSON based document organization software
+
+[Service]
+ExecStart=jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser
+
+[Install]
+WantedBy=default.target
+```
+
 ## Check your database
 Because `jendeley` is fully JSON-based, you can check the contents of the
 database easily. For example, you can use `jq` command to list up all titles in
