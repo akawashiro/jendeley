@@ -208,17 +208,17 @@ function App() {
     }
 
     const e: Entry = {
-      abstract: "",
-      authors: [],
+      abstract: tableData[cell.row.index]["abstract"],
+      authors: tableData[cell.row.index]["authors"],
       id: tableData[cell.row.index]["id"],
       id_type: tableData[cell.row.index]["id_type"],
-      url: "",
-      title: "",
-      path: "",
+      url: tableData[cell.row.index]["url"],
+      title: tableData[cell.row.index]["title"],
+      path: tableData[cell.row.index]["path"],
       tags: tags,
       comments: comments,
-      year: 0,
-      publisher: "",
+      year: tableData[cell.row.index]["year"],
+      publisher: tableData[cell.row.index]["publisher"],
     };
     const response = await fetch(REACT_APP_API_URL + "/api/update_entry", {
       method: "PUT",
