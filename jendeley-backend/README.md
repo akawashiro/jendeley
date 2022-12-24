@@ -13,6 +13,7 @@ npm install @a_kawashiro/jendeley -g
 ```
 jendeley scan --papers_dir <YOUR PDFs DIR>
 ```
+This command emits the database to `<YOUR PDFs DIR>/jendeley_db.json`.
 
 
 ## Launch jendeley UI
