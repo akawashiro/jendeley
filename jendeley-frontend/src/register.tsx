@@ -13,7 +13,7 @@ import "./App.css";
 import { RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./schema";
 import { splitTagsStr } from "./stringUtils";
 
-const { REACT_APP_API_URL} = process.env;
+const { REACT_APP_API_URL } = process.env;
 
 function RegisterWebWithDialog(props: any) {
   const [webUrl, setWebUrl] = React.useState("");

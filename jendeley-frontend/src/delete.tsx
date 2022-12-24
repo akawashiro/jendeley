@@ -11,7 +11,7 @@ import "./App.css";
 import { IDType, Entry } from "./schema";
 import { Delete } from "@mui/icons-material";
 
-const { REACT_APP_API_URL} = process.env;
+const { REACT_APP_API_URL } = process.env;
 
 function DeleteButton(props: any) {
   const [open, setOpen] = React.useState(false);
@@ -24,7 +24,12 @@ function DeleteButton(props: any) {
     setOpen(false);
   };
 
-  async function deleteRow(id: string, id_type: IDType, tableData: any, setTableData: any) {
+  async function deleteRow(
+    id: string,
+    id_type: IDType,
+    tableData: any,
+    setTableData: any
+  ) {
     console.log("Delete " + id);
 
     const e: Entry = {
@@ -71,7 +76,12 @@ function DeleteButton(props: any) {
           <Button onClick={handleClose}>Cancel</Button>
           <Button
             onClick={() =>
-              deleteRow(props.id, props.id_type, props.tableData, props.setTableData)
+              deleteRow(
+                props.id,
+                props.id_type,
+                props.tableData,
+                props.setTableData
+              )
             }
             autoFocus
           >

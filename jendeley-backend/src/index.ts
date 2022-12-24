@@ -37,7 +37,11 @@ async function main() {
     .option("--no_browser", "Don't launch browser")
     .option("--use_dev_port", "Only for developpers")
     .action((cmd, options) => {
-      startServer(options._optionValues.db, options._optionValues.no_browser, options._optionValues.use_dev_port);
+      startServer(
+        options._optionValues.db,
+        options._optionValues.no_browser,
+        options._optionValues.use_dev_port
+      );
     });
 
   program
