@@ -15,14 +15,9 @@ import {
   updateEntry,
 } from "./api";
 
-function startServer(
-  db_path: string,
-  no_browser: boolean,
-  use_dev_port: boolean
-) {
+function startServer(db_path: string, no_browser: boolean, port: number) {
   if (fs.existsSync(db_path)) {
     const app = express();
-    const port = use_dev_port ? 5001 : 5000;
 
     app.use(cors());
 
