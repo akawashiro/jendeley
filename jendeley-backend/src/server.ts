@@ -7,12 +7,12 @@ import { Request, Response } from "express";
 import bodyParser from "body-parser";
 import { logger } from "./logger";
 import {
-  add_pdf_from_url,
-  add_web_from_url,
-  delete_entry,
-  get_db,
-  get_pdf,
-  update_entry,
+  addPdfFromUrl,
+  addWebFromUrl,
+  deleteEntry,
+  getDB,
+  getPdf,
+  updateEntry,
 } from "./api";
 
 function startServer(
@@ -35,11 +35,11 @@ function startServer(
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
     app.get("/api/get_db", (request: Request, response: Response) => {
-      get_db(request, response, db_path);
+      getDB(request, response, db_path);
     });
 
     app.get("/api/get_pdf", (request: Request, response: Response) => {
-      get_pdf(request, response, db_path);
+      getPdf(request, response, db_path);
     });
 
     let jsonParser = bodyParser.json();
@@ -48,7 +48,7 @@ function startServer(
       "/api/add_pdf_from_url",
       jsonParser,
       async (httpRequest: Request, response: Response) => {
-        add_pdf_from_url(httpRequest, response, db_path);
+        addPdfFromUrl(httpRequest, response, db_path);
       }
     );
 
@@ -56,7 +56,7 @@ function startServer(
       "/api/add_web_from_url",
       jsonParser,
       async (httpRequest: Request, response: Response) => {
-        add_web_from_url(httpRequest, response, db_path);
+        addWebFromUrl(httpRequest, response, db_path);
       }
     );
 
@@ -64,7 +64,7 @@ function startServer(
       "/api/update_entry",
       jsonParser,
       (request: Request, response: Response) => {
-        update_entry(request, response, db_path);
+        updateEntry(request, response, db_path);
       }
     );
 
@@ -72,7 +72,7 @@ function startServer(
       "/api/delete_entry",
       jsonParser,
       (request: Request, response: Response) => {
-        delete_entry(request, response, db_path);
+        deleteEntry(request, response, db_path);
       }
     );
 

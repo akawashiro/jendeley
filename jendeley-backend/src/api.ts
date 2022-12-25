@@ -198,7 +198,7 @@ function getEntry(id: string, json: any): Entry {
   }
 }
 
-function update_entry(request: Request, response: Response, db_path: string) {
+function updateEntry(request: Request, response: Response, db_path: string) {
   logger.info("Get a update_entry request url = " + request.url);
   const entry_o = request.body;
 
@@ -234,7 +234,7 @@ function update_entry(request: Request, response: Response, db_path: string) {
   logger.info("Sent a response from update_entry");
 }
 
-function get_pdf(request: Request, response: Response, db_path: string) {
+function getPdf(request: Request, response: Response, db_path: string) {
   logger.info("Get a get_pdf request", request.url);
   const params = url.parse(request.url, true).query;
   const pdf_path = unescape(base_64.decode(params.file as string));
@@ -250,7 +250,7 @@ function get_pdf(request: Request, response: Response, db_path: string) {
   logger.info("Sent a response from get_pdf");
 }
 
-function get_db(request: Request, response: Response, db_path: string) {
+function getDB(request: Request, response: Response, db_path: string) {
   logger.info("Get a get_db request" + request.url);
   const json = JSON.parse(fs.readFileSync(db_path).toString());
   let db_response: DB = [];
@@ -271,7 +271,7 @@ function get_db(request: Request, response: Response, db_path: string) {
   logger.info("Sent a response from get_db");
 }
 
-async function get_title_from_url(url: string) {
+async function getTitleFromUrl(url: string) {
   let { got } = await import("got");
 
   const res = await got(url);
@@ -280,7 +280,7 @@ async function get_title_from_url(url: string) {
   return title;
 }
 
-async function add_web_from_url(
+async function addWebFromUrl(
   httpRequest: Request,
   response: Response,
   db_path: string
@@ -294,7 +294,7 @@ async function add_web_from_url(
   );
 
   let json = JSON.parse(fs.readFileSync(db_path).toString());
-  const title = req.title == "" ? await get_title_from_url(req.url) : req.title;
+  const title = req.title == "" ? await getTitleFromUrl(req.url) : req.title;
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
@@ -313,7 +313,7 @@ async function add_web_from_url(
   logger.info("Sent a response from add_pdf_from_url");
 }
 
-async function add_pdf_from_url(
+async function addPdfFromUrl(
   httpRequest: Request,
   response: Response,
   db_path: string
@@ -377,7 +377,7 @@ async function add_pdf_from_url(
   logger.info("Sent a response from add_pdf_from_url");
 }
 
-function delete_entry(request: Request, response: Response, db_path: string) {
+function deleteEntry(request: Request, response: Response, db_path: string) {
   logger.info("Get a delete_entry request url = " + request.url);
   const entry_o = request.body;
 
@@ -430,11 +430,11 @@ function delete_entry(request: Request, response: Response, db_path: string) {
 }
 
 export {
-  get_db,
-  delete_entry,
-  add_web_from_url,
-  update_entry,
-  add_pdf_from_url,
-  get_pdf,
-  get_title_from_url,
+  getDB,
+  deleteEntry,
+  addWebFromUrl,
+  updateEntry,
+  addPdfFromUrl,
+  getPdf,
+  getTitleFromUrl,
 };
