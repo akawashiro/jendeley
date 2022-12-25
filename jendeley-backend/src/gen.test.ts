@@ -82,6 +82,30 @@ test("ISBN from path", async () => {
   });
 });
 
+test("ISBN from path", async () => {
+  const pdf5 = "hoge [jendeley isbn 9781467330763].pdf";
+  const docID5 = await getDocID(pdf5, "/hoge/", false, null);
+  expect(docID5).toStrictEqual({
+    arxiv: null,
+    doi: null,
+    isbn: "9781467330763",
+    path: null,
+    url: null,
+  });
+});
+
+test("DOI from path", async () => {
+  const pdf6 = "hoge [jendeley doi 10_1145_3290364].pdf";
+  const docID6 = await getDocID(pdf6, "/hoge/", false, null);
+  expect(docID6).toStrictEqual({
+    arxiv: null,
+    doi: "10.1145/3290364",
+    isbn: null,
+    path: null,
+    url: null,
+  });
+});
+
 test("DOI from path", async () => {
   const pdf6 = "hoge_doi_10_1145_3290364.pdf";
   const docID6 = await getDocID(pdf6, "/hoge/", false, null);
