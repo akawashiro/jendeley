@@ -118,29 +118,6 @@ test("DOI from path", async () => {
   });
 });
 
-// test("DOI from path", async () => {
-//   const pdf6 = "hoge_doi_10_1145_3290364.pdf";
-//   const docID6 = await getDocID(pdf6, "/hoge/", false, null);
-//   expect(docID6).toStrictEqual({
-//     arxiv: null,
-//     doi: "10.1145/3290364",
-//     isbn: null,
-//     path: null,
-//     url: null,
-//   });
-//
-//   const pdf7 =
-//     "A Dependently Typed Assembly Language_doi_10_1145_507635_507657.pdf";
-//   const docID7 = await getDocID(pdf7, "/hoge/", false, null);
-//   expect(docID7).toStrictEqual({
-//     arxiv: null,
-//     doi: "10.1145/507635.507657",
-//     isbn: null,
-//     path: null,
-//     url: null,
-//   });
-// });
-
 test("Complicated doi from path", async () => {
   const pdf2 =
     "DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation [jendeley doi 10_1017_S095679681300018X].pdf";
@@ -269,10 +246,10 @@ test("Complicated journal-like doi from path", async () => {
 });
 
 test("Complicated book-like doi from path", async () => {
-  const pdf6 =
+  const pdf =
     "MultistageProgramming/[Oleg Kiselyov] The Design and Implementation of BER MetaOCaml [jendeley doi 10_1007_978-3-319-07151-0_6].pdf";
-  const docID6 = await getDocID(pdf6, "/hoge/", false, null);
-  expect(docID6).toStrictEqual({
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
     arxiv: null,
     doi: "10.1007/978-3-319-07151-0_6",
     isbn: null,
@@ -282,10 +259,10 @@ test("Complicated book-like doi from path", async () => {
 });
 
 test("Complicated book-like doi from path", async () => {
-  const pdf11 =
+  const pdf =
     "[Paul Blain Levy] Call By Push Value [jendeley doi 10_1007_978-94-007-0954-6].pdf";
-  const docID11 = await getDocID(pdf11, "/hoge/", false, null);
-  expect(docID11).toStrictEqual({
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
     arxiv: null,
     doi: "10.1007/978-94-007-0954-6",
     isbn: null,
@@ -293,6 +270,53 @@ test("Complicated book-like doi from path", async () => {
     url: null,
   });
 });
+
+test.skip("Lonely planet China", async () => {
+  const pdf = "lonelyplanet-china-15-full-book.pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
+    arxiv: null,
+    doi: null,
+    isbn: "9781786575227",
+    path: null,
+    url: null,
+  });
+});
+
+// test("ISBN from path", async () => {
+//   const pdf = "hoge_isbn_9781467330763.pdf";
+//   const docID = await getDocID(pdf, "/hoge/", false, null);
+//   expect(docID).toStrictEqual({
+//     arxiv: null,
+//     doi: null,
+//     isbn: "9781467330763",
+//     path: null,
+//     url: null,
+//   });
+// });
+//
+// test("DOI from path", async () => {
+//   const pdf6 = "hoge_doi_10_1145_3290364.pdf";
+//   const docID6 = await getDocID(pdf6, "/hoge/", false, null);
+//   expect(docID6).toStrictEqual({
+//     arxiv: null,
+//     doi: "10.1145/3290364",
+//     isbn: null,
+//     path: null,
+//     url: null,
+//   });
+//
+//   const pdf7 =
+//     "A Dependently Typed Assembly Language_doi_10_1145_507635_507657.pdf";
+//   const docID7 = await getDocID(pdf7, "/hoge/", false, null);
+//   expect(docID7).toStrictEqual({
+//     arxiv: null,
+//     doi: "10.1145/507635.507657",
+//     isbn: null,
+//     path: null,
+//     url: null,
+//   });
+// });
 
 // test("Complicated book-like doi from path", async () => {
 //   const pdf6 =
@@ -313,30 +337,6 @@ test("Complicated book-like doi from path", async () => {
 //     arxiv: null,
 //     doi: "10.1007/978-94-007-0954-6",
 //     isbn: null,
-//     path: null,
-//     url: null,
-//   });
-// });
-
-test.skip("Lonely planet China", async () => {
-  const pdf8 = "lonelyplanet-china-15-full-book.pdf";
-  const docID8 = await getDocID(pdf8, "/hoge/", false, null);
-  expect(docID8).toStrictEqual({
-    arxiv: null,
-    doi: null,
-    isbn: "9781786575227",
-    path: null,
-    url: null,
-  });
-});
-
-// test("ISBN from path", async () => {
-//   const pdf = "hoge_isbn_9781467330763.pdf";
-//   const docID = await getDocID(pdf, "/hoge/", false, null);
-//   expect(docID).toStrictEqual({
-//     arxiv: null,
-//     doi: null,
-//     isbn: "9781467330763",
 //     path: null,
 //     url: null,
 //   });
