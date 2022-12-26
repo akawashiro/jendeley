@@ -15,8 +15,8 @@ import {
   updateEntry,
 } from "./api";
 
-function startServer(db_path: string, no_browser: boolean, port: number) {
-  if (fs.existsSync(db_path)) {
+function startServer(dbPath: string, noBrowser: boolean, port: number) {
+  if (fs.existsSync(dbPath)) {
     const app = express();
 
     app.use(cors());
@@ -30,11 +30,11 @@ function startServer(db_path: string, no_browser: boolean, port: number) {
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
     app.get("/api/get_db", (request: Request, response: Response) => {
-      getDB(request, response, db_path);
+      getDB(request, response, dbPath);
     });
 
     app.get("/api/get_pdf", (request: Request, response: Response) => {
-      getPdf(request, response, db_path);
+      getPdf(request, response, dbPath);
     });
 
     let jsonParser = bodyParser.json();
@@ -43,7 +43,7 @@ function startServer(db_path: string, no_browser: boolean, port: number) {
       "/api/add_pdf_from_url",
       jsonParser,
       async (httpRequest: Request, response: Response) => {
-        addPdfFromUrl(httpRequest, response, db_path);
+        addPdfFromUrl(httpRequest, response, dbPath);
       }
     );
 
@@ -51,7 +51,7 @@ function startServer(db_path: string, no_browser: boolean, port: number) {
       "/api/add_web_from_url",
       jsonParser,
       async (httpRequest: Request, response: Response) => {
-        addWebFromUrl(httpRequest, response, db_path);
+        addWebFromUrl(httpRequest, response, dbPath);
       }
     );
 
@@ -59,7 +59,7 @@ function startServer(db_path: string, no_browser: boolean, port: number) {
       "/api/update_entry",
       jsonParser,
       (request: Request, response: Response) => {
-        updateEntry(request, response, db_path);
+        updateEntry(request, response, dbPath);
       }
     );
 
@@ -67,19 +67,19 @@ function startServer(db_path: string, no_browser: boolean, port: number) {
       "/api/delete_entry",
       jsonParser,
       (request: Request, response: Response) => {
-        deleteEntry(request, response, db_path);
+        deleteEntry(request, response, dbPath);
       }
     );
 
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
       logger.info(`Open http://localhost:${port} with your browser`);
-      if (!no_browser) {
+      if (!noBrowser) {
         open(`http://localhost:${port}`);
       }
     });
   } else {
-    logger.error(db_path + " is not exist.");
+    logger.error(dbPath + " is not exist.");
   }
 }
 

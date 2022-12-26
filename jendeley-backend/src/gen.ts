@@ -25,12 +25,12 @@ function walkPDFDFS(dir: string): string[] {
   }
 }
 
-// All paths returned from walkPDF are relative path from papers_dir.
-function walkPDF(papers_dir: string): string[] {
+// All paths returned from walkPDF are relative path from papersDir.
+function walkPDF(papersDir: string): string[] {
   let r: string[] = [];
-  const pdfs = walkPDFDFS(papers_dir);
+  const pdfs = walkPDFDFS(papersDir);
   for (const pd of pdfs) {
-    r.push(pd.replace(papers_dir, ""));
+    r.push(pd.replace(papersDir, ""));
   }
   return r;
 }
@@ -253,7 +253,7 @@ function registerWeb(
 }
 
 async function registerNonBookPDF(
-  papers_dir: string,
+  papersDir: string,
   pdf: string,
   json_db: any,
   user_specified_title: string | null,
@@ -263,8 +263,8 @@ async function registerNonBookPDF(
   download_url: string | null
 ) {
   logger.info(
-    "papers_dir = " +
-      papers_dir +
+    "papersDir = " +
+      papersDir +
       " pdf = " +
       pdf +
       " tags = " +
@@ -272,7 +272,7 @@ async function registerNonBookPDF(
       " comments = " +
       comments
   );
-  const docID = await getDocID(pdf, papers_dir, false, download_url);
+  const docID = await getDocID(pdf, papersDir, false, download_url);
   logger.info("docID = " + JSON.stringify(docID));
   if (
     docID.arxiv == null &&
@@ -319,13 +319,13 @@ async function registerNonBookPDF(
       const old_fileneme = json["path"];
       json["path"] = new_filename;
 
-      if (fs.existsSync(path.join(papers_dir, new_filename))) {
+      if (fs.existsSync(path.join(papersDir, new_filename))) {
         logger.warn(new_filename + " already exists. Skip registration.");
         return json_db;
       }
       fs.renameSync(
-        path.join(papers_dir, old_fileneme),
-        path.join(papers_dir, new_filename)
+        path.join(papersDir, old_fileneme),
+        path.join(papersDir, new_filename)
       );
       logger.info("Rename " + old_fileneme + " to " + new_filename);
     }
@@ -338,7 +338,7 @@ async function registerNonBookPDF(
 }
 
 async function genDB(
-  papers_dir: string,
+  papersDir: string,
   book_dirs_str: string,
   db_name: string
 ) {
@@ -348,18 +348,18 @@ async function genDB(
     if (book_dirs[i].slice(-1) != "/") {
       book_dirs[i] = book_dirs[i] + "/";
     }
-    if (book_dirs[i].startsWith(papers_dir)) {
-      book_dirs[i] = book_dirs[i].replace(papers_dir, "");
+    if (book_dirs[i].startsWith(papersDir)) {
+      book_dirs[i] = book_dirs[i].replace(papersDir, "");
     }
   }
 
-  if (!fs.existsSync(papers_dir)) {
-    logger.warn("papers_dir:", papers_dir + " is not exist.");
+  if (!fs.existsSync(papersDir)) {
+    logger.warn("papersDir:", papersDir + " is not exist.");
     return;
   }
   for (const bd of book_dirs) {
-    if (!fs.existsSync(path.join(papers_dir, bd))) {
-      logger.warn("bd:", path.join(papers_dir, bd) + " is not exist.");
+    if (!fs.existsSync(path.join(papersDir, bd))) {
+      logger.warn("bd:", path.join(papersDir, bd) + " is not exist.");
       return;
     }
   }
@@ -367,16 +367,16 @@ async function genDB(
   let book_db = new Object();
   let json_db = new Object();
   let exsting_pdfs: string[] = [];
-  if (fs.existsSync(path.join(papers_dir, db_name))) {
+  if (fs.existsSync(path.join(papersDir, db_name))) {
     json_db = JSON.parse(
-      fs.readFileSync(path.join(papers_dir, db_name)).toString()
+      fs.readFileSync(path.join(papersDir, db_name)).toString()
     );
     for (const id of Object.keys(json_db)) {
       exsting_pdfs.push(json_db[id]["path"]);
     }
   }
 
-  let pdfs = walkPDF(papers_dir);
+  let pdfs = walkPDF(papersDir);
   pdfs.sort();
   pdfs = pdfs.filter((p) => !p.includes(JENDELEY_NO_TRACK));
   for (const p of pdfs) {
@@ -392,7 +392,7 @@ async function genDB(
       }
       if (p.startsWith(bd)) {
         is_book = true;
-        const docID = await getDocID(p, papers_dir, true, null);
+        const docID = await getDocID(p, papersDir, true, null);
         const t = await getJson(docID, p);
         if (t != null && t[0]["id_type"] == "isbn") {
           const json = t[0];
@@ -406,7 +406,7 @@ async function genDB(
 
     if (!is_book) {
       json_db = await registerNonBookPDF(
-        papers_dir,
+        papersDir,
         p,
         json_db,
         null,
@@ -489,18 +489,18 @@ async function genDB(
         commands +
         "mv " +
         '"' +
-        path.join(papers_dir, nr) +
+        path.join(papersDir, nr) +
         '"' +
         ' "' +
-        path.join(papers_dir, nr) +
+        path.join(papersDir, nr) +
         '"\n';
     }
     fs.writeFileSync(register_shellscript, commands);
   }
 
   try {
-    const db_path = path.join(papers_dir, db_name);
-    fs.writeFileSync(db_path, JSON.stringify(json_db));
+    const dbPath = path.join(papersDir, db_name);
+    fs.writeFileSync(dbPath, JSON.stringify(json_db));
   } catch (err) {
     logger.warn(err);
   }

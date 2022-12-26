@@ -249,16 +249,16 @@ function getDocIDManuallyWritten(pdf: string): DocID | null {
 
 async function getTitleFromPDF(
   pdf: string,
-  papers_dir: string
+  papersDir: string
 ): Promise<string | null> {
   const pdfExtract = new PDFExtract();
   const options: PDFExtractOptions = {}; /* see below */
   const data = await pdfExtract
-    .extract(path.join(papers_dir, pdf), options)
+    .extract(path.join(papersDir, pdf), options)
     .catch(() => {
       logger.warn(
         "Failed to extract data using pdfExtract from " +
-          path.join(papers_dir, pdf)
+          path.join(papersDir, pdf)
       );
       return {};
     });
@@ -268,7 +268,7 @@ async function getTitleFromPDF(
     data["meta"]["metadata"]["dc:title"] != null
   ) {
     const title = data["meta"]["metadata"]["dc:title"];
-    logger.info("getTitleFromPDF(" + pdf + ", " + papers_dir + ") = " + title);
+    logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = " + title);
     return title;
   } else if (
     data["meta"] != null &&
@@ -276,26 +276,26 @@ async function getTitleFromPDF(
     data["meta"]["info"]["Title"] != null
   ) {
     const title = data["meta"]["info"]["Title"];
-    logger.info("getTitleFromPDF(" + pdf + ", " + papers_dir + ") = " + title);
+    logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = " + title);
     return title;
   } else {
-    logger.info("getTitleFromPDF(" + pdf + ", " + papers_dir + ") = null");
+    logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = null");
     return null;
   }
 }
 
 async function getDocIDFromTitle(
   pdf: string,
-  papers_dir: string
+  papersDir: string
 ): Promise<DocID | null> {
   let titles: string[] = [];
-  const title_from_pdf = await getTitleFromPDF(pdf, papers_dir);
+  const titleFromPdf = await getTitleFromPDF(pdf, papersDir);
   if (
-    title_from_pdf != null &&
-    path.extname(title_from_pdf) != ".dvi" &&
-    path.extname(title_from_pdf) != ".pdf"
+    titleFromPdf != null &&
+    path.extname(titleFromPdf) != ".dvi" &&
+    path.extname(titleFromPdf) != ".pdf"
   ) {
-    titles.push(title_from_pdf);
+    titles.push(titleFromPdf);
   }
 
   let { got } = await import("got");
@@ -324,7 +324,7 @@ async function getDocIDFromTitle(
   return null;
 }
 
-function is_valid_docID(docID: DocID) {
+function isValidDocID(docID: DocID) {
   if (
     docID.arxiv != null ||
     docID.doi != null ||
@@ -337,11 +337,11 @@ function is_valid_docID(docID: DocID) {
 
 async function getDocID(
   pdf: string,
-  papers_dir: string,
-  is_book: boolean,
-  download_url: string | null
+  papersDir: string,
+  isBook: boolean,
+  downloadUrl: string | null
 ): Promise<DocID> {
-  const pdf_fullpath = path.join(papers_dir, pdf);
+  const pdf_fullpath = path.join(papersDir, pdf);
 
   // Handle docIDs embedded in filenames.
   const manuallyWrittenDocID = getDocIDManuallyWritten(pdf);
@@ -350,17 +350,17 @@ async function getDocID(
   }
 
   // Download link gives you additional information
-  if (download_url != null) {
-    const docIDFromUrl = getDocIDFromUrl(download_url);
+  if (downloadUrl != null) {
+    const docIDFromUrl = getDocIDFromUrl(downloadUrl);
     if (docIDFromUrl != null) {
       return docIDFromUrl;
     }
   }
 
-  // Try to get information using filename as title. Skip if `is_book` because
+  // Try to get information using filename as title. Skip if `isBook` because
   // titles of chapters are sometimes confusing such as "Reference".
-  if (!is_book) {
-    const docIDFromTitle = await getDocIDFromTitle(pdf, papers_dir);
+  if (!isBook) {
+    const docIDFromTitle = await getDocIDFromTitle(pdf, papersDir);
     if (docIDFromTitle != null) {
       return docIDFromTitle;
     }
@@ -384,12 +384,12 @@ async function getDocID(
   }
   let id = getDocIDFromTexts(texts);
   logger.info("getDocIDFromTexts(texts) = " + JSON.stringify(id));
-  if (is_book) {
+  if (isBook) {
     id.doi = null;
     id.arxiv = null;
     id.path = null;
   }
-  if (is_book || is_valid_docID(id)) {
+  if (isBook || isValidDocID(id)) {
     return id;
   }
 
