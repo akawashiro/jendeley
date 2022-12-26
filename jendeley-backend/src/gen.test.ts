@@ -46,9 +46,21 @@ test("ISBN from text", async () => {
 });
 
 test("no_id from path", async () => {
-  const pdf4 = "hoge_no_id.pdf";
-  const docID4 = await getDocID(pdf4, "/hoge/", false, null);
-  expect(docID4).toStrictEqual({
+  const pdf = "hoge_no_id.pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
+    arxiv: null,
+    doi: null,
+    isbn: null,
+    path: "hoge_no_id.pdf",
+    url: null,
+  });
+});
+
+test("jendeley no id from path", async () => {
+  const pdf = "hoge [jendeley no id].pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
     arxiv: null,
     doi: null,
     isbn: null,
@@ -71,9 +83,9 @@ test("arXiv from URL", async () => {
 });
 
 test("ISBN from path", async () => {
-  const pdf5 = "hoge_isbn_9781467330763.pdf";
-  const docID5 = await getDocID(pdf5, "/hoge/", false, null);
-  expect(docID5).toStrictEqual({
+  const pdf = "hoge_isbn_9781467330763.pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
     arxiv: null,
     doi: null,
     isbn: "9781467330763",
@@ -83,9 +95,21 @@ test("ISBN from path", async () => {
 });
 
 test("ISBN from path", async () => {
-  const pdf5 = "hoge [jendeley isbn 9781467330763].pdf";
-  const docID5 = await getDocID(pdf5, "/hoge/", false, null);
-  expect(docID5).toStrictEqual({
+  const pdf = "hoge [jendeley isbn 9781467330763].pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
+    arxiv: null,
+    doi: null,
+    isbn: "9781467330763",
+    path: null,
+    url: null,
+  });
+});
+
+test("ISBN from path", async () => {
+  const pdf = "hoge [jendeley   isbn   9781467330763].pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
     arxiv: null,
     doi: null,
     isbn: "9781467330763",
@@ -95,9 +119,9 @@ test("ISBN from path", async () => {
 });
 
 test("DOI from path", async () => {
-  const pdf6 = "hoge [jendeley doi 10_1145_3290364].pdf";
-  const docID6 = await getDocID(pdf6, "/hoge/", false, null);
-  expect(docID6).toStrictEqual({
+  const pdf = "hoge [jendeley doi 10_1145_3290364].pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
     arxiv: null,
     doi: "10.1145/3290364",
     isbn: null,
