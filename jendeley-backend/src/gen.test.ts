@@ -118,6 +118,19 @@ test("DOI from path", async () => {
   });
 });
 
+test("DOI from path", async () => {
+  const pdf =
+    "Everything Old is New Again Binary Security of WebAssembly [jendeley doi 10_5555_3489212_3489225].pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, null);
+  expect(docID).toStrictEqual({
+    arxiv: null,
+    doi: "10.5555/3489212.3489225",
+    isbn: null,
+    path: null,
+    url: null,
+  });
+});
+
 test("Complicated doi from path", async () => {
   const pdf2 =
     "DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation [jendeley doi 10_1017_S095679681300018X].pdf";
