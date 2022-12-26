@@ -57,7 +57,7 @@ function RegisterWebWithDialog(props: any) {
   };
 
   async function handleRegister() {
-    console.log("Register new PDF.");
+    console.log("Register PDF.");
     const r: RequestGetWebFromUrl = {
       url: webUrl,
       title: title,
@@ -88,7 +88,7 @@ function RegisterWebWithDialog(props: any) {
         Register web article
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Register new PDF</DialogTitle>
+        <DialogTitle>Register web article</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
             <TextField
@@ -196,7 +196,7 @@ function RegisterPDFWithDialog(props: any) {
   };
 
   async function handleRegister() {
-    console.log("Register new PDF.");
+    console.log("Register PDF.");
     const r: RequestGetPdfFromUrl = {
       url: pdfUrl,
       title: title === "" ? null : title,
@@ -229,7 +229,7 @@ function RegisterPDFWithDialog(props: any) {
         Register PDF
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Register new PDF</DialogTitle>
+        <DialogTitle>Register PDF</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
             <TextField
@@ -291,7 +291,7 @@ function RegisterPDFWithDialog(props: any) {
   //       Register PDF
   //     </Button>
   //     <Dialog open={open} onClose={handleClose}>
-  //       <DialogTitle>Register new PDF</DialogTitle>
+  //       <DialogTitle>Register PDF</DialogTitle>
   //       <DialogContent>
   //         <Stack spacing={2}>
   //           <TextField
