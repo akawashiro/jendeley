@@ -7,7 +7,7 @@ import { genDB, genDummyDB } from "./gen";
 async function main() {
   const program = new Command();
 
-  program.name("jendeley").version("0.0.11", "-v, --version");
+  program.name("jendeley").version("0.0.12", "-v, --version");
 
   program
     .command("scan")
