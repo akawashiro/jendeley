@@ -463,9 +463,27 @@ async function genDB(
         " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
     );
 
-    // For Windows.
+    // TODO: For Windows.
     const register_shellscript = "edit_and_run.sh";
-    let commands = "";
+    let commands = `#! /bin/bash
+#
+# Sorry! This script works only on Linux or MacOS.
+#
+# Please edit and run this script to rename files
+# which are not registered to the database.
+# You need to specify DOI or ISBN for each files.
+#
+# To specify DOI, change the filename to include
+# [jendeley doi <DOI replaced all delimiters with underscore>].
+# For example, "cyclone [jendeley doi 10_1145_512529_512563].pdf".
+#
+# To specify ISBN, change the filename to include
+# [jendeley isbn <ISBN>]. For example,
+# "hoge [jendeley isbn 9781467330763].pdf".
+#
+# If you don't register PDFs, please rename them to include
+# [jendeley no track].  For example, "hoge [jendeley no track].pdf".
+`;
     for (const nr of not_registerd_pdfs) {
       commands =
         commands +
