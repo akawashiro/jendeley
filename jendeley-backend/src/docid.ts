@@ -253,7 +253,15 @@ async function getTitleFromPDF(
 ): Promise<string | null> {
   const pdfExtract = new PDFExtract();
   const options: PDFExtractOptions = {}; /* see below */
-  const data = await pdfExtract.extract(path.join(papers_dir, pdf), options);
+  const data = await pdfExtract
+    .extract(path.join(papers_dir, pdf), options)
+    .catch(() => {
+      logger.warn(
+        "Failed to extract data using pdfExtract from " +
+          path.join(papers_dir, pdf)
+      );
+      return {};
+    });
   if (
     data["meta"] != null &&
     data["meta"]["metadata"] != null &&
