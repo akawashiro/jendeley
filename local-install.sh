@@ -9,4 +9,4 @@ cp -r ./jendeley-frontend/build ./jendeley-backend/built-frontend
 
 pushd./jendeley-backend
 npm run build
-npm publish --dry-run
+npm install . -g
