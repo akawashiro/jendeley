@@ -2,6 +2,9 @@ FROM node:18
 
 COPY . /jendeley
 
+WORKDIR /jendeley
+RUN diff /jendeley/jendeley-backend/src/schema.ts /jendeley/jendeley-frontend/src/schema.ts
+
 WORKDIR /jendeley/jendeley-backend
 RUN npm install
 RUN npm run check:prettier
