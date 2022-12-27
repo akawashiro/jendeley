@@ -1,7 +1,12 @@
 #! /bin/bash -eux
 
-cd jendeley-frontend
+pushd ./jendeley-frontend
 npm run build
-cd ../jendeley-backend
+popd
+
+rm -rf ./jendeley-backend/built-frontend
+cp -r ./jendeley-frontend/build ./jendeley-backend/built-frontend
+
+pushd./jendeley-backend
 npm run build
 npm install . -g
