@@ -21,13 +21,13 @@ test("Title from path", async () => {
 test("JSON from path", async () => {
   const pdf =
     "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   const t = await getJson(docID, pdf);
   expect(t).toBeTruthy();
-  if (t == null) return;
+  if (t == undefined) return;
   const json = t[0];
   expect(json).toBeTruthy();
-  if (json == null) return;
+  if (json == undefined) return;
   expect(json["title"]).toBe(
     "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf"
   );
@@ -47,25 +47,25 @@ test("ISBN from text", async () => {
 
 test("no_id from path", async () => {
   const pdf = "hoge_no_id.pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
-    doi: null,
-    isbn: null,
+    arxiv: undefined,
+    doi: undefined,
+    isbn: undefined,
     path: "hoge_no_id.pdf",
-    url: null,
+    url: undefined,
   });
 });
 
 test("jendeley no id from path", async () => {
   const pdf = "hoge [jendeley no id].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
-    doi: null,
-    isbn: null,
+    arxiv: undefined,
+    doi: undefined,
+    isbn: undefined,
     path: "hoge [jendeley no id].pdf",
-    url: null,
+    url: undefined,
   });
 });
 
@@ -75,282 +75,282 @@ test("arXiv from URL", async () => {
   const docID = await getDocID(pdf, "/hoge/", false, url);
   expect(docID).toStrictEqual({
     arxiv: "2212.07677",
-    doi: null,
-    isbn: null,
-    path: null,
-    url: null,
+    doi: undefined,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("ISBN from path", async () => {
   const pdf = "hoge [jendeley isbn 9781467330763].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
-    doi: null,
+    arxiv: undefined,
+    doi: undefined,
     isbn: "9781467330763",
-    path: null,
-    url: null,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("ISBN from path", async () => {
   const pdf = "hoge [jendeley   isbn   9781467330763].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
-    doi: null,
+    arxiv: undefined,
+    doi: undefined,
     isbn: "9781467330763",
-    path: null,
-    url: null,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("DOI from path", async () => {
   const pdf = "hoge [jendeley doi 10_1145_3290364].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1145/3290364",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("DOI from path", async () => {
   const pdf =
     "Everything Old is New Again Binary Security of WebAssembly [jendeley doi 10_5555_3489212_3489225].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.5555/3489212.3489225",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("Complicated doi from path", async () => {
   const pdf2 =
     "DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation [jendeley doi 10_1017_S095679681300018X].pdf";
-  const docID2 = await getDocID(pdf2, "/hoge/", false, null);
+  const docID2 = await getDocID(pdf2, "/hoge/", false, undefined);
   expect(docID2).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1017/S095679681300018X",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf4 =
     "MemoryModel/[Scott Owens, Susmit Sarkar, Peter Sewell] A Better x86 Memory Model x86-TSO [jendeley doi 10_1007_978-3-642-03359-9_27].pdf";
-  const docID4 = await getDocID(pdf4, "/hoge/", false, null);
+  const docID4 = await getDocID(pdf4, "/hoge/", false, undefined);
   expect(docID4).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1007/978-3-642-03359-9_27",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf5 =
     "Riffle An Efficient Communication System with Strong Anonymity [jendeley doi 10_1515_popets-2016-0008].pdf";
-  const docID5 = await getDocID(pdf5, "/hoge/", false, null);
+  const docID5 = await getDocID(pdf5, "/hoge/", false, undefined);
   expect(docID5).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1515/popets-2016-0008",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf7 =
     "[Peter Dybjer] Inductive families [jendeley doi 10_1007_BF01211308].pdf";
-  const docID7 = await getDocID(pdf7, "/hoge/", false, null);
+  const docID7 = await getDocID(pdf7, "/hoge/", false, undefined);
   expect(docID7).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1007/BF01211308",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf9 =
     "[Henk Barendregt] Lambda Calculus with Types [jendeley doi 10_1017_CBO9781139032636].pdf";
-  const docID9 = await getDocID(pdf9, "/hoge/", false, null);
+  const docID9 = await getDocID(pdf9, "/hoge/", false, undefined);
   expect(docID9).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1017/CBO9781139032636",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("Complicated journal-like doi from path", async () => {
   const pdf1 =
     "Call-by-name, call-by-value and the λ-calculus [jendeley doi 10_1016_0304-3975(75)90017-1].pdf";
-  const docID1 = await getDocID(pdf1, "/hoge/", false, null);
+  const docID1 = await getDocID(pdf1, "/hoge/", false, undefined);
   expect(docID1).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1016/0304-3975(75)90017-1",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf3 =
     "Emerging-MPEG-Standards-for-Point-Cloud-Compression [jendeley doi 10_1109_JETCAS_2018_2885981].pdf";
-  const docID3 = await getDocID(pdf3, "/hoge/", false, null);
+  const docID3 = await getDocID(pdf3, "/hoge/", false, undefined);
   expect(docID3).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1109/JETCAS.2018.2885981",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf10 =
     "[John C. Reynolds] Separation Logic A Logic for Shared Mutable Data Structures [jendeley doi 10_1109_LICS_2002_1029817].pdf";
-  const docID10 = await getDocID(pdf10, "/hoge/", false, null);
+  const docID10 = await getDocID(pdf10, "/hoge/", false, undefined);
   expect(docID10).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1109/LICS.2002.1029817",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("Complicated journal-like doi from path", async () => {
   const pdf1 =
     "Call-by-name, call-by-value and the λ-calculus [jendeley doi 10_1016_0304-3975(75)90017-1].pdf";
-  const docID1 = await getDocID(pdf1, "/hoge/", false, null);
+  const docID1 = await getDocID(pdf1, "/hoge/", false, undefined);
   expect(docID1).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1016/0304-3975(75)90017-1",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf3 =
     "Emerging-MPEG-Standards-for-Point-Cloud-Compression [jendeley doi 10_1109_JETCAS_2018_2885981].pdf";
-  const docID3 = await getDocID(pdf3, "/hoge/", false, null);
+  const docID3 = await getDocID(pdf3, "/hoge/", false, undefined);
   expect(docID3).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1109/JETCAS.2018.2885981",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 
   const pdf10 =
     "[John C. Reynolds] Separation Logic A Logic for Shared Mutable Data Structures [jendeley doi 10_1109_LICS_2002_1029817].pdf";
-  const docID10 = await getDocID(pdf10, "/hoge/", false, null);
+  const docID10 = await getDocID(pdf10, "/hoge/", false, undefined);
   expect(docID10).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1109/LICS.2002.1029817",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("Complicated book-like doi from path", async () => {
   const pdf =
     "MultistageProgramming/[Oleg Kiselyov] The Design and Implementation of BER MetaOCaml [jendeley doi 10_1007_978-3-319-07151-0_6].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1007/978-3-319-07151-0_6",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test("Complicated book-like doi from path", async () => {
   const pdf =
     "[Paul Blain Levy] Call By Push Value [jendeley doi 10_1007_978-94-007-0954-6].pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
+    arxiv: undefined,
     doi: "10.1007/978-94-007-0954-6",
-    isbn: null,
-    path: null,
-    url: null,
+    isbn: undefined,
+    path: undefined,
+    url: undefined,
   });
 });
 
 test.skip("Lonely planet China", async () => {
   const pdf = "lonelyplanet-china-15-full-book.pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, null);
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
   expect(docID).toStrictEqual({
-    arxiv: null,
-    doi: null,
+    arxiv: undefined,
+    doi: undefined,
     isbn: "9781786575227",
-    path: null,
-    url: null,
+    path: undefined,
+    url: undefined,
   });
 });
 
 // test("ISBN from path", async () => {
 //   const pdf = "hoge_isbn_9781467330763.pdf";
-//   const docID = await getDocID(pdf, "/hoge/", false, null);
+//   const docID = await getDocID(pdf, "/hoge/", false, undefined);
 //   expect(docID).toStrictEqual({
-//     arxiv: null,
-//     doi: null,
+//     arxiv: undefined,
+//     doi: undefined,
 //     isbn: "9781467330763",
-//     path: null,
-//     url: null,
+//     path: undefined,
+//     url: undefined,
 //   });
 // });
 //
 // test("DOI from path", async () => {
 //   const pdf6 = "hoge_doi_10_1145_3290364.pdf";
-//   const docID6 = await getDocID(pdf6, "/hoge/", false, null);
+//   const docID6 = await getDocID(pdf6, "/hoge/", false, undefined);
 //   expect(docID6).toStrictEqual({
-//     arxiv: null,
+//     arxiv: undefined,
 //     doi: "10.1145/3290364",
-//     isbn: null,
-//     path: null,
-//     url: null,
+//     isbn: undefined,
+//     path: undefined,
+//     url: undefined,
 //   });
 //
 //   const pdf7 =
 //     "A Dependently Typed Assembly Language_doi_10_1145_507635_507657.pdf";
-//   const docID7 = await getDocID(pdf7, "/hoge/", false, null);
+//   const docID7 = await getDocID(pdf7, "/hoge/", false, undefined);
 //   expect(docID7).toStrictEqual({
-//     arxiv: null,
+//     arxiv: undefined,
 //     doi: "10.1145/507635.507657",
-//     isbn: null,
-//     path: null,
-//     url: null,
+//     isbn: undefined,
+//     path: undefined,
+//     url: undefined,
 //   });
 // });
 
 // test("Complicated book-like doi from path", async () => {
 //   const pdf6 =
 //     "MultistageProgramming/[Oleg Kiselyov] The Design and Implementation of BER MetaOCaml_doi_10_1007_978-3-319-07151-0_6.pdf";
-//   const docID6 = await getDocID(pdf6, "/hoge/", false, null);
+//   const docID6 = await getDocID(pdf6, "/hoge/", false, undefined);
 //   expect(docID6).toStrictEqual({
-//     arxiv: null,
+//     arxiv: undefined,
 //     doi: "10.1007/978-3-319-07151-0_6",
-//     isbn: null,
-//     path: null,
-//     url: null,
+//     isbn: undefined,
+//     path: undefined,
+//     url: undefined,
 //   });
 //
 //   const pdf11 =
 //     "[Paul Blain Levy] Call By Push Value_doi_10_1007_978-94-007-0954-6.pdf";
-//   const docID11 = await getDocID(pdf11, "/hoge/", false, null);
+//   const docID11 = await getDocID(pdf11, "/hoge/", false, undefined);
 //   expect(docID11).toStrictEqual({
-//     arxiv: null,
+//     arxiv: undefined,
 //     doi: "10.1007/978-94-007-0954-6",
-//     isbn: null,
-//     path: null,
-//     url: null,
+//     isbn: undefined,
+//     path: undefined,
+//     url: undefined,
 //   });
 // });

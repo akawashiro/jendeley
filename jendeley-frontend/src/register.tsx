@@ -199,9 +199,9 @@ function RegisterPDFWithDialog(props: any) {
     console.log("Register PDF.");
     const r: RequestGetPdfFromUrl = {
       url: pdfUrl,
-      title: title === "" ? null : title,
-      isbn: isbn === "" ? null : isbn,
-      doi: doi === "" ? null : doi,
+      title: title === "" ? undefined : title,
+      isbn: isbn === "" ? undefined : isbn,
+      doi: doi === "" ? undefined : doi,
       tags: splitTagsStr(tags),
       comments: comments,
     };
