@@ -58,4 +58,4 @@ async function main() {
   program.parse();
 }
 
-main().then((_arg) => { });
+main().then((_arg) => {});
