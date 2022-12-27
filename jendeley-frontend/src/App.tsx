@@ -96,10 +96,11 @@ function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
   } else {
     return (
       <a
-        href={`${REACT_APP_API_URL +
+        href={`${
+          REACT_APP_API_URL +
           "/api/get_pdf/?file=" +
           base_64.encode(escape(row.original.path))
-          }`}
+        }`}
         target="_blank"
         rel="noopener noreferrer"
       >{`${cell.getValue()}`}</a>
