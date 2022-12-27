@@ -26,7 +26,7 @@ function DeleteButton(props: any) {
 
   async function deleteRow(
     id: string,
-    id_type: IDType,
+    idType: IDType,
     tableData: any,
     setTableData: any
   ) {
@@ -37,7 +37,7 @@ function DeleteButton(props: any) {
       authors: [],
       id: id,
       url: "",
-      id_type: id_type,
+      idType: idType,
       title: "",
       path: "",
       tags: [],
@@ -78,7 +78,7 @@ function DeleteButton(props: any) {
             onClick={() =>
               deleteRow(
                 props.id,
-                props.id_type,
+                props.idType,
                 props.tableData,
                 props.setTableData
               )

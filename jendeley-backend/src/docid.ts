@@ -362,8 +362,8 @@ async function getDocIDFromTitle(
     const options = { headers: { Accept: "application/json" } };
     try {
       const data = (await got(URL, options).json()) as Object;
-      const n_item = data["message"]["items"].length;
-      for (let i = 0; i < n_item; i++) {
+      const nItem = data["message"]["items"].length;
+      for (let i = 0; i < nItem; i++) {
         const t = data["message"]["items"][i]["title"][0].toLowerCase();
         if (title.toLowerCase() == t) {
           logger.info("title = " + title + " t = " + t);

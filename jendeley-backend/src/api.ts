@@ -38,7 +38,7 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
-      id_type: json[id]["id_type"],
+      idType: json[id]["id_type"],
       url: json[id]["url"],
       title: title,
       authors: authors,
@@ -76,7 +76,7 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
-      id_type: json[id]["id_type"],
+      idType: json[id]["id_type"],
       title: title,
       url: "",
       authors: authors,
@@ -116,7 +116,7 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
-      id_type: json[id]["id_type"],
+      idType: json[id]["id_type"],
       title: title,
       authors: authors,
       url: "",
@@ -157,7 +157,7 @@ function getEntry(id: string, json: any): Entry {
 
     const e = {
       id: id,
-      id_type: json[id]["id_type"],
+      idType: json[id]["id_type"],
       title: title,
       url: "",
       authors: authors,
@@ -183,7 +183,7 @@ function getEntry(id: string, json: any): Entry {
     const publisher = "";
     const e = {
       id: id,
-      id_type: json[id]["id_type"],
+      idType: json[id]["id_type"],
       title: title,
       url: "",
       authors: authors,
