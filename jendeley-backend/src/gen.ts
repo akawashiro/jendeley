@@ -337,19 +337,15 @@ async function registerNonBookPDF(
   }
 }
 
-async function genDB(
-  papersDir: string,
-  book_dirs_str: string,
-  db_name: string
-) {
-  let book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
-  for (let i = 0; i < book_dirs.length; i++) {
+async function genDB(papersDir: string, bookDirsStr: string, db_name: string) {
+  let bookDirs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
+  for (let i = 0; i < bookDirs.length; i++) {
     // TODO: OS dependency
-    if (book_dirs[i].slice(-1) != "/") {
-      book_dirs[i] = book_dirs[i] + "/";
+    if (bookDirs[i].slice(-1) != "/") {
+      bookDirs[i] = bookDirs[i] + "/";
     }
-    if (book_dirs[i].startsWith(papersDir)) {
-      book_dirs[i] = book_dirs[i].replace(papersDir, "");
+    if (bookDirs[i].startsWith(papersDir)) {
+      bookDirs[i] = bookDirs[i].replace(papersDir, "");
     }
   }
 
@@ -357,22 +353,22 @@ async function genDB(
     logger.warn("papersDir:", papersDir + " is not exist.");
     return;
   }
-  for (const bd of book_dirs) {
+  for (const bd of bookDirs) {
     if (!fs.existsSync(path.join(papersDir, bd))) {
       logger.warn("bd:", path.join(papersDir, bd) + " is not exist.");
       return;
     }
   }
 
-  let book_db = new Object();
-  let json_db = new Object();
+  let bookDB = new Object();
+  let jsonDB = new Object();
   let exsting_pdfs: string[] = [];
   if (fs.existsSync(path.join(papersDir, db_name))) {
-    json_db = JSON.parse(
+    jsonDB = JSON.parse(
       fs.readFileSync(path.join(papersDir, db_name)).toString()
     );
-    for (const id of Object.keys(json_db)) {
-      exsting_pdfs.push(json_db[id]["path"]);
+    for (const id of Object.keys(jsonDB)) {
+      exsting_pdfs.push(jsonDB[id]["path"]);
     }
   }
 
@@ -386,9 +382,9 @@ async function genDB(
 
     logger.info("Processing " + p);
     let is_book = false;
-    for (const bd of book_dirs) {
-      if (book_db[bd] == undefined) {
-        book_db[bd] = {};
+    for (const bd of bookDirs) {
+      if (bookDB[bd] == undefined) {
+        bookDB[bd] = {};
       }
       if (p.startsWith(bd)) {
         is_book = true;
@@ -396,19 +392,19 @@ async function genDB(
         const t = await getJson(docID, p);
         if (t != null && t[0]["id_type"] == "isbn") {
           const json = t[0];
-          book_db[bd][p] = json;
-          book_db[bd]["id"] = t[1];
+          bookDB[bd][p] = json;
+          bookDB[bd]["id"] = t[1];
         } else {
-          book_db[bd][p] = new Object();
+          bookDB[bd][p] = new Object();
         }
       }
     }
 
     if (!is_book) {
-      json_db = await registerNonBookPDF(
+      jsonDB = await registerNonBookPDF(
         papersDir,
         p,
-        json_db,
+        jsonDB,
         null,
         "",
         [],
@@ -418,20 +414,20 @@ async function genDB(
     }
   }
 
-  for (const book_dir of Object.keys(book_db)) {
+  for (const book_dir of Object.keys(bookDB)) {
     let book_info: Object | null = null;
     let book_id: string | null = "";
-    for (const path of Object.keys(book_db[book_dir])) {
+    for (const path of Object.keys(bookDB[book_dir])) {
       if (
-        book_db[book_dir][path] != null &&
-        book_db[book_dir][path]["id_type"] == "isbn"
+        bookDB[book_dir][path] != null &&
+        bookDB[book_dir][path]["id_type"] == "isbn"
       ) {
-        book_info = book_db[book_dir][path];
-        book_id = book_db[book_dir]["id"];
+        book_info = bookDB[book_dir][path];
+        book_id = bookDB[book_dir]["id"];
       }
     }
     if (book_info != null && book_id != null) {
-      for (const chapter_path of Object.keys(book_db[book_dir])) {
+      for (const chapter_path of Object.keys(bookDB[book_dir])) {
         const chapter_id = book_id + "_" + path.basename(chapter_path);
         let chapter_info = JSON.parse(JSON.stringify(book_info));
         chapter_info["title"] = path.join(
@@ -440,19 +436,19 @@ async function genDB(
         );
         chapter_info["id_type"] = "book";
         chapter_info["path"] = chapter_path;
-        if (json_db.hasOwnProperty(chapter_id)) {
+        if (jsonDB.hasOwnProperty(chapter_id)) {
           logger.warn(chapter_id, " is already registered.");
         }
         if (isValidJsonEntry(chapter_info)) {
-          json_db[chapter_id] = chapter_info;
+          jsonDB[chapter_id] = chapter_info;
         }
       }
     }
   }
 
   let registered_pdfs: string[] = [];
-  for (const id of Object.keys(json_db)) {
-    registered_pdfs.push(json_db[id]["path"]);
+  for (const id of Object.keys(jsonDB)) {
+    registered_pdfs.push(jsonDB[id]["path"]);
   }
 
   const not_registerd_pdfs = pdfs.filter((x) => !registered_pdfs.includes(x));
@@ -500,7 +496,7 @@ async function genDB(
 
   try {
     const dbPath = path.join(papersDir, db_name);
-    fs.writeFileSync(dbPath, JSON.stringify(json_db));
+    fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
   } catch (err) {
     logger.warn(err);
   }
