@@ -206,21 +206,21 @@ function isValidJsonEntry(json: Object) {
 function genDummyDB(output: string) {
   const n_entry = 500;
 
-  let json_db = new Object();
+  let jsonDB = new Object();
   for (let i = 0; i < n_entry; i++) {
     const id = "path_" + crypto.randomBytes(20).toString("hex");
-    json_db[id] = new Object();
-    json_db[id]["title"] = crypto.randomBytes(40).toString("hex");
-    json_db[id]["path"] = crypto.randomBytes(40).toString("hex");
-    json_db[id]["abstract"] = crypto.randomBytes(280).toString("hex");
-    json_db[id]["comments"] = crypto.randomBytes(280).toString("hex");
+    jsonDB[id] = new Object();
+    jsonDB[id]["title"] = crypto.randomBytes(40).toString("hex");
+    jsonDB[id]["path"] = crypto.randomBytes(40).toString("hex");
+    jsonDB[id]["abstract"] = crypto.randomBytes(280).toString("hex");
+    jsonDB[id]["comments"] = crypto.randomBytes(280).toString("hex");
   }
 
-  fs.writeFileSync(output, JSON.stringify(json_db));
+  fs.writeFileSync(output, JSON.stringify(jsonDB));
 }
 
 function registerWeb(
-  json_db: any,
+  jsonDB: any,
   url: string,
   title: string,
   comments: string,
@@ -253,12 +253,12 @@ function registerWeb(
   json["id_type"] = "url";
 
   if (isValidJsonEntry(json)) {
-    json_db["url_" + url] = json;
+    jsonDB["url_" + url] = json;
     logger.info("Register url_" + url);
-    return json_db;
+    return jsonDB;
   } else {
     logger.warn("Failed to register url_" + url);
-    return json_db;
+    return jsonDB;
   }
 }
 
@@ -269,8 +269,8 @@ async function registerNonBookPDF(
   userSpecifiedTitle: string | undefined,
   comments: string,
   tags: string[],
-  rename_using_title: boolean,
-  download_url: string | undefined
+  renameUsingTitle: boolean,
+  downloadUrl: string | undefined
 ) {
   logger.info(
     "papersDir = " +
@@ -282,7 +282,7 @@ async function registerNonBookPDF(
       " comments = " +
       comments
   );
-  const docID = await getDocID(pdf, papersDir, false, download_url);
+  const docID = await getDocID(pdf, papersDir, false, downloadUrl);
   logger.info("docID = " + JSON.stringify(docID));
   if (
     docID.arxiv == undefined &&
@@ -321,7 +321,7 @@ async function registerNonBookPDF(
 
   if (isValidJsonEntry(json)) {
     // TODO: Condition of json["id_type"] != "path" is not good
-    if (rename_using_title && json["id_type"] != "path") {
+    if (renameUsingTitle && json["id_type"] != "path") {
       const newFilename = path.join(
         path.dirname(pdf),
         json["title"].replace(/[/\\?%*:|"<>.]/g, "") + " " + path.basename(pdf)
@@ -389,13 +389,13 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     }
 
     logger.info("Processing " + p);
-    let is_book = false;
+    let isBook = false;
     for (const bd of bookDirs) {
       if (bookDB[bd] == undefined) {
         bookDB[bd] = {};
       }
       if (p.startsWith(bd)) {
-        is_book = true;
+        isBook = true;
         const docID = await getDocID(p, papersDir, true, undefined);
         const t = await getJson(docID, p);
         if (t != undefined && t[0]["id_type"] == "isbn") {
@@ -408,7 +408,7 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
       }
     }
 
-    if (!is_book) {
+    if (!isBook) {
       jsonDB = await registerNonBookPDF(
         papersDir,
         p,

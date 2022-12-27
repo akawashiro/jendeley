@@ -85,7 +85,7 @@ function stringArrayFilterFn(
 }
 
 function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
-  if (row.original.id_type === "url") {
+  if (row.original.idType === "url") {
     return (
       <a
         href={`${row.original.url}`}
@@ -125,7 +125,7 @@ function App() {
         Cell: ({ cell, row }) => (
           <DeleteButton
             id={`${cell.getValue<string>()}`}
-            id_type={`${row.original.id_type}`}
+            idType={`${row.original.idType}`}
             title={`${row.original.title}`}
             setTableData={setTableData}
             tableData={tableData}
@@ -211,7 +211,7 @@ function App() {
       abstract: tableData[cell.row.index]["abstract"],
       authors: tableData[cell.row.index]["authors"],
       id: tableData[cell.row.index]["id"],
-      id_type: tableData[cell.row.index]["id_type"],
+      idType: tableData[cell.row.index]["idType"],
       url: tableData[cell.row.index]["url"],
       title: tableData[cell.row.index]["title"],
       path: tableData[cell.row.index]["path"],

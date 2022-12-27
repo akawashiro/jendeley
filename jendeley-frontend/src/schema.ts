@@ -4,7 +4,7 @@ type IDType = "doi" | "isbn" | "url" | "book";
 
 type Entry = {
   id: string;
-  id_type: IDType;
+  idType: IDType;
   url: string;
   title: string;
   path: string;
