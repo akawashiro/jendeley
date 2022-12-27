@@ -255,8 +255,8 @@ function registerWeb(
 async function registerNonBookPDF(
   papersDir: string,
   pdf: string,
-  json_db: any,
-  user_specified_title: string | null,
+  jsonDB: any,
+  userSpecifiedTitle: string | null,
   comments: string,
   tags: string[],
   rename_using_title: boolean,
@@ -286,70 +286,64 @@ async function registerNonBookPDF(
 
   if (t == null) {
     logger.warn(pdf + " is not valid.");
-    return json_db;
+    return jsonDB;
   }
 
   const json = t[0];
   const dbID = t[1];
 
-  if (user_specified_title != null) {
-    json["title"] = user_specified_title;
+  if (userSpecifiedTitle != null) {
+    json["title"] = userSpecifiedTitle;
   }
   json["comments"] = comments;
   json["tags"] = tags;
 
-  if (json_db.hasOwnProperty(dbID)) {
+  if (jsonDB.hasOwnProperty(dbID)) {
     logger.warn(
       pdf +
         " is duplicated. You can find another file in " +
-        json_db[dbID]["path"] +
+        jsonDB[dbID]["path"] +
         "."
     );
     console.warn("mv ", '"' + pdf + '" duplicated');
-    return json_db;
+    return jsonDB;
   }
 
   if (isValidJsonEntry(json)) {
     // TODO: Condition of json["id_type"] != "path" is not good
     if (rename_using_title && json["id_type"] != "path") {
-      const new_filename = path.join(
+      const newFilename = path.join(
         path.dirname(pdf),
         json["title"].replace(/[/\\?%*:|"<>.]/g, "") + " " + path.basename(pdf)
       );
-      const old_fileneme = json["path"];
-      json["path"] = new_filename;
+      const oldFileneme = json["path"];
+      json["path"] = newFilename;
 
-      if (fs.existsSync(path.join(papersDir, new_filename))) {
-        logger.warn(new_filename + " already exists. Skip registration.");
-        return json_db;
+      if (fs.existsSync(path.join(papersDir, newFilename))) {
+        logger.warn(newFilename + " already exists. Skip registration.");
+        return jsonDB;
       }
       fs.renameSync(
-        path.join(papersDir, old_fileneme),
-        path.join(papersDir, new_filename)
+        path.join(papersDir, oldFileneme),
+        path.join(papersDir, newFilename)
       );
-      logger.info("Rename " + old_fileneme + " to " + new_filename);
+      logger.info("Rename " + oldFileneme + " to " + newFilename);
     }
 
-    json_db[dbID] = json;
-    return json_db;
+    jsonDB[dbID] = json;
+    return jsonDB;
   } else {
-    return json_db;
+    return jsonDB;
   }
 }
 
-async function genDB(
-  papersDir: string,
-  book_dirs_str: string,
-  db_name: string
-) {
-  let book_dirs = book_dirs_str == "" ? [] : book_dirs_str.split(",");
-  for (let i = 0; i < book_dirs.length; i++) {
-    // TODO: OS dependency
-    if (book_dirs[i].slice(-1) != "/") {
-      book_dirs[i] = book_dirs[i] + "/";
-    }
-    if (book_dirs[i].startsWith(papersDir)) {
-      book_dirs[i] = book_dirs[i].replace(papersDir, "");
+async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
+  papersDir = path.resolve(papersDir);
+  let bookDirs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
+  for (let i = 0; i < bookDirs.length; i++) {
+    bookDirs[i] = path.resolve(bookDirs[i]);
+    if (bookDirs[i].startsWith(papersDir)) {
+      bookDirs[i] = bookDirs[i].replace(papersDir, "");
     }
   }
 
@@ -357,22 +351,22 @@ async function genDB(
     logger.warn("papersDir:", papersDir + " is not exist.");
     return;
   }
-  for (const bd of book_dirs) {
+  for (const bd of bookDirs) {
     if (!fs.existsSync(path.join(papersDir, bd))) {
       logger.warn("bd:", path.join(papersDir, bd) + " is not exist.");
       return;
     }
   }
 
-  let book_db = new Object();
-  let json_db = new Object();
-  let exsting_pdfs: string[] = [];
-  if (fs.existsSync(path.join(papersDir, db_name))) {
-    json_db = JSON.parse(
-      fs.readFileSync(path.join(papersDir, db_name)).toString()
+  let bookDB = new Object();
+  let jsonDB = new Object();
+  let exstingPdfs: string[] = [];
+  if (fs.existsSync(path.join(papersDir, dbName))) {
+    jsonDB = JSON.parse(
+      fs.readFileSync(path.join(papersDir, dbName)).toString()
     );
-    for (const id of Object.keys(json_db)) {
-      exsting_pdfs.push(json_db[id]["path"]);
+    for (const id of Object.keys(jsonDB)) {
+      exstingPdfs.push(jsonDB[id]["path"]);
     }
   }
 
@@ -380,15 +374,15 @@ async function genDB(
   pdfs.sort();
   pdfs = pdfs.filter((p) => !p.includes(JENDELEY_NO_TRACK));
   for (const p of pdfs) {
-    if (exsting_pdfs.includes(p)) {
+    if (exstingPdfs.includes(p)) {
       continue;
     }
 
     logger.info("Processing " + p);
     let is_book = false;
-    for (const bd of book_dirs) {
-      if (book_db[bd] == undefined) {
-        book_db[bd] = {};
+    for (const bd of bookDirs) {
+      if (bookDB[bd] == undefined) {
+        bookDB[bd] = {};
       }
       if (p.startsWith(bd)) {
         is_book = true;
@@ -396,19 +390,19 @@ async function genDB(
         const t = await getJson(docID, p);
         if (t != null && t[0]["id_type"] == "isbn") {
           const json = t[0];
-          book_db[bd][p] = json;
-          book_db[bd]["id"] = t[1];
+          bookDB[bd][p] = json;
+          bookDB[bd]["id"] = t[1];
         } else {
-          book_db[bd][p] = new Object();
+          bookDB[bd][p] = new Object();
         }
       }
     }
 
     if (!is_book) {
-      json_db = await registerNonBookPDF(
+      jsonDB = await registerNonBookPDF(
         papersDir,
         p,
-        json_db,
+        jsonDB,
         null,
         "",
         [],
@@ -418,53 +412,53 @@ async function genDB(
     }
   }
 
-  for (const book_dir of Object.keys(book_db)) {
-    let book_info: Object | null = null;
-    let book_id: string | null = "";
-    for (const path of Object.keys(book_db[book_dir])) {
+  for (const bookDir of Object.keys(bookDB)) {
+    let bookInfo: Object | null = null;
+    let bookID: string | null = "";
+    for (const path of Object.keys(bookDB[bookDir])) {
       if (
-        book_db[book_dir][path] != null &&
-        book_db[book_dir][path]["id_type"] == "isbn"
+        bookDB[bookDir][path] != null &&
+        bookDB[bookDir][path]["id_type"] == "isbn"
       ) {
-        book_info = book_db[book_dir][path];
-        book_id = book_db[book_dir]["id"];
+        bookInfo = bookDB[bookDir][path];
+        bookID = bookDB[bookDir]["id"];
       }
     }
-    if (book_info != null && book_id != null) {
-      for (const chapter_path of Object.keys(book_db[book_dir])) {
-        const chapter_id = book_id + "_" + path.basename(chapter_path);
-        let chapter_info = JSON.parse(JSON.stringify(book_info));
-        chapter_info["title"] = path.join(
-          chapter_info["title"],
-          path.basename(chapter_path, ".pdf")
+    if (bookInfo != null && bookID != null) {
+      for (const chapterPath of Object.keys(bookDB[bookDir])) {
+        const chapterID = bookID + "_" + path.basename(chapterPath);
+        let chapterInfo = JSON.parse(JSON.stringify(bookInfo));
+        chapterInfo["title"] = path.join(
+          chapterInfo["title"],
+          path.basename(chapterPath, ".pdf")
         );
-        chapter_info["id_type"] = "book";
-        chapter_info["path"] = chapter_path;
-        if (json_db.hasOwnProperty(chapter_id)) {
-          logger.warn(chapter_id, " is already registered.");
+        chapterInfo["id_type"] = "book";
+        chapterInfo["path"] = chapterPath;
+        if (jsonDB.hasOwnProperty(chapterID)) {
+          logger.warn(chapterID, " is already registered.");
         }
-        if (isValidJsonEntry(chapter_info)) {
-          json_db[chapter_id] = chapter_info;
+        if (isValidJsonEntry(chapterInfo)) {
+          jsonDB[chapterID] = chapterInfo;
         }
       }
     }
   }
 
-  let registered_pdfs: string[] = [];
-  for (const id of Object.keys(json_db)) {
-    registered_pdfs.push(json_db[id]["path"]);
+  let registeredPdfs: string[] = [];
+  for (const id of Object.keys(jsonDB)) {
+    registeredPdfs.push(jsonDB[id]["path"]);
   }
 
-  const not_registerd_pdfs = pdfs.filter((x) => !registered_pdfs.includes(x));
+  const notRegisterdPdfs = pdfs.filter((x) => !registeredPdfs.includes(x));
 
-  if (not_registerd_pdfs.length > 0) {
+  if (notRegisterdPdfs.length > 0) {
     logger.warn(
-      not_registerd_pdfs.length +
+      notRegisterdPdfs.length +
         " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
     );
 
     // TODO: For Windows.
-    const register_shellscript = "edit_and_run.sh";
+    const registerShellscript = "edit_and_run.sh";
     let commands = `#! /bin/bash
 #
 # Sorry! This script works only on Linux or MacOS.
@@ -484,7 +478,7 @@ async function genDB(
 # If you don't register PDFs, please rename them to include
 # [jendeley no track].  For example, "hoge [jendeley no track].pdf".
 `;
-    for (const nr of not_registerd_pdfs) {
+    for (const nr of notRegisterdPdfs) {
       commands =
         commands +
         "mv " +
@@ -495,12 +489,12 @@ async function genDB(
         path.join(papersDir, nr) +
         '"\n';
     }
-    fs.writeFileSync(register_shellscript, commands);
+    fs.writeFileSync(registerShellscript, commands);
   }
 
   try {
-    const dbPath = path.join(papersDir, db_name);
-    fs.writeFileSync(dbPath, JSON.stringify(json_db));
+    const dbPath = path.join(papersDir, dbName);
+    fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
   } catch (err) {
     logger.warn(err);
   }
