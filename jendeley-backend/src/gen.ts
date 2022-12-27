@@ -338,12 +338,10 @@ async function registerNonBookPDF(
 }
 
 async function genDB(papersDir: string, bookDirsStr: string, db_name: string) {
+  papersDir = path.resolve(papersDir);
   let bookDirs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
   for (let i = 0; i < bookDirs.length; i++) {
-    // TODO: OS dependency
-    if (bookDirs[i].slice(-1) != "/") {
-      bookDirs[i] = bookDirs[i] + "/";
-    }
+    bookDirs[i] = path.resolve(bookDirs[i]);
     if (bookDirs[i].startsWith(papersDir)) {
       bookDirs[i] = bookDirs[i].replace(papersDir, "");
     }
