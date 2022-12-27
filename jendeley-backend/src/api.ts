@@ -17,16 +17,16 @@ import { registerWeb, registerNonBookPDF } from "./gen";
 
 function checkEntry(entry: Entry) {
   console.assert(
-    entry.title != null && entry.path != null,
+    entry.title != undefined && entry.path != undefined,
     "id = ",
     entry.id,
     "entry = ",
-    JSON.stringify(entry, null, 2)
+    JSON.stringify(entry, undefined, 2)
   );
 }
 
 function getEntry(id: string, json: any): Entry {
-  console.assert(json[id] != null, "json[" + id + "] != null");
+  console.assert(json[id] != undefined, "json[" + id + "] != undefined");
 
   if (json[id]["id_type"] == "url") {
     const title: string = json[id]["title"];
@@ -46,7 +46,7 @@ function getEntry(id: string, json: any): Entry {
       comments: comments,
       abstract: abstract,
       path: "",
-      year: null,
+      year: undefined,
       publisher: "",
     };
     checkEntry(e);
@@ -55,18 +55,18 @@ function getEntry(id: string, json: any): Entry {
     const title: string = json[id]["title"];
     const path: string = json[id]["path"];
     let authors: string[] = [];
-    if (json[id]["authors"] != null) {
+    if (json[id]["authors"] != undefined) {
       authors = json[id]["authors"];
     }
-    let year: number | null = null;
+    let year: number | undefined = undefined;
     if (
-      json[id]["publishedDate"] != null &&
+      json[id]["publishedDate"] != undefined &&
       !isNaN(parseInt(json[id]["publishedDate"].substr(0, 4)))
     ) {
       year = parseInt(json[id]["publishedDate"].substr(0, 4));
     }
     let publisher: string = "";
-    if (json[id]["publisher"] != null) {
+    if (json[id]["publisher"] != undefined) {
       publisher = json[id]["publisher"];
     }
     const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
@@ -100,16 +100,16 @@ function getEntry(id: string, json: any): Entry {
         );
       }
     }
-    let year: number | null = null;
-    if (json[id]["published-print"] != null) {
+    let year: number | undefined = undefined;
+    if (json[id]["published-print"] != undefined) {
       year = json[id]["published-print"]["date-parts"][0][0];
-    } else if (json[id]["created"] != null) {
+    } else if (json[id]["created"] != undefined) {
       year = json[id]["created"]["date-parts"][0][0];
     }
     const publisher: string =
-      json[id]["event"] != null ? json[id]["event"] : "";
+      json[id]["event"] != undefined ? json[id]["event"] : "";
     const abstract: string =
-      json[id]["abstract"] != null ? json[id]["abstract"] : "";
+      json[id]["abstract"] != undefined ? json[id]["abstract"] : "";
     const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
     const comments =
       json[id]["comments"] != undefined ? json[id]["comments"] : [];
@@ -140,17 +140,17 @@ function getEntry(id: string, json: any): Entry {
     } else {
       authors.push(json[id]["author"]["name"]);
     }
-    let year: number | null = null;
+    let year: number | undefined = undefined;
     if (
-      json[id]["published"] != null &&
+      json[id]["published"] != undefined &&
       !isNaN(parseInt(json[id]["published"].substr(0, 4)))
     ) {
       year = parseInt(json[id]["published"].substr(0, 4));
     }
     const publisher: string =
-      json[id]["event"] != null ? json[id]["event"] : "";
+      json[id]["event"] != undefined ? json[id]["event"] : "";
     const abstract: string =
-      json[id]["summary"] != null ? json[id]["summary"] : "";
+      json[id]["summary"] != undefined ? json[id]["summary"] : "";
     const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
     const comments =
       json[id]["comments"] != undefined ? json[id]["comments"] : [];
@@ -177,8 +177,9 @@ function getEntry(id: string, json: any): Entry {
     const comments =
       json[id]["comments"] != undefined ? json[id]["comments"] : [];
     const authors = [];
-    const abstract = json[id]["abstract"] != null ? json[id]["abstract"] : "";
-    const year = null;
+    const abstract =
+      json[id]["abstract"] != undefined ? json[id]["abstract"] : "";
+    const year = undefined;
     const publisher = "";
     const e = {
       id: id,
@@ -256,7 +257,7 @@ function getDB(request: Request, response: Response, db_path: string) {
   let db_response: DB = [];
 
   for (const id of Object.keys(json)) {
-    if (json[id] == null) continue;
+    if (json[id] == undefined) continue;
     const e = getEntry(id, json);
     db_response.push(e);
   }

@@ -12,7 +12,7 @@ type Entry = {
   comments: string;
   authors: string[];
   abstract: string;
-  year: number | null;
+  year: number | undefined;
   publisher: string;
 };
 
@@ -20,9 +20,9 @@ type DB = Entry[];
 
 type RequestGetPdfFromUrl = {
   url: string;
-  title: string | null;
-  doi: string | null;
-  isbn: string | null;
+  title: string | undefined;
+  doi: string | undefined;
+  isbn: string | undefined;
   tags: string[];
   comments: string;
 };

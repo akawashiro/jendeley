@@ -69,7 +69,7 @@ async function getIsbnJson(isbn: string) {
     })
     .catch(function (err) {
       logger.warn("Failed to get information from ISBN: " + isbn);
-      return null;
+      return undefined;
     });
   return b;
 }
@@ -109,13 +109,13 @@ async function getArxivJson(arxiv: string) {
 async function getJson(
   docID: DocID,
   path: string
-): Promise<[Object, string] | null> {
-  let json_r: Object | null = null;
-  let db_id: string | null = null;
+): Promise<[Object, string] | undefined> {
+  let json_r: Object | undefined = undefined;
+  let db_id: string | undefined = undefined;
 
-  if (docID.arxiv != null) {
+  if (docID.arxiv != undefined) {
     let json = await getArxivJson(docID.arxiv);
-    if (json != null) {
+    if (json != undefined) {
       json["path"] = path;
       json["id_type"] = "arxiv";
       json_r = json;
@@ -129,9 +129,12 @@ async function getJson(
       );
     }
   }
-  if (docID.doi != null && (json_r == null || json_r["title"] == null)) {
+  if (
+    docID.doi != undefined &&
+    (json_r == undefined || json_r["title"] == undefined)
+  ) {
     let json = await getDoiJSON(docID.doi);
-    if (json != null) {
+    if (json != undefined) {
       json["path"] = path;
       json["id_type"] = "doi";
       json_r = json;
@@ -145,9 +148,12 @@ async function getJson(
       );
     }
   }
-  if (docID.isbn != null && (json_r == null || json_r["title"] == null)) {
+  if (
+    docID.isbn != undefined &&
+    (json_r == undefined || json_r["title"] == undefined)
+  ) {
     let json = await getIsbnJson(docID.isbn);
-    if (json != null) {
+    if (json != undefined) {
       json["path"] = path;
       json["id_type"] = "isbn";
       json_r = json;
@@ -161,7 +167,10 @@ async function getJson(
       );
     }
   }
-  if (docID.path != null && (json_r == null || json_r["title"] == null)) {
+  if (
+    docID.path != undefined &&
+    (json_r == undefined || json_r["title"] == undefined)
+  ) {
     let json = new Object();
     json["path"] = path;
     json["title"] = docID.path;
@@ -170,7 +179,7 @@ async function getJson(
     db_id = "path_" + docID.path;
   }
 
-  if (json_r == null || db_id == null) {
+  if (json_r == undefined || db_id == undefined) {
     logger.warn(
       "Failed to get information of " +
         JSON.stringify(docID) +
@@ -181,7 +190,7 @@ async function getJson(
         " db_id = " +
         JSON.stringify(db_id)
     );
-    return null;
+    return undefined;
   } else {
     return [json_r, db_id];
   }
@@ -189,7 +198,8 @@ async function getJson(
 
 function isValidJsonEntry(json: Object) {
   return (
-    json["title"] != null && (json["path"] != null || json["id_type"] == "url")
+    json["title"] != undefined &&
+    (json["path"] != undefined || json["id_type"] == "url")
   );
 }
 
@@ -228,10 +238,10 @@ function registerWeb(
   );
   const docID: DocID = {
     url: url,
-    doi: null,
-    isbn: null,
-    path: null,
-    arxiv: null,
+    doi: undefined,
+    isbn: undefined,
+    path: undefined,
+    arxiv: undefined,
   };
   logger.info("docID = " + JSON.stringify(docID));
 
@@ -256,11 +266,11 @@ async function registerNonBookPDF(
   papersDir: string,
   pdf: string,
   jsonDB: any,
-  userSpecifiedTitle: string | null,
+  userSpecifiedTitle: string | undefined,
   comments: string,
   tags: string[],
   rename_using_title: boolean,
-  download_url: string | null
+  download_url: string | undefined
 ) {
   logger.info(
     "papersDir = " +
@@ -275,16 +285,16 @@ async function registerNonBookPDF(
   const docID = await getDocID(pdf, papersDir, false, download_url);
   logger.info("docID = " + JSON.stringify(docID));
   if (
-    docID.arxiv == null &&
-    docID.doi == null &&
-    docID.isbn == null &&
-    docID.path == null
+    docID.arxiv == undefined &&
+    docID.doi == undefined &&
+    docID.isbn == undefined &&
+    docID.path == undefined
   ) {
     logger.warn("Cannot get docID of " + pdf);
   }
   const t = await getJson(docID, pdf);
 
-  if (t == null) {
+  if (t == undefined) {
     logger.warn(pdf + " is not valid.");
     return jsonDB;
   }
@@ -292,7 +302,7 @@ async function registerNonBookPDF(
   const json = t[0];
   const dbID = t[1];
 
-  if (userSpecifiedTitle != null) {
+  if (userSpecifiedTitle != undefined) {
     json["title"] = userSpecifiedTitle;
   }
   json["comments"] = comments;
@@ -386,9 +396,9 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
       }
       if (p.startsWith(bd)) {
         is_book = true;
-        const docID = await getDocID(p, papersDir, true, null);
+        const docID = await getDocID(p, papersDir, true, undefined);
         const t = await getJson(docID, p);
-        if (t != null && t[0]["id_type"] == "isbn") {
+        if (t != undefined && t[0]["id_type"] == "isbn") {
           const json = t[0];
           bookDB[bd][p] = json;
           bookDB[bd]["id"] = t[1];
@@ -403,28 +413,28 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
         papersDir,
         p,
         jsonDB,
-        null,
+        undefined,
         "",
         [],
         false,
-        null
+        undefined
       );
     }
   }
 
   for (const bookDir of Object.keys(bookDB)) {
-    let bookInfo: Object | null = null;
-    let bookID: string | null = "";
+    let bookInfo: Object | undefined = undefined;
+    let bookID: string | undefined = "";
     for (const path of Object.keys(bookDB[bookDir])) {
       if (
-        bookDB[bookDir][path] != null &&
+        bookDB[bookDir][path] != undefined &&
         bookDB[bookDir][path]["id_type"] == "isbn"
       ) {
         bookInfo = bookDB[bookDir][path];
         bookID = bookDB[bookDir]["id"];
       }
     }
-    if (bookInfo != null && bookID != null) {
+    if (bookInfo != undefined && bookID != undefined) {
       for (const chapterPath of Object.keys(bookDB[bookDir])) {
         const chapterID = bookID + "_" + path.basename(chapterPath);
         let chapterInfo = JSON.parse(JSON.stringify(bookInfo));
