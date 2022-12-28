@@ -7,6 +7,6 @@ popd
 rm -rf ./jendeley-backend/built-frontend
 cp -r ./jendeley-frontend/build ./jendeley-backend/built-frontend
 
-pushd./jendeley-backend
+pushd ./jendeley-backend
 npm run build
 npm publish --dry-run
