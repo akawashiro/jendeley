@@ -22,7 +22,7 @@ import {
   DB,
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
-} from "./schema";
+} from "./api_schema";
 import https from "https";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import { validateJsonDB } from "./validate_db";

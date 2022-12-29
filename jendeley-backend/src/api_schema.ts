@@ -1,6 +1,6 @@
 // This file is shared between client and server
 
-type IDType = "doi" | "isbn" | "url" | "book";
+type IDType = "doi" | "isbn" | "url" | "book" | "arxiv" | "path";
 
 type Entry = {
   id: string;

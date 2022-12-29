@@ -8,7 +8,7 @@ import {
   IconButton,
 } from "@mui/material";
 import "./App.css";
-import { IDType, Entry } from "./schema";
+import { IDType, Entry } from "./api_schema";
 import { Delete } from "@mui/icons-material";
 
 const { REACT_APP_API_URL } = process.env;

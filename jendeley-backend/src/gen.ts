@@ -18,9 +18,18 @@ import {
   ENTRY_URL,
   ID_TYPE_URL,
   ID_TYPE_BOOK,
+  ARXIV_API_URL,
+  ENTRY_DATA_FROM_ARXIV,
 } from "./constants";
 import { DocID, getDocID } from "./docid";
 import { validateJsonDB } from "./validate_db";
+import {
+  ArxivEntry,
+  DoiEntry,
+  IsbnEntry,
+  PathEntry,
+  UrlEntry,
+} from "./db_schema";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -96,7 +105,7 @@ async function getArxivJson(arxiv: string) {
 
   // See here for API documentation
   // https://arxiv.org/help/api/
-  const URL = "http://export.arxiv.org/api/query?id_list=" + arxiv;
+  const URL = ARXIV_API_URL + arxiv;
   const options = { headers: { Accept: "application/json" } };
   try {
     const data = (await got(URL, options)).body;
@@ -128,15 +137,23 @@ async function getArxivJson(arxiv: string) {
 async function getJson(
   docID: DocID,
   path: string
-): Promise<[Object, string] | undefined> {
-  let json_r: Object | undefined = undefined;
+): Promise<
+  [ArxivEntry | DoiEntry | IsbnEntry | PathEntry, string] | undefined
+> {
+  let json_r: ArxivEntry | DoiEntry | IsbnEntry | PathEntry | undefined =
+    undefined;
   let db_id: string | undefined = undefined;
 
   if (docID.arxiv != undefined) {
-    let json = await getArxivJson(docID.arxiv);
-    if (json != undefined) {
-      json[ENTRY_PATH] = path;
-      json[ENTRY_ID_TYPE] = ID_TYPE_ARXIV;
+    let data_from_arxiv = await getArxivJson(docID.arxiv);
+    if (data_from_arxiv != undefined) {
+      let json: ArxivEntry = {
+        path: path,
+        id_type: ID_TYPE_ARXIV,
+        tags: [],
+        comments: "",
+        data_from_arxiv: data_from_arxiv,
+      };
       json_r = json;
       db_id = "arxiv_" + docID.arxiv;
     } else {
@@ -152,10 +169,15 @@ async function getJson(
     docID.doi != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let json = await getDoiJSON(docID.doi);
-    if (json != undefined) {
-      json[ENTRY_PATH] = path;
-      json[ENTRY_ID_TYPE] = ID_TYPE_DOI;
+    let data_from_crossref = await getDoiJSON(docID.doi);
+    if (data_from_crossref != undefined) {
+      let json: DoiEntry = {
+        path: path,
+        id_type: ID_TYPE_ARXIV,
+        tags: [],
+        comments: "",
+        data_from_crossref: data_from_crossref,
+      };
       json_r = json;
       db_id = "doi_" + docID.doi;
     } else {
@@ -171,10 +193,15 @@ async function getJson(
     docID.isbn != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let json = await getIsbnJson(docID.isbn);
-    if (json != undefined) {
-      json[ENTRY_PATH] = path;
-      json[ENTRY_ID_TYPE] = ID_TYPE_ISBN;
+    let data_from_node_isbn = await getIsbnJson(docID.isbn);
+    if (data_from_node_isbn != undefined) {
+      let json: IsbnEntry = {
+        path: path,
+        id_type: ID_TYPE_ISBN,
+        tags: [],
+        comments: "",
+        data_from_node_isbn: data_from_node_isbn,
+      };
       json_r = json;
       db_id = "isbn_" + docID.isbn;
     } else {
@@ -190,10 +217,13 @@ async function getJson(
     docID.path != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let json = new Object();
-    json[ENTRY_PATH] = path;
-    json[ENTRY_TITLE] = docID.path;
-    json[ENTRY_ID_TYPE] = ID_TYPE_PATH;
+    let json: PathEntry = {
+      path: path,
+      title: docID.path,
+      id_type: ID_TYPE_PATH,
+      tags: [],
+      comments: "",
+    };
     json_r = json;
     db_id = "path_" + docID.path;
   }
@@ -267,12 +297,13 @@ function registerWeb(
   };
   logger.info("docID = " + JSON.stringify(docID));
 
-  let json = new Object();
-  json[ENTRY_TITLE] = title;
-  json[ENTRY_URL] = url;
-  json[ENTRY_COMMENTS] = comments;
-  json[ENTRY_TAGS] = tags;
-  json[ENTRY_ID_TYPE] = ID_TYPE_URL;
+  let json: UrlEntry = {
+    title: title,
+    url: url,
+    comments: comments,
+    tags: tags,
+    id_type: ID_TYPE_URL,
+  };
 
   if (isValidJsonEntry(json)) {
     jsonDB["url_" + url] = json;

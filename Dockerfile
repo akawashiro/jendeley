@@ -3,7 +3,7 @@ FROM node:18
 COPY . /jendeley
 
 WORKDIR /jendeley
-RUN diff /jendeley/jendeley-backend/src/schema.ts /jendeley/jendeley-frontend/src/schema.ts
+RUN diff /jendeley/jendeley-backend/src/api_schema.ts /jendeley/jendeley-frontend/src/api_schema.ts
 
 WORKDIR /jendeley/jendeley-backend
 RUN npm install
