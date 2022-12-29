@@ -173,7 +173,7 @@ async function getJson(
     if (data_from_crossref != undefined) {
       let json: DoiEntry = {
         path: path,
-        id_type: ID_TYPE_ARXIV,
+        id_type: ID_TYPE_DOI,
         tags: [],
         comments: "",
         data_from_crossref: data_from_crossref,
@@ -268,7 +268,7 @@ function genDummyDB(output: string) {
   if (!validateJsonDB(jsonDB, undefined)) {
     throw new Error("validateJsonDB failed!");
   }
-  fs.writeFileSync(output, JSON.stringify(jsonDB));
+  fs.writeFileSync(output, JSON.stringify(jsonDB, null, 2));
 }
 
 function registerWeb(
@@ -377,39 +377,35 @@ async function registerNonBookPDF(
     return jsonDB;
   }
 
-  if (isValidJsonEntry(json)) {
-    // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
-    if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
-      const newFilename = path.join(
-        path.dirname(pdf),
-        json[ENTRY_TITLE].replace(/[/\\?%*:|"<>.]/g, "") +
-          " " +
-          path.basename(pdf)
-      );
-      const oldFileneme = json[ENTRY_PATH];
-      json[ENTRY_PATH] = newFilename;
+  // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
+  if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
+    const newFilename = path.join(
+      path.dirname(pdf),
+      json[ENTRY_TITLE].replace(/[/\\?%*:|"<>.]/g, "") +
+        " " +
+        path.basename(pdf)
+    );
+    const oldFileneme = json[ENTRY_PATH];
+    json[ENTRY_PATH] = newFilename;
 
-      if (fs.existsSync(path.join(papersDir, newFilename))) {
-        logger.warn(newFilename + " already exists. Skip registration.");
-        return jsonDB;
-      }
-      fs.renameSync(
-        path.join(papersDir, oldFileneme),
-        path.join(papersDir, newFilename)
-      );
-      logger.info("Rename " + oldFileneme + " to " + newFilename);
+    if (fs.existsSync(path.join(papersDir, newFilename))) {
+      logger.warn(newFilename + " already exists. Skip registration.");
+      return jsonDB;
     }
-
-    jsonDB[dbID] = json;
-
-    if (!validateJsonDB(jsonDB, undefined)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
-    return jsonDB;
-  } else {
-    return jsonDB;
+    fs.renameSync(
+      path.join(papersDir, oldFileneme),
+      path.join(papersDir, newFilename)
+    );
+    logger.info("Rename " + oldFileneme + " to " + newFilename);
   }
+
+  jsonDB[dbID] = json;
+
+  if (!validateJsonDB(jsonDB, undefined)) {
+    throw new Error("validateJsonDB failed!");
+  }
+
+  return jsonDB;
 }
 
 async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
@@ -574,7 +570,7 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
+    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
   } catch (err) {
     logger.warn(err);
   }
