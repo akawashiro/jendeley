@@ -11,19 +11,12 @@ import {
   ID_TYPE_URL,
   ENTRY_PATH,
   ENTRY_COMMENTS,
+  ENTRY_URL,
 } from "./constants";
 import { logger } from "./logger";
 
-function validateDB(dbPath: string): boolean {
-  dbPath = path.resolve(dbPath);
-
-  logger.info("validateDB");
-  if (!fs.existsSync(dbPath)) {
-    logger.warn(dbPath + "does not exists.");
-    return false;
-  }
-
-  const jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+// We should call this function whenever rewrite DB.
+function validateJsonDB(jsonDB: any, dbPath: string | undefined): boolean {
   let validDB = true;
 
   for (const id of Object.keys(jsonDB)) {
@@ -84,15 +77,60 @@ function validateDB(dbPath: string): boolean {
         validDB = false;
       }
     } else {
-      const dbDir = path.dirname(dbPath);
-      const filepath = jsonDB[id][ENTRY_PATH];
-      if (!path.join(dbDir, filepath)) {
-        logger.warn("File not exists: " + filepath + " id: " + id);
+      if (dbPath != undefined) {
+        const dbDir = path.dirname(dbPath);
+        const filepath = jsonDB[id][ENTRY_PATH];
+        if (!path.join(dbDir, filepath)) {
+          logger.warn("File not exists: " + filepath + " id: " + id);
+          validDB = false;
+        }
+      } else {
+        logger.info("dbPath is undefined. Skip file existence check.");
+      }
+    }
+
+    // ENTRY_URL check
+    if (id_type != ID_TYPE_URL) {
+      if (ENTRY_URL in jsonDB[id]) {
+        logger.warn(
+          ENTRY_PATH +
+            " should not exists in id_type of " +
+            ID_TYPE_URL +
+            " id: " +
+            id
+        );
         validDB = false;
+      }
+    } else {
+      function isValidUrl(urlString: string) {
+        try {
+          return Boolean(new URL(urlString));
+        } catch (e) {
+          return false;
+        }
+      }
+
+      const url = jsonDB[id][ENTRY_URL];
+      if (!isValidUrl(url)) {
+        validDB = false;
+        logger.warn(url + " is not valid. id: " + id);
       }
     }
   }
   return validDB;
 }
 
-export { validateDB };
+function validateDB(dbPath: string): boolean {
+  dbPath = path.resolve(dbPath);
+  const jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+
+  logger.info("validateDB");
+  if (!fs.existsSync(dbPath)) {
+    logger.warn(dbPath + "does not exists.");
+    return false;
+  }
+
+  return validateJsonDB(jsonDB, dbPath);
+}
+
+export { validateJsonDB, validateDB };
