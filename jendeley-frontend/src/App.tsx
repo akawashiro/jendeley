@@ -94,9 +94,9 @@ function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
       >{`${cell.getValue()}`}</a>
     );
   } else {
-      if(row.original.path === undefined){
-          throw Error("row.original.path is undefined for " + row.original.id);
-      }
+    if (row.original.path === undefined) {
+      throw Error("row.original.path is undefined for " + row.original.id);
+    }
     return (
       <a
         href={`${
