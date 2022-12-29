@@ -1,6 +1,6 @@
 const JENDELEY_NO_TRACK = "[jendeley no track]";
 const JENDELEY_NO_ID = "[jendeley no id]";
-const ENTRY_ID_TYPE = "id_type";
+const ENTRY_ID_TYPE = "idType";
 const ENTRY_PATH = "path";
 const ENTRY_URL = "url";
 const ENTRY_TAGS = "tags";

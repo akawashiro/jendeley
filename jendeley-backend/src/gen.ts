@@ -407,7 +407,9 @@ async function registerNonBookPDF(
   jsonDB[dbID] = json;
 
   if (!validateJsonDB(jsonDB, undefined)) {
-    throw new Error("validateJsonDB failed!");
+    throw new Error(
+      "validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2)
+    );
   }
 
   return jsonDB;
