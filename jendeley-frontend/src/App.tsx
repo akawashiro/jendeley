@@ -15,7 +15,7 @@ import { RegisterWebWithDialog, RegisterPDFWithDialog } from "./register";
 import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 
-const { REACT_APP_API_URL } = process.env;
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 function authorChips(authors: string[]) {
   // TODO padding or margine
