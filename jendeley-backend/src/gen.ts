@@ -65,6 +65,8 @@ function getTitleFromPath(pdf: string): string {
 async function getDoiJSON(doi: string): Promise<Object> {
   let { got } = await import("got");
 
+  // See here for API documentation
+  // https://www.crossref.org/documentation/retrieve-metadata/rest-api/
   const URL = "https://api.crossref.org/v1/works/" + doi + "/transform";
   const options = { headers: { Accept: "application/json" } };
   try {
@@ -92,6 +94,8 @@ async function getIsbnJson(isbn: string) {
 async function getArxivJson(arxiv: string) {
   let { got } = await import("got");
 
+  // See here for API documentation
+  // https://arxiv.org/help/api/
   const URL = "http://export.arxiv.org/api/query?id_list=" + arxiv;
   const options = { headers: { Accept: "application/json" } };
   try {
