@@ -1,7 +1,5 @@
-import { IDType } from "./api_schema";
-
 type ArxivEntry = {
-  idType: IDType;
+  idType: "arxiv";
   path: string;
   tags: string[];
   comments: string;
@@ -10,7 +8,7 @@ type ArxivEntry = {
 };
 
 type DoiEntry = {
-  idType: IDType;
+  idType: "doi";
   path: string;
   tags: string[];
   comments: string;
@@ -19,7 +17,7 @@ type DoiEntry = {
 };
 
 type IsbnEntry = {
-  idType: IDType;
+  idType: "isbn";
   path: string;
   tags: string[];
   comments: string;
@@ -28,7 +26,7 @@ type IsbnEntry = {
 };
 
 type PathEntry = {
-  idType: IDType;
+  idType: "path";
   path: string;
   title: string;
   tags: string[];
@@ -37,7 +35,7 @@ type PathEntry = {
 };
 
 type UrlEntry = {
-  idType: IDType;
+  idType: "url";
   url: string;
   title: string;
   tags: string[];

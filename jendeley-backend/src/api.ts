@@ -16,6 +16,9 @@ import {
   ENTRY_URL,
   ENTRY_COMMENTS,
   ENTRY_TAGS,
+  ID_TYPE_ARXIV,
+  ID_TYPE_PATH,
+  ENTRY_PATH,
 } from "./constants";
 import {
   Entry,
@@ -26,7 +29,7 @@ import {
 import https from "https";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import { validateJsonDB } from "./validate_db";
-import { ArxivEntry, DoiEntry, UrlEntry } from "./db_schema";
+import { ArxivEntry, DoiEntry, PathEntry, UrlEntry } from "./db_schema";
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -55,7 +58,7 @@ function getEntry(id: string, jsonDB: any): Entry {
       tags: urlEntry.tags,
       comments: urlEntry.comments,
       abstract: abstract,
-      path: "",
+      path: undefined,
       year: undefined,
       publisher: "",
     };
@@ -92,7 +95,7 @@ function getEntry(id: string, jsonDB: any): Entry {
       id: id,
       idType: jsonDB[id][ENTRY_ID_TYPE],
       title: title,
-      url: "",
+      url: undefined,
       authors: authors,
       tags: tags,
       comments: comments,
@@ -139,7 +142,7 @@ function getEntry(id: string, jsonDB: any): Entry {
       idType: jsonDB[id][ENTRY_ID_TYPE],
       title: title,
       authors: authors,
-      url: "",
+      url: undefined,
       tags: tags,
       comments: comments,
       abstract: abstract,
@@ -149,7 +152,7 @@ function getEntry(id: string, jsonDB: any): Entry {
     };
     checkEntry(e);
     return e;
-  } else if (jsonDB[id][ENTRY_ID_TYPE] == "arxiv") {
+  } else if (jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_ARXIV) {
     const arxivEntry: ArxivEntry = jsonDB[id];
     const title: string = arxivEntry.dataFromArxiv["title"];
     let authors: string[] = [];
@@ -180,7 +183,7 @@ function getEntry(id: string, jsonDB: any): Entry {
       id: id,
       idType: arxivEntry.idType,
       title: title,
-      url: "",
+      url: undefined,
       authors: authors,
       tags: arxivEntry.tags,
       abstract: abstract,
@@ -192,29 +195,32 @@ function getEntry(id: string, jsonDB: any): Entry {
     checkEntry(e);
     return e;
   } else {
-    const title: string = jsonDB[id][ENTRY_TITLE];
-    const path: string = jsonDB[id]["path"];
-    const tags =
-      jsonDB[id][ENTRY_TAGS] != undefined ? jsonDB[id][ENTRY_TAGS] : [];
-    const comments =
-      jsonDB[id][ENTRY_COMMENTS] != undefined ? jsonDB[id][ENTRY_COMMENTS] : [];
+    if (jsonDB[id][ENTRY_ID_TYPE] != ID_TYPE_PATH) {
+      throw new Error(
+        jsonDB[id][ENTRY_ID_TYPE] +
+          " must be " +
+          ID_TYPE_PATH +
+          " but id: " +
+          id +
+          " is not."
+      );
+    }
+    const pathEntry: PathEntry = jsonDB[id];
     const authors = [];
     const abstract =
       jsonDB[id]["abstract"] != undefined ? jsonDB[id]["abstract"] : "";
-    const year = undefined;
-    const publisher = "";
     const e = {
       id: id,
-      idType: jsonDB[id][ENTRY_ID_TYPE],
-      title: title,
-      url: "",
+      idType: pathEntry.idType,
+      title: pathEntry.title,
+      url: undefined,
       authors: authors,
-      tags: tags,
+      tags: pathEntry.tags,
       abstract: abstract,
-      comments: comments,
-      path: path,
-      year: year,
-      publisher: publisher,
+      comments: pathEntry.comments,
+      path: pathEntry.path,
+      year: undefined,
+      publisher: undefined,
     };
     checkEntry(e);
     return e;
@@ -424,7 +430,7 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
     let jsonDB = JSON.parse(fs.readFileSync(db_path).toString());
     if (
       jsonDB[entry.id] != undefined &&
-      jsonDB[entry.id]["path"] != undefined
+      jsonDB[entry.id][ENTRY_PATH] != undefined
     ) {
       logger.info("Delete " + jsonDB[entry.id]["path"]);
       const old_filename = path.join(
@@ -445,7 +451,7 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
       delete jsonDB[entry.id];
     } else if (
       jsonDB[entry.id] != undefined &&
-      jsonDB[entry.id]["path"] == undefined &&
+      jsonDB[entry.id][ENTRY_PATH] == undefined &&
       jsonDB[entry.id][ENTRY_ID_TYPE] == ID_TYPE_URL
     ) {
       logger.info("Delete " + entry.id);
