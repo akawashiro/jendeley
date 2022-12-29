@@ -5,7 +5,18 @@ import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import cheerio from "cheerio";
-import { JENDELEY_NO_TRACK } from "./constants";
+import {
+  JENDELEY_NO_TRACK,
+  ENTRY_ID_TYPE,
+  ID_TYPE_URL,
+  ID_TYPE_ISBN,
+  ID_TYPE_BOOK,
+  ID_TYPE_DOI,
+  ENTRY_TITLE,
+  ENTRY_URL,
+  ENTRY_COMMENTS,
+  ENTRY_TAGS,
+} from "./constants";
 import {
   Entry,
   DB,
@@ -14,6 +25,7 @@ import {
 } from "./schema";
 import https from "https";
 import { registerWeb, registerNonBookPDF } from "./gen";
+import { validateJsonDB } from "./validate_db";
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -28,18 +40,18 @@ function checkEntry(entry: Entry) {
 function getEntry(id: string, json: any): Entry {
   console.assert(json[id] != undefined, "json[" + id + "] != undefined");
 
-  if (json[id]["id_type"] == "url") {
-    const title: string = json[id]["title"];
+  if (json[id][ENTRY_ID_TYPE] == ID_TYPE_URL) {
+    const title: string = json[id][ENTRY_TITLE];
     let authors: string[] = [];
-    const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
     const comments =
-      json[id]["comments"] != undefined ? json[id]["comments"] : [];
+      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
     const abstract = "";
 
     const e = {
       id: id,
-      idType: json[id]["id_type"],
-      url: json[id]["url"],
+      idType: json[id][ENTRY_ID_TYPE],
+      url: json[id][ENTRY_URL],
       title: title,
       authors: authors,
       tags: tags,
@@ -51,8 +63,11 @@ function getEntry(id: string, json: any): Entry {
     };
     checkEntry(e);
     return e;
-  } else if (json[id]["id_type"] == "isbn" || json[id]["id_type"] == "book") {
-    const title: string = json[id]["title"];
+  } else if (
+    json[id][ENTRY_ID_TYPE] == ID_TYPE_ISBN ||
+    json[id][ENTRY_ID_TYPE] == ID_TYPE_BOOK
+  ) {
+    const title: string = json[id][ENTRY_TITLE];
     const path: string = json[id]["path"];
     let authors: string[] = [];
     if (json[id]["authors"] != undefined) {
@@ -69,14 +84,14 @@ function getEntry(id: string, json: any): Entry {
     if (json[id]["publisher"] != undefined) {
       publisher = json[id]["publisher"];
     }
-    const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
     const comments =
-      json[id]["comments"] != undefined ? json[id]["comments"] : [];
+      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
     const abstract = "";
 
     const e = {
       id: id,
-      idType: json[id]["id_type"],
+      idType: json[id][ENTRY_ID_TYPE],
       title: title,
       url: "",
       authors: authors,
@@ -89,8 +104,8 @@ function getEntry(id: string, json: any): Entry {
     };
     checkEntry(e);
     return e;
-  } else if (json[id]["id_type"] == "doi") {
-    const title: string = json[id]["title"];
+  } else if (json[id][ENTRY_ID_TYPE] == ID_TYPE_DOI) {
+    const title: string = json[id][ENTRY_TITLE];
     const path: string = json[id]["path"];
     let authors: string[] = [];
     if (json[id]["author"] != undefined) {
@@ -110,13 +125,13 @@ function getEntry(id: string, json: any): Entry {
       json[id]["event"] != undefined ? json[id]["event"] : "";
     const abstract: string =
       json[id]["abstract"] != undefined ? json[id]["abstract"] : "";
-    const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
     const comments =
-      json[id]["comments"] != undefined ? json[id]["comments"] : [];
+      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
 
     const e = {
       id: id,
-      idType: json[id]["id_type"],
+      idType: json[id][ENTRY_ID_TYPE],
       title: title,
       authors: authors,
       url: "",
@@ -129,8 +144,8 @@ function getEntry(id: string, json: any): Entry {
     };
     checkEntry(e);
     return e;
-  } else if (json[id]["id_type"] == "arxiv") {
-    const title: string = json[id]["title"];
+  } else if (json[id][ENTRY_ID_TYPE] == "arxiv") {
+    const title: string = json[id][ENTRY_TITLE];
     const path: string = json[id]["path"];
     let authors: string[] = [];
     if (json[id]["author"].length != undefined) {
@@ -151,13 +166,13 @@ function getEntry(id: string, json: any): Entry {
       json[id]["event"] != undefined ? json[id]["event"] : "";
     const abstract: string =
       json[id]["summary"] != undefined ? json[id]["summary"] : "";
-    const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
     const comments =
-      json[id]["comments"] != undefined ? json[id]["comments"] : [];
+      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
 
     const e = {
       id: id,
-      idType: json[id]["id_type"],
+      idType: json[id][ENTRY_ID_TYPE],
       title: title,
       url: "",
       authors: authors,
@@ -171,11 +186,11 @@ function getEntry(id: string, json: any): Entry {
     checkEntry(e);
     return e;
   } else {
-    const title: string = json[id]["title"];
+    const title: string = json[id][ENTRY_TITLE];
     const path: string = json[id]["path"];
-    const tags = json[id]["tags"] != undefined ? json[id]["tags"] : [];
+    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
     const comments =
-      json[id]["comments"] != undefined ? json[id]["comments"] : [];
+      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
     const authors = [];
     const abstract =
       json[id]["abstract"] != undefined ? json[id]["abstract"] : "";
@@ -183,7 +198,7 @@ function getEntry(id: string, json: any): Entry {
     const publisher = "";
     const e = {
       id: id,
-      idType: json[id]["id_type"],
+      idType: json[id][ENTRY_ID_TYPE],
       title: title,
       url: "",
       authors: authors,
@@ -199,24 +214,29 @@ function getEntry(id: string, json: any): Entry {
   }
 }
 
-function updateEntry(request: Request, response: Response, db_path: string) {
+function updateEntry(request: Request, response: Response, dbPath: string) {
   logger.info("Get a update_entry request url = " + request.url);
   const entry_o = request.body;
 
   // TODO: Is there any more sophisticated way to check user defined type?
   if (
     entry_o["id"] != undefined &&
-    entry_o["tags"] != undefined &&
-    entry_o["comments"] != undefined
+    entry_o[ENTRY_TAGS] != undefined &&
+    entry_o[ENTRY_COMMENTS] != undefined
   ) {
     const entry = entry_o as Entry;
-    let json = JSON.parse(fs.readFileSync(db_path).toString());
-    if (json[entry.id] != undefined) {
+    let jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+    if (jsonDB[entry.id] != undefined) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
-      json[entry.id]["tags"] = entry.tags;
-      json[entry.id]["comments"] = entry.comments;
+      jsonDB[entry.id][ENTRY_TAGS] = entry.tags;
+      jsonDB[entry.id][ENTRY_COMMENTS] = entry.comments;
     }
-    fs.writeFileSync(db_path, JSON.stringify(json));
+
+    if (!validateJsonDB(jsonDB, dbPath)) {
+      throw new Error("validateJsonDB failed!");
+    }
+
+    fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
   } else {
     logger.warn(
       "Object from the client is not legitimated. entry_o = " +
@@ -284,7 +304,7 @@ async function getTitleFromUrl(url: string) {
 async function addWebFromUrl(
   httpRequest: Request,
   response: Response,
-  db_path: string
+  dPath: string
 ) {
   const req = httpRequest.body as RequestGetWebFromUrl;
   logger.info(
@@ -294,14 +314,19 @@ async function addWebFromUrl(
       JSON.stringify(req)
   );
 
-  let json = JSON.parse(fs.readFileSync(db_path).toString());
+  let jsonDB = JSON.parse(fs.readFileSync(dPath).toString());
   const title = req.title == "" ? await getTitleFromUrl(req.url) : req.title;
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
-  json = registerWeb(json, req.url, title, req.comments, tags);
-  fs.writeFileSync(db_path, JSON.stringify(json));
+  jsonDB = registerWeb(jsonDB, req.url, title, req.comments, tags);
+
+  if (!validateJsonDB(jsonDB, dPath)) {
+    throw new Error("validateJsonDB failed!");
+  }
+
+  fs.writeFileSync(dPath, JSON.stringify(jsonDB));
 
   response.writeHead(200, {
     "Content-Type": "application/json",
@@ -317,7 +342,7 @@ async function addWebFromUrl(
 async function addPdfFromUrl(
   httpRequest: Request,
   response: Response,
-  db_path: string
+  dbPath: string
 ) {
   // TODO: Handle RequestGetPdfFromUrl.isbn/doi/comments/tags
   const req = httpRequest.body as RequestGetPdfFromUrl;
@@ -349,23 +374,28 @@ async function addPdfFromUrl(
     );
   };
 
-  await download(req.url, path.join(path.dirname(db_path), filename));
-  let json = JSON.parse(fs.readFileSync(db_path).toString());
+  await download(req.url, path.join(path.dirname(dbPath), filename));
+  let jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
-  json = await registerNonBookPDF(
-    path.dirname(db_path),
+  jsonDB = await registerNonBookPDF(
+    path.dirname(dbPath),
     filename,
-    json,
+    jsonDB,
     req.title,
     req.comments,
     tags,
     true,
     req.url
   );
-  fs.writeFileSync(db_path, JSON.stringify(json));
+
+  if (!validateJsonDB(jsonDB, dbPath)) {
+    throw new Error("validateJsonDB failed!");
+  }
+
+  fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
 
   response.writeHead(200, {
     "Content-Type": "application/json",
@@ -384,12 +414,15 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
 
   if (entry_o["id"] != undefined) {
     const entry = entry_o as Entry;
-    let json = JSON.parse(fs.readFileSync(db_path).toString());
-    if (json[entry.id] != undefined && json[entry.id]["path"] != undefined) {
-      logger.info("Delete " + json[entry.id]["path"]);
+    let jsonDB = JSON.parse(fs.readFileSync(db_path).toString());
+    if (
+      jsonDB[entry.id] != undefined &&
+      jsonDB[entry.id]["path"] != undefined
+    ) {
+      logger.info("Delete " + jsonDB[entry.id]["path"]);
       const old_filename = path.join(
         path.dirname(db_path),
-        json[entry.id]["path"]
+        jsonDB[entry.id]["path"]
       );
       const dir = path.dirname(old_filename);
       const new_filename = path.join(
@@ -402,16 +435,21 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
       } else {
         logger.warn("Failed to rename " + old_filename + " to " + new_filename);
       }
-      delete json[entry.id];
+      delete jsonDB[entry.id];
     } else if (
-      json[entry.id] != undefined &&
-      json[entry.id]["path"] == undefined &&
-      json[entry.id]["id_type"] == "url"
+      jsonDB[entry.id] != undefined &&
+      jsonDB[entry.id]["path"] == undefined &&
+      jsonDB[entry.id][ENTRY_ID_TYPE] == ID_TYPE_URL
     ) {
       logger.info("Delete " + entry.id);
-      delete json[entry.id];
+      delete jsonDB[entry.id];
     }
-    fs.writeFileSync(db_path, JSON.stringify(json));
+
+    if (!validateJsonDB(jsonDB, db_path)) {
+      throw new Error("validateJsonDB failed!");
+    }
+
+    fs.writeFileSync(db_path, JSON.stringify(jsonDB));
   } else {
     logger.warn(
       "Object from the client is not legitimated. entry_o = " +

@@ -20,6 +20,7 @@ import {
   ID_TYPE_BOOK,
 } from "./constants";
 import { DocID, getDocID } from "./docid";
+import { validateJsonDB } from "./validate_db";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -64,6 +65,8 @@ function getTitleFromPath(pdf: string): string {
 async function getDoiJSON(doi: string): Promise<Object> {
   let { got } = await import("got");
 
+  // See here for API documentation
+  // https://www.crossref.org/documentation/retrieve-metadata/rest-api/
   const URL = "https://api.crossref.org/v1/works/" + doi + "/transform";
   const options = { headers: { Accept: "application/json" } };
   try {
@@ -91,6 +94,8 @@ async function getIsbnJson(isbn: string) {
 async function getArxivJson(arxiv: string) {
   let { got } = await import("got");
 
+  // See here for API documentation
+  // https://arxiv.org/help/api/
   const URL = "http://export.arxiv.org/api/query?id_list=" + arxiv;
   const options = { headers: { Accept: "application/json" } };
   try {
@@ -230,6 +235,9 @@ function genDummyDB(output: string) {
     jsonDB[id][ENTRY_COMMENTS] = crypto.randomBytes(280).toString("hex");
   }
 
+  if (!validateJsonDB(jsonDB, undefined)) {
+    throw new Error("validateJsonDB failed!");
+  }
   fs.writeFileSync(output, JSON.stringify(jsonDB));
 }
 
@@ -269,6 +277,11 @@ function registerWeb(
   if (isValidJsonEntry(json)) {
     jsonDB["url_" + url] = json;
     logger.info("Register url_" + url);
+
+    if (!validateJsonDB(jsonDB, undefined)) {
+      throw new Error("validateJsonDB failed!");
+    }
+
     return jsonDB;
   } else {
     logger.warn("Failed to register url_" + url);
@@ -357,6 +370,11 @@ async function registerNonBookPDF(
     }
 
     jsonDB[dbID] = json;
+
+    if (!validateJsonDB(jsonDB, undefined)) {
+      throw new Error("validateJsonDB failed!");
+    }
+
     return jsonDB;
   } else {
     return jsonDB;
@@ -520,6 +538,11 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
 
   try {
     const dbPath = path.join(papersDir, dbName);
+
+    if (!validateJsonDB(jsonDB, dbPath)) {
+      throw new Error("validateJsonDB failed!");
+    }
+
     fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
   } catch (err) {
     logger.warn(err);

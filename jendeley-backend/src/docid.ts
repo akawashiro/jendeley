@@ -356,6 +356,9 @@ async function getDocIDFromTitle(
 
   for (const title of titles) {
     logger.info("getDocIDFromTitle title = " + title);
+
+    // See here for API documentation
+    // https://www.crossref.org/documentation/retrieve-metadata/rest-api/
     const URL =
       "https://api.crossref.org/v1/works?query.bibliographic=" +
       title.replaceAll(" ", "+");
