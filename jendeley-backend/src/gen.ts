@@ -145,14 +145,15 @@ async function getJson(
   let db_id: string | undefined = undefined;
 
   if (docID.arxiv != undefined) {
-    let data_from_arxiv = await getArxivJson(docID.arxiv);
-    if (data_from_arxiv != undefined) {
+    let dataFromArxiv = await getArxivJson(docID.arxiv);
+    if (dataFromArxiv != undefined) {
       let json: ArxivEntry = {
         path: path,
-        id_type: ID_TYPE_ARXIV,
+        idType: ID_TYPE_ARXIV,
         tags: [],
         comments: "",
-        data_from_arxiv: data_from_arxiv,
+        userSpecifiedTitle: undefined,
+        dataFromArxiv: dataFromArxiv,
       };
       json_r = json;
       db_id = "arxiv_" + docID.arxiv;
@@ -169,14 +170,15 @@ async function getJson(
     docID.doi != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let data_from_crossref = await getDoiJSON(docID.doi);
-    if (data_from_crossref != undefined) {
+    let dataFromCrossref = await getDoiJSON(docID.doi);
+    if (dataFromCrossref != undefined) {
       let json: DoiEntry = {
         path: path,
-        id_type: ID_TYPE_DOI,
+        idType: ID_TYPE_DOI,
         tags: [],
         comments: "",
-        data_from_crossref: data_from_crossref,
+        userSpecifiedTitle: undefined,
+        dataFromCrossref: dataFromCrossref,
       };
       json_r = json;
       db_id = "doi_" + docID.doi;
@@ -193,14 +195,15 @@ async function getJson(
     docID.isbn != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let data_from_node_isbn = await getIsbnJson(docID.isbn);
-    if (data_from_node_isbn != undefined) {
+    let dataFromNodeIsbn = await getIsbnJson(docID.isbn);
+    if (dataFromNodeIsbn != undefined) {
       let json: IsbnEntry = {
         path: path,
-        id_type: ID_TYPE_ISBN,
+        idType: ID_TYPE_ISBN,
         tags: [],
         comments: "",
-        data_from_node_isbn: data_from_node_isbn,
+        userSpecifiedTitle: undefined,
+        dataFromNodeIsbn: dataFromNodeIsbn,
       };
       json_r = json;
       db_id = "isbn_" + docID.isbn;
@@ -220,9 +223,10 @@ async function getJson(
     let json: PathEntry = {
       path: path,
       title: docID.path,
-      id_type: ID_TYPE_PATH,
+      idType: ID_TYPE_PATH,
       tags: [],
       comments: "",
+      userSpecifiedTitle: undefined,
     };
     json_r = json;
     db_id = "path_" + docID.path;
@@ -302,7 +306,8 @@ function registerWeb(
     url: url,
     comments: comments,
     tags: tags,
-    id_type: ID_TYPE_URL,
+    userSpecifiedTitle: undefined,
+    idType: ID_TYPE_URL,
   };
 
   if (isValidJsonEntry(json)) {

@@ -1,42 +1,47 @@
 import { IDType } from "./api_schema";
 
 type ArxivEntry = {
-  id_type: IDType;
+  idType: IDType;
   path: string;
   tags: string[];
   comments: string;
-  data_from_arxiv: any;
+  userSpecifiedTitle: string | undefined;
+  dataFromArxiv: any;
 };
 
 type DoiEntry = {
-  id_type: IDType;
+  idType: IDType;
   path: string;
   tags: string[];
   comments: string;
-  data_from_crossref: any;
+  userSpecifiedTitle: string | undefined;
+  dataFromCrossref: any;
 };
 
 type IsbnEntry = {
-  id_type: IDType;
+  idType: IDType;
   path: string;
   tags: string[];
   comments: string;
-  data_from_node_isbn: any;
+  userSpecifiedTitle: string | undefined;
+  dataFromNodeIsbn: any;
 };
 
 type PathEntry = {
-  id_type: IDType;
+  idType: IDType;
   path: string;
   title: string;
   tags: string[];
+  userSpecifiedTitle: string | undefined;
   comments: string;
 };
 
 type UrlEntry = {
-  id_type: IDType;
+  idType: IDType;
   url: string;
   title: string;
   tags: string[];
+  userSpecifiedTitle: string | undefined;
   comments: string;
 };
 
