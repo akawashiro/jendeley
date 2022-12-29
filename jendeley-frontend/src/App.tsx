@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
 import { Box } from "@mui/material";
 import "./App.css";
-import { Entry, DB } from "./schema";
+import { Entry, DB } from "./api_schema";
 import MaterialReactTable, {
   MRT_Cell,
   MRT_ColumnDef,
@@ -94,6 +94,9 @@ function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
       >{`${cell.getValue()}`}</a>
     );
   } else {
+    if (row.original.path === undefined) {
+      throw Error("row.original.path is undefined for " + row.original.id);
+    }
     return (
       <a
         href={`${

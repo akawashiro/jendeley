@@ -16,16 +16,20 @@ import {
   ENTRY_URL,
   ENTRY_COMMENTS,
   ENTRY_TAGS,
+  ID_TYPE_ARXIV,
+  ID_TYPE_PATH,
+  ENTRY_PATH,
 } from "./constants";
 import {
   Entry,
   DB,
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
-} from "./schema";
+} from "./api_schema";
 import https from "https";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import { validateJsonDB } from "./validate_db";
+import { ArxivEntry, DoiEntry, PathEntry, UrlEntry } from "./db_schema";
 
 function checkEntry(entry: Entry) {
   console.assert(
@@ -37,63 +41,61 @@ function checkEntry(entry: Entry) {
   );
 }
 
-function getEntry(id: string, json: any): Entry {
-  console.assert(json[id] != undefined, "json[" + id + "] != undefined");
+function getEntry(id: string, jsonDB: any): Entry {
+  console.assert(jsonDB[id] != undefined, "json[" + id + "] != undefined");
 
-  if (json[id][ENTRY_ID_TYPE] == ID_TYPE_URL) {
-    const title: string = json[id][ENTRY_TITLE];
+  if (jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_URL) {
+    const urlEntry: UrlEntry = jsonDB[id];
     let authors: string[] = [];
-    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
-    const comments =
-      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
     const abstract = "";
 
     const e = {
       id: id,
-      idType: json[id][ENTRY_ID_TYPE],
-      url: json[id][ENTRY_URL],
-      title: title,
+      idType: urlEntry.idType,
+      url: urlEntry.url,
+      title: urlEntry.title,
       authors: authors,
-      tags: tags,
-      comments: comments,
+      tags: urlEntry.tags,
+      comments: urlEntry.comments,
       abstract: abstract,
-      path: "",
+      path: undefined,
       year: undefined,
       publisher: "",
     };
     checkEntry(e);
     return e;
   } else if (
-    json[id][ENTRY_ID_TYPE] == ID_TYPE_ISBN ||
-    json[id][ENTRY_ID_TYPE] == ID_TYPE_BOOK
+    jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_ISBN ||
+    jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_BOOK
   ) {
-    const title: string = json[id][ENTRY_TITLE];
-    const path: string = json[id]["path"];
+    const title: string = jsonDB[id][ENTRY_TITLE];
+    const path: string = jsonDB[id]["path"];
     let authors: string[] = [];
-    if (json[id]["authors"] != undefined) {
-      authors = json[id]["authors"];
+    if (jsonDB[id]["authors"] != undefined) {
+      authors = jsonDB[id]["authors"];
     }
     let year: number | undefined = undefined;
     if (
-      json[id]["publishedDate"] != undefined &&
-      !isNaN(parseInt(json[id]["publishedDate"].substr(0, 4)))
+      jsonDB[id]["publishedDate"] != undefined &&
+      !isNaN(parseInt(jsonDB[id]["publishedDate"].substr(0, 4)))
     ) {
-      year = parseInt(json[id]["publishedDate"].substr(0, 4));
+      year = parseInt(jsonDB[id]["publishedDate"].substr(0, 4));
     }
     let publisher: string = "";
-    if (json[id]["publisher"] != undefined) {
-      publisher = json[id]["publisher"];
+    if (jsonDB[id]["publisher"] != undefined) {
+      publisher = jsonDB[id]["publisher"];
     }
-    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
+    const tags =
+      jsonDB[id][ENTRY_TAGS] != undefined ? jsonDB[id][ENTRY_TAGS] : [];
     const comments =
-      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
+      jsonDB[id][ENTRY_COMMENTS] != undefined ? jsonDB[id][ENTRY_COMMENTS] : [];
     const abstract = "";
 
     const e = {
       id: id,
-      idType: json[id][ENTRY_ID_TYPE],
+      idType: jsonDB[id][ENTRY_ID_TYPE],
       title: title,
-      url: "",
+      url: undefined,
       authors: authors,
       tags: tags,
       comments: comments,
@@ -104,37 +106,43 @@ function getEntry(id: string, json: any): Entry {
     };
     checkEntry(e);
     return e;
-  } else if (json[id][ENTRY_ID_TYPE] == ID_TYPE_DOI) {
-    const title: string = json[id][ENTRY_TITLE];
-    const path: string = json[id]["path"];
+  } else if (jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_DOI) {
+    const doiEntry: DoiEntry = jsonDB[id];
+    const title: string = doiEntry.dataFromCrossref["title"];
+    const path: string = doiEntry.path;
     let authors: string[] = [];
-    if (json[id]["author"] != undefined) {
-      for (let i = 0; i < json[id]["author"].length; i++) {
+    if (doiEntry.dataFromCrossref["author"] != undefined) {
+      for (let i = 0; i < doiEntry.dataFromCrossref["author"].length; i++) {
         authors.push(
-          json[id]["author"][i]["given"] + " " + json[id]["author"][i]["family"]
+          doiEntry.dataFromCrossref["author"][i]["given"] +
+            " " +
+            doiEntry.dataFromCrossref["author"][i]["family"]
         );
       }
     }
     let year: number | undefined = undefined;
-    if (json[id]["published-print"] != undefined) {
-      year = json[id]["published-print"]["date-parts"][0][0];
-    } else if (json[id]["created"] != undefined) {
-      year = json[id]["created"]["date-parts"][0][0];
+    if (doiEntry.dataFromCrossref["published-print"] != undefined) {
+      year = doiEntry.dataFromCrossref["published-print"]["date-parts"][0][0];
+    } else if (doiEntry.dataFromCrossref["created"] != undefined) {
+      year = doiEntry.dataFromCrossref["created"]["date-parts"][0][0];
     }
     const publisher: string =
-      json[id]["event"] != undefined ? json[id]["event"] : "";
+      doiEntry.dataFromCrossref["event"] != undefined
+        ? doiEntry.dataFromCrossref["event"]
+        : "";
     const abstract: string =
-      json[id]["abstract"] != undefined ? json[id]["abstract"] : "";
-    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
-    const comments =
-      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
+      doiEntry.dataFromCrossref["abstract"] != undefined
+        ? doiEntry.dataFromCrossref["abstract"]
+        : "";
+    const tags = doiEntry.tags;
+    const comments = doiEntry.comments;
 
     const e = {
       id: id,
-      idType: json[id][ENTRY_ID_TYPE],
+      idType: jsonDB[id][ENTRY_ID_TYPE],
       title: title,
       authors: authors,
-      url: "",
+      url: undefined,
       tags: tags,
       comments: comments,
       abstract: abstract,
@@ -144,70 +152,75 @@ function getEntry(id: string, json: any): Entry {
     };
     checkEntry(e);
     return e;
-  } else if (json[id][ENTRY_ID_TYPE] == "arxiv") {
-    const title: string = json[id][ENTRY_TITLE];
-    const path: string = json[id]["path"];
+  } else if (jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_ARXIV) {
+    const arxivEntry: ArxivEntry = jsonDB[id];
+    const title: string = arxivEntry.dataFromArxiv["title"];
     let authors: string[] = [];
-    if (json[id]["author"].length != undefined) {
-      for (let i = 0; i < json[id]["author"].length; i++) {
-        authors.push(json[id]["author"][i]["name"]);
+    if (arxivEntry.dataFromArxiv["author"].length != undefined) {
+      for (let i = 0; i < arxivEntry.dataFromArxiv["author"].length; i++) {
+        authors.push(arxivEntry.dataFromArxiv["author"][i]["name"]);
       }
     } else {
-      authors.push(json[id]["author"]["name"]);
+      authors.push(arxivEntry.dataFromArxiv["author"]["name"]);
     }
     let year: number | undefined = undefined;
     if (
-      json[id]["published"] != undefined &&
-      !isNaN(parseInt(json[id]["published"].substr(0, 4)))
+      arxivEntry.dataFromArxiv["published"] != undefined &&
+      !isNaN(parseInt(arxivEntry.dataFromArxiv["published"].substr(0, 4)))
     ) {
-      year = parseInt(json[id]["published"].substr(0, 4));
+      year = parseInt(arxivEntry.dataFromArxiv["published"].substr(0, 4));
     }
     const publisher: string =
-      json[id]["event"] != undefined ? json[id]["event"] : "";
+      arxivEntry.dataFromArxiv["event"] != undefined
+        ? arxivEntry.dataFromArxiv["event"]
+        : "";
     const abstract: string =
-      json[id]["summary"] != undefined ? json[id]["summary"] : "";
-    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
-    const comments =
-      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
+      arxivEntry.dataFromArxiv["summary"] != undefined
+        ? arxivEntry.dataFromArxiv["summary"]
+        : "";
 
     const e = {
       id: id,
-      idType: json[id][ENTRY_ID_TYPE],
+      idType: arxivEntry.idType,
       title: title,
-      url: "",
+      url: undefined,
       authors: authors,
-      tags: tags,
+      tags: arxivEntry.tags,
       abstract: abstract,
-      comments: comments,
-      path: path,
+      comments: arxivEntry.comments,
+      path: arxivEntry.path,
       year: year,
       publisher: publisher,
     };
     checkEntry(e);
     return e;
   } else {
-    const title: string = json[id][ENTRY_TITLE];
-    const path: string = json[id]["path"];
-    const tags = json[id][ENTRY_TAGS] != undefined ? json[id][ENTRY_TAGS] : [];
-    const comments =
-      json[id][ENTRY_COMMENTS] != undefined ? json[id][ENTRY_COMMENTS] : [];
+    if (jsonDB[id][ENTRY_ID_TYPE] != ID_TYPE_PATH) {
+      throw new Error(
+        jsonDB[id][ENTRY_ID_TYPE] +
+          " must be " +
+          ID_TYPE_PATH +
+          " but id: " +
+          id +
+          " is not."
+      );
+    }
+    const pathEntry: PathEntry = jsonDB[id];
     const authors = [];
     const abstract =
-      json[id]["abstract"] != undefined ? json[id]["abstract"] : "";
-    const year = undefined;
-    const publisher = "";
+      jsonDB[id]["abstract"] != undefined ? jsonDB[id]["abstract"] : "";
     const e = {
       id: id,
-      idType: json[id][ENTRY_ID_TYPE],
-      title: title,
-      url: "",
+      idType: pathEntry.idType,
+      title: pathEntry.title,
+      url: undefined,
       authors: authors,
-      tags: tags,
+      tags: pathEntry.tags,
       abstract: abstract,
-      comments: comments,
-      path: path,
-      year: year,
-      publisher: publisher,
+      comments: pathEntry.comments,
+      path: pathEntry.path,
+      year: undefined,
+      publisher: undefined,
     };
     checkEntry(e);
     return e;
@@ -271,14 +284,14 @@ function getPdf(request: Request, response: Response, db_path: string) {
   logger.info("Sent a response from get_pdf");
 }
 
-function getDB(request: Request, response: Response, db_path: string) {
+function getDB(request: Request, response: Response, dbPathDB: string) {
   logger.info("Get a get_db request" + request.url);
-  const json = JSON.parse(fs.readFileSync(db_path).toString());
+  const jsonDB = JSON.parse(fs.readFileSync(dbPathDB).toString());
   let db_response: DB = [];
 
-  for (const id of Object.keys(json)) {
-    if (json[id] == undefined) continue;
-    const e = getEntry(id, json);
+  for (const id of Object.keys(jsonDB)) {
+    if (jsonDB[id] == undefined) continue;
+    const e = getEntry(id, jsonDB);
     db_response.push(e);
   }
 
@@ -417,7 +430,7 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
     let jsonDB = JSON.parse(fs.readFileSync(db_path).toString());
     if (
       jsonDB[entry.id] != undefined &&
-      jsonDB[entry.id]["path"] != undefined
+      jsonDB[entry.id][ENTRY_PATH] != undefined
     ) {
       logger.info("Delete " + jsonDB[entry.id]["path"]);
       const old_filename = path.join(
@@ -438,7 +451,7 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
       delete jsonDB[entry.id];
     } else if (
       jsonDB[entry.id] != undefined &&
-      jsonDB[entry.id]["path"] == undefined &&
+      jsonDB[entry.id][ENTRY_PATH] == undefined &&
       jsonDB[entry.id][ENTRY_ID_TYPE] == ID_TYPE_URL
     ) {
       logger.info("Delete " + entry.id);

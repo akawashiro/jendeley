@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import "./App.css";
-import { RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./schema";
+import { RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./api_schema";
 import { splitTagsStr } from "./stringUtils";
 
 const { REACT_APP_API_URL } = process.env;

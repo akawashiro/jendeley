@@ -18,9 +18,18 @@ import {
   ENTRY_URL,
   ID_TYPE_URL,
   ID_TYPE_BOOK,
+  ARXIV_API_URL,
+  ENTRY_DATA_FROM_ARXIV,
 } from "./constants";
 import { DocID, getDocID } from "./docid";
 import { validateJsonDB } from "./validate_db";
+import {
+  ArxivEntry,
+  DoiEntry,
+  IsbnEntry,
+  PathEntry,
+  UrlEntry,
+} from "./db_schema";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -96,7 +105,7 @@ async function getArxivJson(arxiv: string) {
 
   // See here for API documentation
   // https://arxiv.org/help/api/
-  const URL = "http://export.arxiv.org/api/query?id_list=" + arxiv;
+  const URL = ARXIV_API_URL + arxiv;
   const options = { headers: { Accept: "application/json" } };
   try {
     const data = (await got(URL, options)).body;
@@ -128,15 +137,24 @@ async function getArxivJson(arxiv: string) {
 async function getJson(
   docID: DocID,
   path: string
-): Promise<[Object, string] | undefined> {
-  let json_r: Object | undefined = undefined;
+): Promise<
+  [ArxivEntry | DoiEntry | IsbnEntry | PathEntry, string] | undefined
+> {
+  let json_r: ArxivEntry | DoiEntry | IsbnEntry | PathEntry | undefined =
+    undefined;
   let db_id: string | undefined = undefined;
 
   if (docID.arxiv != undefined) {
-    let json = await getArxivJson(docID.arxiv);
-    if (json != undefined) {
-      json[ENTRY_PATH] = path;
-      json[ENTRY_ID_TYPE] = ID_TYPE_ARXIV;
+    let dataFromArxiv = await getArxivJson(docID.arxiv);
+    if (dataFromArxiv != undefined) {
+      let json: ArxivEntry = {
+        path: path,
+        idType: ID_TYPE_ARXIV,
+        tags: [],
+        comments: "",
+        userSpecifiedTitle: undefined,
+        dataFromArxiv: dataFromArxiv,
+      };
       json_r = json;
       db_id = "arxiv_" + docID.arxiv;
     } else {
@@ -152,10 +170,16 @@ async function getJson(
     docID.doi != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let json = await getDoiJSON(docID.doi);
-    if (json != undefined) {
-      json[ENTRY_PATH] = path;
-      json[ENTRY_ID_TYPE] = ID_TYPE_DOI;
+    let dataFromCrossref = await getDoiJSON(docID.doi);
+    if (dataFromCrossref != undefined) {
+      let json: DoiEntry = {
+        path: path,
+        idType: ID_TYPE_DOI,
+        tags: [],
+        comments: "",
+        userSpecifiedTitle: undefined,
+        dataFromCrossref: dataFromCrossref,
+      };
       json_r = json;
       db_id = "doi_" + docID.doi;
     } else {
@@ -171,10 +195,16 @@ async function getJson(
     docID.isbn != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let json = await getIsbnJson(docID.isbn);
-    if (json != undefined) {
-      json[ENTRY_PATH] = path;
-      json[ENTRY_ID_TYPE] = ID_TYPE_ISBN;
+    let dataFromNodeIsbn = await getIsbnJson(docID.isbn);
+    if (dataFromNodeIsbn != undefined) {
+      let json: IsbnEntry = {
+        path: path,
+        idType: ID_TYPE_ISBN,
+        tags: [],
+        comments: "",
+        userSpecifiedTitle: undefined,
+        dataFromNodeIsbn: dataFromNodeIsbn,
+      };
       json_r = json;
       db_id = "isbn_" + docID.isbn;
     } else {
@@ -190,10 +220,14 @@ async function getJson(
     docID.path != undefined &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
-    let json = new Object();
-    json[ENTRY_PATH] = path;
-    json[ENTRY_TITLE] = docID.path;
-    json[ENTRY_ID_TYPE] = ID_TYPE_PATH;
+    let json: PathEntry = {
+      path: path,
+      title: docID.path,
+      idType: ID_TYPE_PATH,
+      tags: [],
+      comments: "",
+      userSpecifiedTitle: undefined,
+    };
     json_r = json;
     db_id = "path_" + docID.path;
   }
@@ -238,7 +272,7 @@ function genDummyDB(output: string) {
   if (!validateJsonDB(jsonDB, undefined)) {
     throw new Error("validateJsonDB failed!");
   }
-  fs.writeFileSync(output, JSON.stringify(jsonDB));
+  fs.writeFileSync(output, JSON.stringify(jsonDB, null, 2));
 }
 
 function registerWeb(
@@ -267,12 +301,14 @@ function registerWeb(
   };
   logger.info("docID = " + JSON.stringify(docID));
 
-  let json = new Object();
-  json[ENTRY_TITLE] = title;
-  json[ENTRY_URL] = url;
-  json[ENTRY_COMMENTS] = comments;
-  json[ENTRY_TAGS] = tags;
-  json[ENTRY_ID_TYPE] = ID_TYPE_URL;
+  let json: UrlEntry = {
+    title: title,
+    url: url,
+    comments: comments,
+    tags: tags,
+    userSpecifiedTitle: undefined,
+    idType: ID_TYPE_URL,
+  };
 
   if (isValidJsonEntry(json)) {
     jsonDB["url_" + url] = json;
@@ -346,39 +382,37 @@ async function registerNonBookPDF(
     return jsonDB;
   }
 
-  if (isValidJsonEntry(json)) {
-    // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
-    if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
-      const newFilename = path.join(
-        path.dirname(pdf),
-        json[ENTRY_TITLE].replace(/[/\\?%*:|"<>.]/g, "") +
-          " " +
-          path.basename(pdf)
-      );
-      const oldFileneme = json[ENTRY_PATH];
-      json[ENTRY_PATH] = newFilename;
+  // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
+  if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
+    const newFilename = path.join(
+      path.dirname(pdf),
+      json[ENTRY_TITLE].replace(/[/\\?%*:|"<>.]/g, "") +
+        " " +
+        path.basename(pdf)
+    );
+    const oldFileneme = json[ENTRY_PATH];
+    json[ENTRY_PATH] = newFilename;
 
-      if (fs.existsSync(path.join(papersDir, newFilename))) {
-        logger.warn(newFilename + " already exists. Skip registration.");
-        return jsonDB;
-      }
-      fs.renameSync(
-        path.join(papersDir, oldFileneme),
-        path.join(papersDir, newFilename)
-      );
-      logger.info("Rename " + oldFileneme + " to " + newFilename);
+    if (fs.existsSync(path.join(papersDir, newFilename))) {
+      logger.warn(newFilename + " already exists. Skip registration.");
+      return jsonDB;
     }
-
-    jsonDB[dbID] = json;
-
-    if (!validateJsonDB(jsonDB, undefined)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
-    return jsonDB;
-  } else {
-    return jsonDB;
+    fs.renameSync(
+      path.join(papersDir, oldFileneme),
+      path.join(papersDir, newFilename)
+    );
+    logger.info("Rename " + oldFileneme + " to " + newFilename);
   }
+
+  jsonDB[dbID] = json;
+
+  if (!validateJsonDB(jsonDB, undefined)) {
+    throw new Error(
+      "validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2)
+    );
+  }
+
+  return jsonDB;
 }
 
 async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
@@ -543,7 +577,7 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
+    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
   } catch (err) {
     logger.warn(err);
   }

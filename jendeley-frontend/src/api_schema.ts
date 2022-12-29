@@ -1,19 +1,19 @@
 // This file is shared between client and server
 
-type IDType = "doi" | "isbn" | "url" | "book";
+type IDType = "doi" | "isbn" | "url" | "book" | "arxiv" | "path";
 
 type Entry = {
   id: string;
   idType: IDType;
-  url: string;
+  url: string | undefined;
   title: string;
-  path: string;
+  path: string | undefined;
   tags: string[];
   comments: string;
   authors: string[];
   abstract: string;
   year: number | undefined;
-  publisher: string;
+  publisher: string | undefined;
 };
 
 type DB = Entry[];
