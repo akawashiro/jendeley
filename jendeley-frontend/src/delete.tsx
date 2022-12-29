@@ -11,7 +11,7 @@ import "./App.css";
 import { IDType, Entry } from "./api_schema";
 import { Delete } from "@mui/icons-material";
 
-const { REACT_APP_API_URL } = process.env;
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 function DeleteButton(props: any) {
   const [open, setOpen] = React.useState(false);

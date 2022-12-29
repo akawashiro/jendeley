@@ -14,8 +14,10 @@ import sanitizeHTML from "sanitize-html";
 import { RegisterWebWithDialog, RegisterPDFWithDialog } from "./register";
 import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { grey } from "@mui/material/colors";
 
-const { REACT_APP_API_URL } = process.env;
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 function authorChips(authors: string[]) {
   // TODO padding or margine
@@ -40,25 +42,40 @@ function authorChips(authors: string[]) {
 }
 
 function tagChips(tags: string[]) {
-  // TODO padding or margine
-  return (
-    <Box>
-      {tags.map((t) => (
-        <Chip
-          label={`${t}`}
-          size="small"
-          onClick={() => {
-            navigator.clipboard.writeText(t);
-          }}
-          sx={{
-            color: getColorFromString(t).color,
-            bgcolor: getColorFromString(t).bgcolor,
-            m: 0.1,
-          }}
-        />
-      ))}
-    </Box>
-  );
+  if (tags.length === 0) {
+    return <EditIcon sx={{ color: grey[300] }} />;
+  } else {
+    return (
+      <Box>
+        {tags.map((t) => (
+          <Chip
+            label={`${t}`}
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(t);
+            }}
+            sx={{
+              color: getColorFromString(t).color,
+              bgcolor: getColorFromString(t).bgcolor,
+              m: 0.1,
+            }}
+          />
+        ))}
+      </Box>
+    );
+  }
+}
+
+function commentsDiv(comments: string) {
+  if (comments === "") {
+    return <EditIcon sx={{ color: grey[300] }} />;
+  } else {
+    return (
+      <Box>
+        <p>{`${comments}`}</p>
+      </Box>
+    );
+  }
 }
 
 function abstractHTML(abstract: string) {
@@ -134,10 +151,11 @@ function App() {
             tableData={tableData}
           />
         ),
-        header: "actions",
+        header: "",
         enableColumnFilter: false,
         enableSorting: false,
         enableEditing: false,
+        enableColumnActions: false,
         size: 3,
       },
       {
@@ -171,6 +189,7 @@ function App() {
       {
         accessorKey: "comments",
         header: "comments",
+        Cell: ({ cell }) => commentsDiv(cell.getValue<string>()),
         filterFn: "includesString",
         enableEditing: true,
         size: 200,
