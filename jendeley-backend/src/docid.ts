@@ -6,15 +6,16 @@ import { logger } from "./logger";
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
 import * as E from "fp-ts/lib/Either";
 
-type DocID = {
-  doi: string | undefined;
-  isbn: string | undefined;
-  arxiv: string | undefined;
-  path: string | undefined;
-  url: string | undefined;
-};
+type DocID =
+  | { docIDType: "doi"; doi: string }
+  | { docIDType: "isbn"; isbn: string }
+  | { docIDType: "arxiv"; arxiv: string }
+  | { docIDType: "path"; path: string }
+  | { docIDType: "url"; url: string };
 
-function getDocIDFromTexts(texts: string[]): E.Either<string, DocID> {
+// This returns multiple DocIDs when it has multiple identifiers for example
+// DOI and ISBN.
+function getDocIDFromTexts(texts: string[]): DocID[] {
   const regexpDOI = new RegExp(
     '(10[.][0-9]{2,}(?:[.][0-9]+)*/(?:(?![%"#? ])\\S)+)',
     "g"
@@ -105,17 +106,17 @@ function getDocIDFromTexts(texts: string[]): E.Either<string, DocID> {
     if (isbn != undefined) break;
   }
 
-  if (doi != undefined || isbn != undefined || arxiv != undefined) {
-    return E.right({
-      doi: doi,
-      isbn: isbn,
-      arxiv: arxiv,
-      path: undefined,
-      url: undefined,
-    });
-  } else {
-    return E.left("Failed to find any identifier in getDocIDFromTexts.");
+  let docIDs: DocID[] = [];
+  if (doi != undefined) {
+    docIDs.push({ docIDType: "doi", doi: doi });
   }
+  if (isbn != undefined) {
+    docIDs.push({ docIDType: "isbn", isbn: isbn });
+  }
+  if (arxiv != undefined) {
+    docIDs.push({ docIDType: "arxiv", arxiv: arxiv });
+  }
+  return docIDs;
 }
 
 function getDocIDFromUrl(url: string): E.Either<string, DocID> {
@@ -125,13 +126,7 @@ function getDocIDFromUrl(url: string): E.Either<string, DocID> {
   );
   const foundArxiv = [...url.matchAll(regexpArxiv)];
   for (const f of foundArxiv) {
-    return E.right({
-      doi: undefined,
-      isbn: undefined,
-      arxiv: f[1],
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "arxiv", arxiv: f[1] });
   }
   return E.left("Failed to get DocID from URL.");
 }
@@ -151,13 +146,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
       "/" +
       d.substring(3 + 4 + 1);
     d = d.replaceAll("_", ".");
-    return E.right({
-      doi: d,
-      isbn: undefined,
-      arxiv: undefined,
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "doi", doi: d });
   }
 
   const regexpDOI2 = new RegExp(
@@ -174,13 +163,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
       "/" +
       d.substring(3 + 4 + 1);
     d = d.replaceAll("_", ".");
-    return E.right({
-      doi: d,
-      isbn: undefined,
-      arxiv: undefined,
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "doi", doi: d });
   }
 
   const regexpDOI3 = new RegExp(
@@ -197,13 +180,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
       "/" +
       d.substring(3 + 4 + 1);
     d = d.replaceAll("_", ".");
-    return E.right({
-      doi: d,
-      isbn: undefined,
-      arxiv: undefined,
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "doi", doi: d });
   }
 
   const regexpDOI4 = new RegExp(
@@ -219,13 +196,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
       d.substring(3, 3 + 4) +
       "/" +
       d.substring(3 + 4 + 1);
-    return E.right({
-      doi: d,
-      isbn: undefined,
-      arxiv: undefined,
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "doi", doi: d });
   }
 
   const regexpDOI6 = new RegExp(
@@ -242,13 +213,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
       "/" +
       d.substring(3 + 4 + 1);
     d = d.replaceAll("_", ".");
-    return E.right({
-      doi: d,
-      isbn: undefined,
-      arxiv: undefined,
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "doi", doi: d });
   }
 
   const regexpDOI7 = new RegExp(
@@ -265,13 +230,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
       "/" +
       d.substring(3 + 4 + 1);
     d = d.replaceAll("_", ".");
-    return E.right({
-      doi: d,
-      isbn: undefined,
-      arxiv: undefined,
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "doi", doi: d });
   }
 
   const regexpISBN = new RegExp(
@@ -281,26 +240,11 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
   const foundISBN = [...pdf.matchAll(regexpISBN)];
   for (const f of foundISBN) {
     let d = f[1] as string;
-    return E.right({
-      doi: undefined,
-      isbn: d,
-      arxiv: undefined,
-      path: undefined,
-      url: undefined,
-    });
+    return E.right({ docIDType: "doi", doi: d });
   }
 
-  if (
-    path.basename(pdf, ".pdf").endsWith("no_id") ||
-    pdf.includes(JENDELEY_NO_ID)
-  ) {
-    return E.right({
-      doi: undefined,
-      isbn: undefined,
-      arxiv: undefined,
-      path: pdf,
-      url: undefined,
-    });
+  if (pdf.includes(JENDELEY_NO_ID)) {
+    return E.right({ docIDType: "path", path: pdf });
   }
 
   return E.left("Failed getDocIDManuallyWritten.");
@@ -376,13 +320,7 @@ async function getDocIDFromTitle(
         if (title.toLowerCase() == t) {
           logger.info("title = " + title + " t = " + t);
           const doi = data["message"]["items"][i]["DOI"];
-          return E.right({
-            doi: doi,
-            isbn: undefined,
-            arxiv: undefined,
-            path: undefined,
-            url: undefined,
-          });
+          return E.right({ docIDType: "doi", doi: doi });
         }
       }
     } catch {
@@ -390,22 +328,6 @@ async function getDocIDFromTitle(
     }
   }
   return E.left("Failed to get DocID in getDocIDFromTitle");
-}
-
-function isValidDocID(docID: E.Either<string, DocID>) {
-  return E.match(
-    (err: string) => {
-      return false;
-    },
-    (id: DocID) => {
-      return (
-        id.arxiv != undefined ||
-        id.doi != undefined ||
-        id.isbn != undefined ||
-        id.path != undefined
-      );
-    }
-  )(docID);
 }
 
 async function getDocID(
@@ -454,30 +376,14 @@ async function getDocID(
   if (texts == undefined) {
     return E.left("Failed to extract text from " + pdfFullpath);
   }
-  const id = getDocIDFromTexts(texts);
-  logger.info("getDocIDFromTexts(texts) = " + JSON.stringify(id));
+  const ids = getDocIDFromTexts(texts);
+  logger.info("getDocIDFromTexts(texts) = " + JSON.stringify(ids));
   if (isBook) {
-    return E.match(
-      (err: string) => {
-        return E.left(err);
-      },
-      (i: DocID) => {
-        if (i.isbn != undefined) {
-          const bookID: DocID = {
-            doi: undefined,
-            arxiv: undefined,
-            path: undefined,
-            isbn: i.isbn,
-            url: undefined,
-          };
-          return E.right(bookID);
-        } else {
-          return E.left("Cannot decide docID of " + pdf + " as book.");
-        }
+    for (const i of ids) {
+      if (i.docIDType == "isbn") {
+        return E.right(i);
       }
-    )(id);
-  } else if (isValidDocID(id)) {
-    return id;
+    }
   }
 
   // The fallback case.

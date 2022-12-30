@@ -3,43 +3,19 @@ import { DocID, getDocID, getDocIDFromTexts, getDocIDFromTitle } from "./docid";
 import * as E from "fp-ts/lib/Either";
 
 function rightDoi(doi: string): E.Either<string, DocID> {
-  return E.right({
-    doi: doi,
-    isbn: undefined,
-    arxiv: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  return E.right({ docIDType: "doi", doi: doi });
 }
 
 function rightIsbn(isbn: string) {
-  return E.right({
-    doi: undefined,
-    isbn: isbn,
-    arxiv: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  return E.right({ docIDType: "isbn", isbn: isbn });
 }
 
 function rightPath(path: string) {
-  return E.right({
-    doi: undefined,
-    isbn: undefined,
-    arxiv: undefined,
-    path: path,
-    url: undefined,
-  });
+  return E.right({ docIDType: "path", path: path });
 }
 
 function rightArxiv(arxiv: string) {
-  return E.right({
-    doi: undefined,
-    isbn: undefined,
-    arxiv: arxiv,
-    path: undefined,
-    url: undefined,
-  });
+  return E.right({ docIDType: "arxiv", arxiv: arxiv });
 }
 
 test.skip("DOI from title", async () => {

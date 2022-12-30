@@ -146,7 +146,7 @@ async function getJson(
     undefined;
   let db_id: string | undefined = undefined;
 
-  if (docID.arxiv != undefined) {
+  if (docID.docIDType == "arxiv") {
     let dataFromArxiv = await getArxivJson(docID.arxiv);
     if (dataFromArxiv != undefined) {
       let json: ArxivEntry = {
@@ -169,7 +169,7 @@ async function getJson(
     }
   }
   if (
-    docID.doi != undefined &&
+    docID.docIDType == "doi" &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
     let dataFromCrossref = await getDoiJSON(docID.doi);
@@ -194,7 +194,7 @@ async function getJson(
     }
   }
   if (
-    docID.isbn != undefined &&
+    docID.docIDType == "isbn" &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
     let dataFromNodeIsbn = await getIsbnJson(docID.isbn);
@@ -219,7 +219,7 @@ async function getJson(
     }
   }
   if (
-    docID.path != undefined &&
+    docID.docIDType == "path" &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
     let json: PathEntry = {
@@ -298,13 +298,7 @@ function registerWeb(
       " comments = " +
       comments
   );
-  const docID: DocID = {
-    url: url,
-    doi: undefined,
-    isbn: undefined,
-    path: undefined,
-    arxiv: undefined,
-  };
+  const docID: DocID = { docIDType: "url", url: url };
   logger.info("docID = " + JSON.stringify(docID));
 
   let json: UrlEntry = {
