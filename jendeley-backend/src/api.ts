@@ -27,6 +27,7 @@ import {
   RequestGetWebFromUrl,
 } from "./api_schema";
 import https from "https";
+import http from "http";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import { validateJsonDB } from "./validate_db";
 import { ArxivEntry, DoiEntry, PathEntry, UrlEntry } from "./db_schema";
@@ -305,7 +306,7 @@ function getDB(request: Request, response: Response, dbPathDB: string) {
   logger.info("Sent a response from get_db");
 }
 
-async function getTitleFromUrl(url: string) {
+async function getTitleFromUrl(url: string): Promise<string | undefined> {
   let { got } = await import("got");
 
   const res = await got(url);
@@ -349,7 +350,7 @@ async function addWebFromUrl(
 
   response.end();
 
-  logger.info("Sent a response from add_pdf_from_url");
+  logger.info("Sent a response from add_web_from_url");
 }
 
 async function addPdfFromUrl(
@@ -375,16 +376,29 @@ async function addPdfFromUrl(
       },
     };
 
-    return new Promise<void>((resolve, reject) =>
-      https
-        .request(uri, options, (res) => {
-          res
-            .pipe(fs.createWriteStream(filename))
-            .on("close", resolve)
-            .on("error", reject);
-        })
-        .end()
-    );
+    if (uri.startsWith("https")) {
+      return new Promise<void>((resolve, reject) =>
+        https
+          .request(uri, options, (res) => {
+            res
+              .pipe(fs.createWriteStream(filename))
+              .on("close", resolve)
+              .on("error", reject);
+          })
+          .end()
+      );
+    } else if (uri.startsWith("http")) {
+      return new Promise<void>((resolve, reject) =>
+        http
+          .request(uri, options, (res) => {
+            res
+              .pipe(fs.createWriteStream(filename))
+              .on("close", resolve)
+              .on("error", reject);
+          })
+          .end()
+      );
+    }
   };
 
   await download(req.url, path.join(path.dirname(dbPath), filename));
