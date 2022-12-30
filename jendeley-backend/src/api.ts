@@ -13,7 +13,6 @@ import {
   ID_TYPE_BOOK,
   ID_TYPE_DOI,
   ENTRY_TITLE,
-  ENTRY_URL,
   ENTRY_COMMENTS,
   ENTRY_TAGS,
   ID_TYPE_ARXIV,
@@ -306,7 +305,8 @@ function getDB(request: Request, response: Response, dbPathDB: string) {
   logger.info("Sent a response from get_db");
 }
 
-async function getTitleFromUrl(url: string): Promise<string | undefined> {
+// Rewrite using Either
+async function getTitleFromUrl(url: string): Promise<string> {
   let { got } = await import("got");
 
   const res = await got(url);
