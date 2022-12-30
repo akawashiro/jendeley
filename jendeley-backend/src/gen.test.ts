@@ -77,27 +77,19 @@ test("JSON from path", async () => {
 });
 
 test("ISBN from text", async () => {
-  const docID1 = await getDocIDFromTexts([
-    "ISBN 0-262-16209-1 (hc. : alk. paper)",
-  ]);
-  expect(docID1).toBe(rightIsbn("0262162091"));
+  const docID1 = getDocIDFromTexts(["ISBN 0-262-16209-1 (hc. : alk. paper)"]);
+  expect(docID1).toStrictEqual(rightIsbn("0262162091"));
+});
 
-  const docID2 = await getDocIDFromTexts([
-    "ISBN: 0262162091 (hc. : alk. paper)",
-  ]);
-  expect(docID2).toBe(rightIsbn("0262162091"));
+test("ISBN from text 2", async () => {
+  const docID2 = getDocIDFromTexts(["ISBN: 0262162091 (hc. : alk. paper)"]);
+  expect(docID2).toStrictEqual(rightIsbn("0262162091"));
 });
 
 test("no_id from path", async () => {
   const pdf = "hoge_no_id.pdf";
   const docID = await getDocID(pdf, "/hoge/", false, undefined);
-  expect(docID).toStrictEqual({
-    arxiv: undefined,
-    doi: undefined,
-    isbn: undefined,
-    path: "hoge_no_id.pdf",
-    url: undefined,
-  });
+  expect(docID).toStrictEqual(rightPath("hoge_no_id.pdf"));
 });
 
 test("jendeley no id from path", async () => {
@@ -177,106 +169,60 @@ test("Complicated journal-like doi from path", async () => {
   const pdf1 =
     "Call-by-name, call-by-value and the λ-calculus [jendeley doi 10_1016_0304-3975(75)90017-1].pdf";
   const docID1 = await getDocID(pdf1, "/hoge/", false, undefined);
-  expect(docID1).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1016/0304-3975(75)90017-1",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID1).toStrictEqual(rightDoi("10.1016/0304-3975(75)90017-1"));
+});
 
+test("Complicated journal-like doi from path 2", async () => {
   const pdf3 =
     "Emerging-MPEG-Standards-for-Point-Cloud-Compression [jendeley doi 10_1109_JETCAS_2018_2885981].pdf";
   const docID3 = await getDocID(pdf3, "/hoge/", false, undefined);
-  expect(docID3).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1109/JETCAS.2018.2885981",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID3).toStrictEqual(rightDoi("10.1109/JETCAS.2018.2885981"));
+});
 
+test("Complicated journal-like doi from path 3", async () => {
   const pdf10 =
     "[John C. Reynolds] Separation Logic A Logic for Shared Mutable Data Structures [jendeley doi 10_1109_LICS_2002_1029817].pdf";
   const docID10 = await getDocID(pdf10, "/hoge/", false, undefined);
-  expect(docID10).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1109/LICS.2002.1029817",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID10).toStrictEqual(rightDoi("10.1109/LICS.2002.1029817"));
 });
 
-test("Complicated journal-like doi from path", async () => {
+test("Complicated journal-like doi from path 4", async () => {
   const pdf1 =
     "Call-by-name, call-by-value and the λ-calculus [jendeley doi 10_1016_0304-3975(75)90017-1].pdf";
   const docID1 = await getDocID(pdf1, "/hoge/", false, undefined);
-  expect(docID1).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1016/0304-3975(75)90017-1",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID1).toStrictEqual(rightDoi("10.1016/0304-3975(75)90017-1"));
+});
 
+test("Complicated journal-like doi from path 5", async () => {
   const pdf3 =
     "Emerging-MPEG-Standards-for-Point-Cloud-Compression [jendeley doi 10_1109_JETCAS_2018_2885981].pdf";
   const docID3 = await getDocID(pdf3, "/hoge/", false, undefined);
-  expect(docID3).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1109/JETCAS.2018.2885981",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID3).toStrictEqual(rightDoi("10.1109/JETCAS.2018.2885981"));
+});
 
+test("Complicated journal-like doi from path 6", async () => {
   const pdf10 =
     "[John C. Reynolds] Separation Logic A Logic for Shared Mutable Data Structures [jendeley doi 10_1109_LICS_2002_1029817].pdf";
   const docID10 = await getDocID(pdf10, "/hoge/", false, undefined);
-  expect(docID10).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1109/LICS.2002.1029817",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID10).toStrictEqual(rightDoi("10.1109/LICS.2002.1029817"));
 });
 
-test("Complicated book-like doi from path", async () => {
+test("Complicated book-like doi from path 7", async () => {
   const pdf =
     "MultistageProgramming/[Oleg Kiselyov] The Design and Implementation of BER MetaOCaml [jendeley doi 10_1007_978-3-319-07151-0_6].pdf";
   const docID = await getDocID(pdf, "/hoge/", false, undefined);
-  expect(docID).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1007/978-3-319-07151-0_6",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID).toStrictEqual(rightDoi("10.1007/978-3-319-07151-0_6"));
 });
 
-test("Complicated book-like doi from path", async () => {
+test("Complicated book-like doi from path 8", async () => {
   const pdf =
     "[Paul Blain Levy] Call By Push Value [jendeley doi 10_1007_978-94-007-0954-6].pdf";
   const docID = await getDocID(pdf, "/hoge/", false, undefined);
-  expect(docID).toStrictEqual({
-    arxiv: undefined,
-    doi: "10.1007/978-94-007-0954-6",
-    isbn: undefined,
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID).toStrictEqual(rightDoi("10.1007/978-94-007-0954-6"));
 });
 
 test.skip("Lonely planet China", async () => {
   const pdf = "lonelyplanet-china-15-full-book.pdf";
   const docID = await getDocID(pdf, "/hoge/", false, undefined);
-  expect(docID).toStrictEqual({
-    arxiv: undefined,
-    doi: undefined,
-    isbn: "9781786575227",
-    path: undefined,
-    url: undefined,
-  });
+  expect(docID).toStrictEqual(rightIsbn("9781786575227"));
 });
