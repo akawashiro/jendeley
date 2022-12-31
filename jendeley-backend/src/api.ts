@@ -20,32 +20,38 @@ import {
   ENTRY_PATH,
 } from "./constants";
 import {
-  Entry,
-  DB,
+  ApiEntry,
+  ApiDB,
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
+  ResponseGet,
 } from "./api_schema";
 import https from "https";
 import http from "http";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import { validateJsonDB } from "./validate_db";
-import { ArxivEntry, DoiEntry, PathEntry, UrlEntry } from "./db_schema";
+import { ArxivEntry, DoiEntry, JsonDB, PathEntry, UrlEntry } from "./db_schema";
+import * as E from "fp-ts/lib/Either";
 
-function checkEntry(entry: Entry) {
-  console.assert(
-    entry.title != undefined && entry.path != undefined,
-    "id = ",
-    entry.id,
-    "entry = ",
-    JSON.stringify(entry, undefined, 2)
-  );
+function checkEntry(entry: ApiEntry) {
+  if (entry.title == undefined || entry.path == undefined) {
+    logger.fatal(
+      "id = ",
+      entry.id,
+      "entry = ",
+      JSON.stringify(entry, undefined, 2)
+    );
+  }
 }
 
-function getEntry(id: string, jsonDB: any): Entry {
-  console.assert(jsonDB[id] != undefined, "json[" + id + "] != undefined");
+function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
+  if (jsonDB[id] == undefined) {
+    throw Error("json[" + id + "] != undefined");
+  }
 
-  if (jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_URL) {
-    const urlEntry: UrlEntry = jsonDB[id];
+  const entryInDB = jsonDB[id];
+  if (entryInDB.idType == "url") {
+    const urlEntry: UrlEntry = entryInDB;
     let authors: string[] = [];
     const abstract = "";
 
@@ -65,49 +71,43 @@ function getEntry(id: string, jsonDB: any): Entry {
     checkEntry(e);
     return e;
   } else if (
-    jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_ISBN ||
-    jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_BOOK
+    entryInDB.idType == ID_TYPE_ISBN ||
+    entryInDB.idType == ID_TYPE_BOOK
   ) {
-    const title: string = jsonDB[id][ENTRY_TITLE];
-    const path: string = jsonDB[id]["path"];
     let authors: string[] = [];
-    if (jsonDB[id]["authors"] != undefined) {
-      authors = jsonDB[id]["authors"];
+    if (entryInDB.dataFromNodeIsbn["authors"] != undefined) {
+      authors = entryInDB.dataFromNodeIsbn["authors"];
     }
     let year: number | undefined = undefined;
     if (
-      jsonDB[id]["publishedDate"] != undefined &&
-      !isNaN(parseInt(jsonDB[id]["publishedDate"].substr(0, 4)))
+      entryInDB.dataFromNodeIsbn["publishedDate"] != undefined &&
+      !isNaN(parseInt(entryInDB.dataFromNodeIsbn["publishedDate"].substr(0, 4)))
     ) {
-      year = parseInt(jsonDB[id]["publishedDate"].substr(0, 4));
+      year = parseInt(entryInDB.dataFromNodeIsbn["publishedDate"].substr(0, 4));
     }
     let publisher: string = "";
-    if (jsonDB[id]["publisher"] != undefined) {
-      publisher = jsonDB[id]["publisher"];
+    if (entryInDB.dataFromNodeIsbn["publisher"] != undefined) {
+      publisher = entryInDB.dataFromNodeIsbn["publisher"];
     }
-    const tags =
-      jsonDB[id][ENTRY_TAGS] != undefined ? jsonDB[id][ENTRY_TAGS] : [];
-    const comments =
-      jsonDB[id][ENTRY_COMMENTS] != undefined ? jsonDB[id][ENTRY_COMMENTS] : [];
     const abstract = "";
 
     const e = {
       id: id,
-      idType: jsonDB[id][ENTRY_ID_TYPE],
-      title: title,
+      idType: entryInDB.idType,
+      title: entryInDB.dataFromNodeIsbn["title"],
       url: undefined,
       authors: authors,
-      tags: tags,
-      comments: comments,
+      tags: entryInDB.tags,
+      comments: entryInDB.comments,
       abstract: abstract,
-      path: path,
+      path: entryInDB.path,
       year: year,
       publisher: publisher,
     };
     checkEntry(e);
     return e;
-  } else if (jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_DOI) {
-    const doiEntry: DoiEntry = jsonDB[id];
+  } else if (entryInDB.idType == ID_TYPE_DOI) {
+    const doiEntry: DoiEntry = entryInDB;
     const title: string = doiEntry.dataFromCrossref["title"];
     const path: string = doiEntry.path;
     let authors: string[] = [];
@@ -152,8 +152,8 @@ function getEntry(id: string, jsonDB: any): Entry {
     };
     checkEntry(e);
     return e;
-  } else if (jsonDB[id][ENTRY_ID_TYPE] == ID_TYPE_ARXIV) {
-    const arxivEntry: ArxivEntry = jsonDB[id];
+  } else if (entryInDB.idType == ID_TYPE_ARXIV) {
+    const arxivEntry: ArxivEntry = entryInDB;
     const title: string = arxivEntry.dataFromArxiv["title"];
     let authors: string[] = [];
     if (arxivEntry.dataFromArxiv["author"].length != undefined) {
@@ -195,7 +195,7 @@ function getEntry(id: string, jsonDB: any): Entry {
     checkEntry(e);
     return e;
   } else {
-    if (jsonDB[id][ENTRY_ID_TYPE] != ID_TYPE_PATH) {
+    if (entryInDB.idType != ID_TYPE_PATH) {
       throw new Error(
         jsonDB[id][ENTRY_ID_TYPE] +
           " must be " +
@@ -205,7 +205,7 @@ function getEntry(id: string, jsonDB: any): Entry {
           " is not."
       );
     }
-    const pathEntry: PathEntry = jsonDB[id];
+    const pathEntry: PathEntry = entryInDB;
     const authors = [];
     const abstract =
       jsonDB[id]["abstract"] != undefined ? jsonDB[id]["abstract"] : "";
@@ -237,7 +237,7 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
     entry_o[ENTRY_TAGS] != undefined &&
     entry_o[ENTRY_COMMENTS] != undefined
   ) {
-    const entry = entry_o as Entry;
+    const entry = entry_o as ApiEntry;
     let jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
     if (jsonDB[entry.id] != undefined) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
@@ -276,8 +276,6 @@ function getPdf(request: Request, response: Response, db_path: string) {
 
   response.writeHead(200, {
     "Content-Type": "application/pdf",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
   });
 
   response.end(pdf);
@@ -287,7 +285,7 @@ function getPdf(request: Request, response: Response, db_path: string) {
 function getDB(request: Request, response: Response, dbPathDB: string) {
   logger.info("Get a get_db request" + request.url);
   const jsonDB = JSON.parse(fs.readFileSync(dbPathDB).toString());
-  let db_response: DB = [];
+  let db_response: ApiDB = [];
 
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
@@ -295,13 +293,7 @@ function getDB(request: Request, response: Response, dbPathDB: string) {
     db_response.push(e);
   }
 
-  response.writeHead(200, {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-  });
-
-  response.end(JSON.stringify(db_response));
+  response.json(db_response);
   logger.info("Sent a response from get_db");
 }
 
@@ -318,7 +310,7 @@ async function getTitleFromUrl(url: string): Promise<string> {
 async function addWebFromUrl(
   httpRequest: Request,
   response: Response,
-  dPath: string
+  dbPath: string
 ) {
   const req = httpRequest.body as RequestGetWebFromUrl;
   logger.info(
@@ -328,27 +320,34 @@ async function addWebFromUrl(
       JSON.stringify(req)
   );
 
-  let jsonDB = JSON.parse(fs.readFileSync(dPath).toString());
+  const jsonDB: JsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
   const title = req.title == "" ? await getTitleFromUrl(req.url) : req.title;
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
-  jsonDB = registerWeb(jsonDB, req.url, title, req.comments, tags);
+  const newDBOrError = registerWeb(jsonDB, req.url, title, req.comments, tags);
 
-  if (!validateJsonDB(jsonDB, dPath)) {
-    throw new Error("validateJsonDB failed!");
+  if (E.isRight(newDBOrError)) {
+    if (!validateJsonDB(E.toUnion(newDBOrError), dbPath)) {
+      throw new Error("validateJsonDB failed!");
+    }
+
+    fs.writeFileSync(dbPath, JSON.stringify(E.toUnion(newDBOrError)));
+
+    const r: ResponseGet = {
+      isSucceeded: true,
+      message: "addPdfFromUrl succeeded",
+    };
+    response.status(200).json(r);
+  } else {
+    const err: string = E.toUnion(newDBOrError);
+    const r: ResponseGet = {
+      isSucceeded: false,
+      message: err,
+    };
+    response.status(500).json(r);
   }
-
-  fs.writeFileSync(dPath, JSON.stringify(jsonDB));
-
-  response.writeHead(200, {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-  });
-
-  response.end();
 
   logger.info("Sent a response from add_web_from_url");
 }
@@ -402,12 +401,12 @@ async function addPdfFromUrl(
   };
 
   await download(req.url, path.join(path.dirname(dbPath), filename));
-  let jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+  const jsonDB: JsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
-  jsonDB = await registerNonBookPDF(
+  const newDBOrError = await registerNonBookPDF(
     path.dirname(dbPath),
     filename,
     jsonDB,
@@ -418,19 +417,26 @@ async function addPdfFromUrl(
     req.url
   );
 
-  if (!validateJsonDB(jsonDB, dbPath)) {
-    throw new Error("validateJsonDB failed!");
+  if (E.isRight(newDBOrError)) {
+    if (!validateJsonDB(E.toUnion(newDBOrError), dbPath)) {
+      throw new Error("validateJsonDB failed!");
+    }
+
+    fs.writeFileSync(dbPath, JSON.stringify(E.toUnion(newDBOrError)));
+
+    const r: ResponseGet = {
+      isSucceeded: true,
+      message: "addPdfFromUrl succeeded",
+    };
+    response.status(200).json(r);
+  } else {
+    const err: string = E.toUnion(newDBOrError);
+    const r: ResponseGet = {
+      isSucceeded: false,
+      message: err,
+    };
+    response.status(500).json(r);
   }
-
-  fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
-
-  response.writeHead(200, {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-  });
-
-  response.end();
 
   logger.info("Sent a response from add_pdf_from_url");
 }
@@ -440,7 +446,7 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
   const entry_o = request.body;
 
   if (entry_o["id"] != undefined) {
-    const entry = entry_o as Entry;
+    const entry = entry_o as ApiEntry;
     let jsonDB = JSON.parse(fs.readFileSync(db_path).toString());
     if (
       jsonDB[entry.id] != undefined &&

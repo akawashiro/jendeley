@@ -287,7 +287,7 @@ function registerWeb(
   title: string,
   comments: string,
   tags: string[]
-) {
+): E.Either<string, JsonDB> {
   logger.info(
     "url = " +
       url +
@@ -318,10 +318,9 @@ function registerWeb(
       throw new Error("validateJsonDB failed!");
     }
 
-    return jsonDB;
+    return E.right(jsonDB);
   } else {
-    logger.warn("Failed to register url_" + url);
-    return jsonDB;
+    return E.left("Failed to register url_" + url);
   }
 }
 
