@@ -384,6 +384,16 @@ async function getDocID(
         return E.right(i);
       }
     }
+  } else {
+    if (ids.length == 1) {
+      return E.right(ids[0]);
+    } else {
+      return E.left(
+        "There is multiple document identifiers in " +
+          pdf +
+          ". And I cannot which one to use."
+      );
+    }
   }
 
   // The fallback case.
