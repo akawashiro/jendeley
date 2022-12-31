@@ -16,7 +16,7 @@ const ID_TYPE_URL = "url";
 const ID_TYPE_META = "meta";
 const ARXIV_API_URL = "http://export.arxiv.org/api/query?id_list=";
 const ENTRY_DATA_FROM_ARXIV = "data_from_" + ARXIV_API_URL;
-const JENDELEY_VERSION = "0.0.16";
+const JENDELEY_VERSION = "0.0.17";
 
 export {
   JENDELEY_NO_TRACK,
