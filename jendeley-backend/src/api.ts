@@ -36,10 +36,7 @@ import * as E from "fp-ts/lib/Either";
 function checkEntry(entry: ApiEntry) {
   if (entry.title == undefined || entry.path == undefined) {
     logger.fatal(
-      "id = ",
-      entry.id,
-      "entry = ",
-      JSON.stringify(entry, undefined, 2)
+      "id = " + entry.id + "entry = " + JSON.stringify(entry, undefined, 2)
     );
   }
 }

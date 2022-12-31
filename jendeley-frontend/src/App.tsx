@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
 import { Box } from "@mui/material";
 import "./App.css";
-import { Entry, DB } from "./api_schema";
+import { ApiEntry, ApiDB } from "./api_schema";
 import MaterialReactTable, {
   MRT_Cell,
   MRT_ColumnDef,
@@ -101,7 +101,7 @@ function stringArrayFilterFn(
   return false;
 }
 
-function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
+function cellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
   if (row.original.idType === "url") {
     return (
       <a
@@ -129,7 +129,7 @@ function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
 }
 
 function App() {
-  const [tableData, setTableData] = React.useState<DB>([]);
+  const [tableData, setTableData] = React.useState<ApiDB>([]);
 
   React.useEffect(() => {
     console.log("Fetching from DB in loading");
@@ -138,7 +138,7 @@ function App() {
       .then((json) => setTableData(() => json));
   }, []);
 
-  const columns = useMemo<MRT_ColumnDef<Entry>[]>(
+  const columns = useMemo<MRT_ColumnDef<ApiEntry>[]>(
     () => [
       {
         accessorKey: "id",
@@ -217,7 +217,7 @@ function App() {
     [tableData]
   );
 
-  const handleSaveCell = async (cell: MRT_Cell<Entry>, value: any) => {
+  const handleSaveCell = async (cell: MRT_Cell<ApiEntry>, value: any) => {
     let tags = tableData[cell.row.index]["tags"];
     let comments = tableData[cell.row.index]["comments"];
 
@@ -229,7 +229,7 @@ function App() {
       tableData[cell.row.index]["tags"] = tags;
     }
 
-    const e: Entry = {
+    const e: ApiEntry = {
       abstract: tableData[cell.row.index]["abstract"],
       authors: tableData[cell.row.index]["authors"],
       id: tableData[cell.row.index]["id"],

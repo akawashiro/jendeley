@@ -29,7 +29,8 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
       id_type != ID_TYPE_DOI &&
       id_type != ID_TYPE_ISBN &&
       id_type != ID_TYPE_PATH &&
-      id_type != ID_TYPE_BOOK
+      id_type != ID_TYPE_BOOK &&
+      id_type != ID_TYPE_URL
     ) {
       logger.warn("Invalid id_type: " + id_type);
       validDB = false;

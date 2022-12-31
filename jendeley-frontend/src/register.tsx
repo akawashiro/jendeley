@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import "./App.css";
-import { RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./api_schema";
+import { ApiResponse, RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./api_schema";
 import { splitTagsStr } from "./stringUtils";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -57,7 +57,7 @@ function RegisterWebWithDialog(props: any) {
   };
 
   async function handleRegister() {
-    console.log("Register PDF.");
+    console.log("Register Web.");
     const r: RequestGetWebFromUrl = {
       url: webUrl,
       title: title,
@@ -75,7 +75,9 @@ function RegisterWebWithDialog(props: any) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(r),
-    });
+    })
+      .then((response) => response.json())
+      .then((apiResponse: ApiResponse) => console.log("response = " + JSON.stringify(apiResponse)));
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
@@ -216,7 +218,9 @@ function RegisterPDFWithDialog(props: any) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(r),
-    });
+    })
+      .then((response) => response.json())
+      .then((apiResponse: ApiResponse) => console.log("response = " + JSON.stringify(apiResponse)));
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())

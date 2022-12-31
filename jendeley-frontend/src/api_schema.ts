@@ -34,7 +34,7 @@ type RequestGetWebFromUrl = {
   comments: string;
 };
 
-type ResponseGet = {
+type ApiResponse = {
   isSucceeded: boolean;
   message: string;
 };
@@ -45,6 +45,6 @@ export type {
   ApiDB,
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
-  ResponseGet,
+  ApiResponse,
 };
 export {};
