@@ -4,11 +4,12 @@ import { Command } from "commander";
 import { startServer } from "./server";
 import { genDB, genDummyDB } from "./gen";
 import { validateDB } from "./validate_db";
+import { JENDELEY_VERSION } from "./constants";
 
 async function main() {
   const program = new Command();
 
-  program.name("jendeley").version("0.0.16", "-v, --version");
+  program.name("jendeley").version(JENDELEY_VERSION, "-v, --version");
 
   program
     .command("scan")

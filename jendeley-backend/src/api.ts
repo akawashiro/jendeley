@@ -18,6 +18,7 @@ import {
   ID_TYPE_ARXIV,
   ID_TYPE_PATH,
   ENTRY_PATH,
+  DB_META_KEY,
 } from "./constants";
 import {
   ApiEntry,
@@ -47,6 +48,11 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   }
 
   const entryInDB = jsonDB[id];
+
+  if (entryInDB.idType == "meta") {
+    throw Error("metadata = " + JSON.stringify(entryInDB));
+  }
+
   if (entryInDB.idType == "url") {
     const urlEntry: UrlEntry = entryInDB;
     let authors: string[] = [];
@@ -140,7 +146,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
 
     const e = {
       id: id,
-      idType: jsonDB[id][ENTRY_ID_TYPE],
+      idType: entryInDB.idType,
       title: title,
       authors: authors,
       url: undefined,
@@ -290,6 +296,7 @@ function getDB(request: Request, response: Response, dbPathDB: string) {
 
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
+    if (id == DB_META_KEY) continue;
     const e = getEntry(id, jsonDB);
     db_response.push(e);
   }
