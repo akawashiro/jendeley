@@ -18,3 +18,6 @@ Run backend server
 cd jendeley-backend
 npm run scan_test_pdfs_and_launch
 ```
+
+## On `fp-ts`
+Although `jendeley` is using [fp-ts](https://gcanti.github.io/fp-ts/) now, I don't want to do functional programming in TypeScript. I just want to use `Either` type. So, I don't use difficult feature of functional programming such as monad in `jendeley`.
