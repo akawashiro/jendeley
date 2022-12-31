@@ -470,7 +470,7 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
         dir,
         path.basename(old_filename, ".pdf") + " " + JENDELEY_NO_TRACK + ".pdf"
       );
-      if (!fs.existsSync(old_filename)) {
+      if (fs.existsSync(old_filename) && !fs.existsSync(new_filename)) {
         logger.info("Rename " + old_filename + " to " + new_filename);
         fs.renameSync(old_filename, new_filename);
       } else {
