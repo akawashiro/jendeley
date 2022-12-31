@@ -53,19 +53,13 @@ test("JSON from path", async () => {
 });
 
 test("ISBN from text", async () => {
-  const docID1 = getDocIDFromTexts(["ISBN 0-262-16209-1 (hc. : alk. paper)"]);
-  expect(docID1).toStrictEqual(rightIsbn("0262162091"));
+  const docID = getDocIDFromTexts(["ISBN 0-262-16209-1 (hc. : alk. paper)"]);
+  expect(docID).toStrictEqual([{ docIDType: "isbn", isbn: "0262162091" }]);
 });
 
 test("ISBN from text 2", async () => {
-  const docID2 = getDocIDFromTexts(["ISBN: 0262162091 (hc. : alk. paper)"]);
-  expect(docID2).toStrictEqual(rightIsbn("0262162091"));
-});
-
-test("no_id from path", async () => {
-  const pdf = "hoge_no_id.pdf";
-  const docID = await getDocID(pdf, "/hoge/", false, undefined);
-  expect(docID).toStrictEqual(rightPath("hoge_no_id.pdf"));
+  const docID = getDocIDFromTexts(["ISBN: 0262162091 (hc. : alk. paper)"]);
+  expect(docID).toStrictEqual([{ docIDType: "isbn", isbn: "0262162091" }]);
 });
 
 test("jendeley no id from path", async () => {
@@ -107,17 +101,17 @@ test("DOI from path", async () => {
 });
 
 test("Complicated doi from path", async () => {
-  const pdf2 =
+  const pdf =
     "DependentType/[EDWIN BRADY] Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation [jendeley doi 10_1017_S095679681300018X].pdf";
-  const docID2 = await getDocID(pdf2, "/hoge/", false, undefined);
-  expect(docID2).toStrictEqual(rightDoi("10.1017/S095679681300018X"));
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
+  expect(docID).toStrictEqual(rightDoi("10.1017/S095679681300018X"));
 });
 
 test("Complicated doi from path", async () => {
-  const pdf4 =
+  const pdf =
     "MemoryModel/[Scott Owens, Susmit Sarkar, Peter Sewell] A Better x86 Memory Model x86-TSO [jendeley doi 10_1007_978-3-642-03359-9_27].pdf";
-  const docID4 = await getDocID(pdf4, "/hoge/", false, undefined);
-  expect(docID4).toStrictEqual(rightDoi("10.1007/978-3-642-03359-9_27"));
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
+  expect(docID).toStrictEqual(rightDoi("10.1007/978-3-642-03359-9_27"));
 });
 
 test("Complicated doi from path", async () => {

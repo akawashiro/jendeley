@@ -240,7 +240,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
   const foundISBN = [...pdf.matchAll(regexpISBN)];
   for (const f of foundISBN) {
     let d = f[1] as string;
-    return E.right({ docIDType: "doi", doi: d });
+    return E.right({ docIDType: "isbn", isbn: d });
   }
 
   if (pdf.includes(JENDELEY_NO_ID)) {
