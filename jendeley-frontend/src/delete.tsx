@@ -48,8 +48,6 @@ function DeleteButton(props: any) {
     const response = await fetch(REACT_APP_API_URL + "/api/delete_entry", {
       method: "DELETE",
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "PUT",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(e),

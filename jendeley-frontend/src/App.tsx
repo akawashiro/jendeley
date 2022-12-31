@@ -247,8 +247,6 @@ function App() {
     const response = await fetch(REACT_APP_API_URL + "/api/update_entry", {
       method: "PUT",
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "PUT",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(e),
