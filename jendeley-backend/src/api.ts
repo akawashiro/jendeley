@@ -257,20 +257,24 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
     }
 
     fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
+
+    const r: ApiResponse = {
+      isSucceeded: true,
+      message: "Update " + entry_o["id"],
+    };
+    response.status(200).json(r);
   } else {
     logger.warn(
       "Object from the client is not legitimated. entry_o = " +
         JSON.stringify(entry_o)
     );
+
+    const r: ApiResponse = {
+      isSucceeded: false,
+      message: "Failed update. entry_o = " + JSON.stringify(entry_o),
+    };
+    response.status(500).json(r);
   }
-
-  response.writeHead(200, {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-  });
-
-  response.end();
 
   logger.info("Sent a response from update_entry");
 }
@@ -301,7 +305,7 @@ function getDB(request: Request, response: Response, dbPathDB: string) {
     db_response.push(e);
   }
 
-  response.json(db_response);
+  response.status(200).json(db_response);
   logger.info("Sent a response from get_db");
 }
 
