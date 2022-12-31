@@ -18,6 +18,7 @@ import {
   ID_TYPE_ARXIV,
   ID_TYPE_PATH,
   ENTRY_PATH,
+  DB_META_KEY,
 } from "./constants";
 import {
   ApiEntry,
@@ -47,6 +48,11 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   }
 
   const entryInDB = jsonDB[id];
+
+  if (entryInDB.idType == "meta") {
+    throw Error("metadata = " + JSON.stringify(entryInDB));
+  }
+
   if (entryInDB.idType == "url") {
     const urlEntry: UrlEntry = entryInDB;
     let authors: string[] = [];
@@ -86,12 +92,16 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
     if (entryInDB.dataFromNodeIsbn["publisher"] != undefined) {
       publisher = entryInDB.dataFromNodeIsbn["publisher"];
     }
+    const title =
+      entryInDB.userSpecifiedTitle != undefined
+        ? entryInDB.userSpecifiedTitle
+        : entryInDB.dataFromNodeIsbn["title"];
     const abstract = "";
 
     const e = {
       id: id,
       idType: entryInDB.idType,
-      title: entryInDB.dataFromNodeIsbn["title"],
+      title: title,
       url: undefined,
       authors: authors,
       tags: entryInDB.tags,
@@ -136,7 +146,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
 
     const e = {
       id: id,
-      idType: jsonDB[id][ENTRY_ID_TYPE],
+      idType: entryInDB.idType,
       title: title,
       authors: authors,
       url: undefined,
@@ -286,6 +296,7 @@ function getDB(request: Request, response: Response, dbPathDB: string) {
 
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
+    if (id == DB_META_KEY) continue;
     const e = getEntry(id, jsonDB);
     db_response.push(e);
   }
@@ -459,7 +470,7 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
         dir,
         path.basename(old_filename, ".pdf") + " " + JENDELEY_NO_TRACK + ".pdf"
       );
-      if (!fs.existsSync(old_filename)) {
+      if (fs.existsSync(old_filename) && !fs.existsSync(new_filename)) {
         logger.info("Rename " + old_filename + " to " + new_filename);
         fs.renameSync(old_filename, new_filename);
       } else {

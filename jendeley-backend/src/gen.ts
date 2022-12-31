@@ -20,6 +20,8 @@ import {
   ID_TYPE_BOOK,
   ARXIV_API_URL,
   ENTRY_DATA_FROM_ARXIV,
+  JENDELEY_VERSION,
+  DB_META_KEY,
 } from "./constants";
 import { DocID, getDocID } from "./docid";
 import { validateJsonDB } from "./validate_db";
@@ -441,6 +443,7 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     };
   } = {};
   let jsonDB: JsonDB = {};
+  jsonDB[DB_META_KEY] = { idType: "meta", version: JENDELEY_VERSION };
   let exstingPdfs: string[] = [];
   if (fs.existsSync(path.join(papersDir, dbName))) {
     jsonDB = JSON.parse(

@@ -9,9 +9,11 @@ import {
   ID_TYPE_ISBN,
   ID_TYPE_PATH,
   ID_TYPE_URL,
+  ID_TYPE_META,
   ENTRY_PATH,
   ENTRY_COMMENTS,
   ENTRY_URL,
+  DB_META_KEY,
 } from "./constants";
 import { JsonDB } from "./db_schema";
 import { logger } from "./logger";
@@ -20,8 +22,16 @@ import { logger } from "./logger";
 function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
   let validDB = true;
 
+  if (jsonDB[DB_META_KEY] == undefined) {
+    logger.warn("No metadata in DB.");
+    validDB = false;
+  }
+
   for (const id of Object.keys(jsonDB)) {
     const id_type = jsonDB[id][ENTRY_ID_TYPE];
+    if (id_type == ID_TYPE_META) {
+      continue;
+    }
 
     // ENTRY_ID_TYPE check
     if (

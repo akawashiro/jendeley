@@ -52,6 +52,11 @@ type UrlEntry = {
   comments: string;
 };
 
+type DBMetaData = {
+  idType: "meta";
+  version: string;
+};
+
 type JsonDB = {
   [key: string]:
     | ArxivEntry
@@ -59,7 +64,8 @@ type JsonDB = {
     | IsbnEntry
     | PathEntry
     | UrlEntry
-    | BookEntry;
+    | BookEntry
+    | DBMetaData;
 };
 
 export type {

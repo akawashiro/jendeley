@@ -76,8 +76,6 @@ function RegisterWebWithDialog(props: any) {
     await fetch(REACT_APP_API_URL + "/api/add_web_from_url", {
       method: "PUT",
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "PUT",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(r),
@@ -227,8 +225,6 @@ function RegisterPDFWithDialog(props: any) {
     await fetch(REACT_APP_API_URL + "/api/add_pdf_from_url", {
       method: "PUT",
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "PUT",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(r),
