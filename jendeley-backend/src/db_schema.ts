@@ -62,5 +62,13 @@ type JsonDB = {
     | BookEntry;
 };
 
-export type { ArxivEntry, DoiEntry, IsbnEntry, PathEntry, UrlEntry, JsonDB };
+export type {
+  ArxivEntry,
+  DoiEntry,
+  IsbnEntry,
+  PathEntry,
+  UrlEntry,
+  BookEntry,
+  JsonDB,
+};
 export {};

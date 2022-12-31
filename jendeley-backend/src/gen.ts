@@ -30,6 +30,7 @@ import {
   JsonDB,
   PathEntry,
   UrlEntry,
+  BookEntry,
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
 
@@ -433,7 +434,12 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     }
   }
 
-  let bookDB = new Object();
+  let bookChapters: {
+    [key: string]: {
+      isbnEntry: [IsbnEntry, string] | undefined;
+      pdfs: string[];
+    };
+  } = {};
   let jsonDB: JsonDB = {};
   let exstingPdfs: string[] = [];
   if (fs.existsSync(path.join(papersDir, dbName))) {
@@ -456,19 +462,23 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     logger.info("Processing " + p);
     let isBook = false;
     for (const bd of bookDirs) {
-      if (bookDB[bd] == undefined) {
-        bookDB[bd] = {};
+      if (bookChapters[bd] == undefined) {
+        bookChapters[bd] = { isbnEntry: undefined, pdfs: [] };
       }
+
       if (p.startsWith(bd)) {
-        bookDB[bd][p] = new Object();
         isBook = true;
         const docID = await getDocID(p, papersDir, true, undefined);
+        bookChapters[bd].pdfs.push(p);
         if (E.isRight(docID)) {
-          const t = await getJson(E.toUnion(docID), p);
-          if (t != undefined && t[0][ENTRY_ID_TYPE] == ID_TYPE_ISBN) {
-            const json = t[0];
-            bookDB[bd][p] = json;
-            bookDB[bd]["id"] = t[1];
+          const i: DocID = E.toUnion(docID);
+          const t = await getJson(i, p);
+          if (
+            t != undefined &&
+            t[0][ENTRY_ID_TYPE] == ID_TYPE_ISBN &&
+            i.docIDType == "isbn"
+          ) {
+            bookChapters[bd].isbnEntry = [t[0], i.isbn];
           }
         }
       }
@@ -491,35 +501,40 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     }
   }
 
-  for (const bookDir of Object.keys(bookDB)) {
-    let bookInfo: Object | undefined = undefined;
-    let bookID: string | undefined = "";
-    for (const path of Object.keys(bookDB[bookDir])) {
-      if (
-        bookDB[bookDir][path] != undefined &&
-        bookDB[bookDir][path][ENTRY_ID_TYPE] == ID_TYPE_ISBN
-      ) {
-        bookInfo = bookDB[bookDir][path];
-        bookID = bookDB[bookDir]["id"];
-      }
+  for (const bookDir of Object.keys(bookChapters)) {
+    let bookInfo = bookChapters[bookDir].isbnEntry;
+    if (bookInfo == undefined) {
+      logger.warn(
+        "PDFs in " + bookDir + " are ignored. Because we cannot find no ISBN."
+      );
+      continue;
     }
-    if (bookInfo != undefined && bookID != undefined) {
-      for (const chapterPath of Object.keys(bookDB[bookDir])) {
-        const chapterID = bookID + "_" + path.basename(chapterPath);
-        let chapterInfo = JSON.parse(JSON.stringify(bookInfo));
-        chapterInfo[ENTRY_TITLE] = path.join(
-          chapterInfo[ENTRY_TITLE],
-          path.basename(chapterPath, ".pdf")
-        );
-        chapterInfo[ENTRY_ID_TYPE] = ID_TYPE_BOOK;
-        chapterInfo[ENTRY_PATH] = chapterPath;
-        if (jsonDB.hasOwnProperty(chapterID)) {
-          logger.warn(chapterID, " is already registered.");
-        }
-        if (isValidJsonEntry(chapterInfo)) {
-          jsonDB[chapterID] = chapterInfo;
-        }
+    const isbnEntry: IsbnEntry = bookInfo[0];
+    const isbn: string = bookInfo[1];
+
+    for (const pdf of bookChapters[bookDir].pdfs) {
+      let title = "";
+      if (isbnEntry.dataFromNodeIsbn["title"] != undefined) {
+        title =
+          isbnEntry.dataFromNodeIsbn["title"] +
+          "_" +
+          path.basename(pdf, ".pdf");
+      } else {
+        title = path.join(bookDir, path.basename(pdf, ".pdf"));
       }
+
+      // TODO: Should we use userSpecifiedTitle here? Otherwise, we can rewrite
+      // isbnEntry.dataFromNodeIsbn["title"].
+      const bookEntry: BookEntry = {
+        idType: "book",
+        path: pdf,
+        tags: [],
+        comments: "",
+        userSpecifiedTitle: title,
+        dataFromNodeIsbn: isbnEntry.dataFromNodeIsbn,
+      };
+      const chapterID = "book_" + isbn + "_" + path.basename(pdf);
+      jsonDB[chapterID] = bookEntry;
     }
   }
 
