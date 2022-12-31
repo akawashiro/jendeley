@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import base_64 from "base-64";
 import { Box } from "@mui/material";
 import "./App.css";
-import { Entry, DB } from "./api_schema";
+import { ApiEntry, ApiDB } from "./api_schema";
 import MaterialReactTable, {
   MRT_Cell,
   MRT_ColumnDef,
@@ -16,6 +16,7 @@ import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
+import { SnackbarProvider } from "notistack";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -101,7 +102,7 @@ function stringArrayFilterFn(
   return false;
 }
 
-function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
+function cellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
   if (row.original.idType === "url") {
     return (
       <a
@@ -129,7 +130,7 @@ function cellHref(cell: MRT_Cell<Entry>, row: MRT_Row<Entry>) {
 }
 
 function App() {
-  const [tableData, setTableData] = React.useState<DB>([]);
+  const [tableData, setTableData] = React.useState<ApiDB>([]);
 
   React.useEffect(() => {
     console.log("Fetching from DB in loading");
@@ -138,7 +139,7 @@ function App() {
       .then((json) => setTableData(() => json));
   }, []);
 
-  const columns = useMemo<MRT_ColumnDef<Entry>[]>(
+  const columns = useMemo<MRT_ColumnDef<ApiEntry>[]>(
     () => [
       {
         accessorKey: "id",
@@ -217,7 +218,7 @@ function App() {
     [tableData]
   );
 
-  const handleSaveCell = async (cell: MRT_Cell<Entry>, value: any) => {
+  const handleSaveCell = async (cell: MRT_Cell<ApiEntry>, value: any) => {
     let tags = tableData[cell.row.index]["tags"];
     let comments = tableData[cell.row.index]["comments"];
 
@@ -229,7 +230,7 @@ function App() {
       tableData[cell.row.index]["tags"] = tags;
     }
 
-    const e: Entry = {
+    const e: ApiEntry = {
       abstract: tableData[cell.row.index]["abstract"],
       authors: tableData[cell.row.index]["authors"],
       id: tableData[cell.row.index]["id"],
@@ -257,51 +258,53 @@ function App() {
   };
 
   return (
-    <Box component="main" sx={{ m: 2 }}>
-      <MaterialReactTable
-        displayColumnDefOptions={{
-          "mrt-row-actions": {
-            muiTableHeadCellProps: {
-              align: "center",
+    <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
+      <Box component="main" sx={{ m: 2 }}>
+        <MaterialReactTable
+          displayColumnDefOptions={{
+            "mrt-row-actions": {
+              muiTableHeadCellProps: {
+                align: "center",
+              },
+              size: 10,
             },
-            size: 10,
-          },
-        }}
-        enableEditing
-        columns={columns}
-        data={tableData}
-        enableRowVirtualization
-        enablePagination={false}
-        initialState={{
-          showColumnFilters: true,
-          sorting: [{ id: "year", desc: true }],
-          columnVisibility: { id: true, path: false },
-          density: "comfortable",
-        }}
-        enableStickyHeader
-        enableColumnResizing
-        columnResizeMode="onEnd"
-        editingMode="cell"
-        muiTableBodyCellEditTextFieldProps={({ cell }) => ({
-          //onBlur is more efficient, but could use onChange instead
-          onBlur: (event) => {
-            handleSaveCell(cell, event.target.value);
-          },
-          variant: "outlined",
-          multiline: true,
-          margin: "none",
-          minRows: 7,
-        })}
-        renderTopToolbarCustomActions={({ table }) => {
-          return (
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <RegisterWebWithDialog setTableData={setTableData} />
-              <RegisterPDFWithDialog setTableData={setTableData} />
-            </div>
-          );
-        }}
-      />
-    </Box>
+          }}
+          enableEditing
+          columns={columns}
+          data={tableData}
+          enableRowVirtualization
+          enablePagination={false}
+          initialState={{
+            showColumnFilters: true,
+            sorting: [{ id: "year", desc: true }],
+            columnVisibility: { id: true, path: false },
+            density: "comfortable",
+          }}
+          enableStickyHeader
+          enableColumnResizing
+          columnResizeMode="onEnd"
+          editingMode="cell"
+          muiTableBodyCellEditTextFieldProps={({ cell }) => ({
+            //onBlur is more efficient, but could use onChange instead
+            onBlur: (event) => {
+              handleSaveCell(cell, event.target.value);
+            },
+            variant: "outlined",
+            multiline: true,
+            margin: "none",
+            minRows: 7,
+          })}
+          renderTopToolbarCustomActions={({ table }) => {
+            return (
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <RegisterWebWithDialog setTableData={setTableData} />
+                <RegisterPDFWithDialog setTableData={setTableData} />
+              </div>
+            );
+          }}
+        />
+      </Box>
+    </SnackbarProvider>
   );
 }
 

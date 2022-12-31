@@ -16,6 +16,15 @@ type DoiEntry = {
   dataFromCrossref: any;
 };
 
+type BookEntry = {
+  idType: "book";
+  path: string;
+  tags: string[];
+  comments: string;
+  userSpecifiedTitle: string | undefined;
+  dataFromNodeIsbn: any;
+};
+
 type IsbnEntry = {
   idType: "isbn";
   path: string;
@@ -43,5 +52,23 @@ type UrlEntry = {
   comments: string;
 };
 
-export type { ArxivEntry, DoiEntry, IsbnEntry, PathEntry, UrlEntry };
+type JsonDB = {
+  [key: string]:
+    | ArxivEntry
+    | DoiEntry
+    | IsbnEntry
+    | PathEntry
+    | UrlEntry
+    | BookEntry;
+};
+
+export type {
+  ArxivEntry,
+  DoiEntry,
+  IsbnEntry,
+  PathEntry,
+  UrlEntry,
+  BookEntry,
+  JsonDB,
+};
 export {};

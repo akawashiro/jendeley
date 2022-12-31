@@ -2,7 +2,7 @@
 
 type IDType = "doi" | "isbn" | "url" | "book" | "arxiv" | "path";
 
-type Entry = {
+type ApiEntry = {
   id: string;
   idType: IDType;
   url: string | undefined;
@@ -16,7 +16,7 @@ type Entry = {
   publisher: string | undefined;
 };
 
-type DB = Entry[];
+type ApiDB = ApiEntry[];
 
 type RequestGetPdfFromUrl = {
   url: string;
@@ -34,5 +34,17 @@ type RequestGetWebFromUrl = {
   comments: string;
 };
 
-export type { IDType, Entry, DB, RequestGetPdfFromUrl, RequestGetWebFromUrl };
+type ApiResponse = {
+  isSucceeded: boolean;
+  message: string;
+};
+
+export type {
+  IDType,
+  ApiEntry,
+  ApiDB,
+  RequestGetPdfFromUrl,
+  RequestGetWebFromUrl,
+  ApiResponse,
+};
 export {};

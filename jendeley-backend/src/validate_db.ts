@@ -13,10 +13,11 @@ import {
   ENTRY_COMMENTS,
   ENTRY_URL,
 } from "./constants";
+import { JsonDB } from "./db_schema";
 import { logger } from "./logger";
 
 // We should call this function whenever rewrite DB.
-function validateJsonDB(jsonDB: any, dbPath: string | undefined): boolean {
+function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
   let validDB = true;
 
   for (const id of Object.keys(jsonDB)) {
@@ -28,7 +29,8 @@ function validateJsonDB(jsonDB: any, dbPath: string | undefined): boolean {
       id_type != ID_TYPE_DOI &&
       id_type != ID_TYPE_ISBN &&
       id_type != ID_TYPE_PATH &&
-      id_type != ID_TYPE_BOOK
+      id_type != ID_TYPE_BOOK &&
+      id_type != ID_TYPE_URL
     ) {
       logger.warn("Invalid id_type: " + id_type);
       validDB = false;

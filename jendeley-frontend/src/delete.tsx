@@ -8,7 +8,7 @@ import {
   IconButton,
 } from "@mui/material";
 import "./App.css";
-import { IDType, Entry } from "./api_schema";
+import { IDType, ApiEntry } from "./api_schema";
 import { Delete } from "@mui/icons-material";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -32,7 +32,7 @@ function DeleteButton(props: any) {
   ) {
     console.log("Delete " + id);
 
-    const e: Entry = {
+    const e: ApiEntry = {
       abstract: "",
       authors: [],
       id: id,

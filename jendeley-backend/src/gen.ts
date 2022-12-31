@@ -27,9 +27,12 @@ import {
   ArxivEntry,
   DoiEntry,
   IsbnEntry,
+  JsonDB,
   PathEntry,
   UrlEntry,
+  BookEntry,
 } from "./db_schema";
+import * as E from "fp-ts/lib/Either";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -144,7 +147,7 @@ async function getJson(
     undefined;
   let db_id: string | undefined = undefined;
 
-  if (docID.arxiv != undefined) {
+  if (docID.docIDType == "arxiv") {
     let dataFromArxiv = await getArxivJson(docID.arxiv);
     if (dataFromArxiv != undefined) {
       let json: ArxivEntry = {
@@ -167,7 +170,7 @@ async function getJson(
     }
   }
   if (
-    docID.doi != undefined &&
+    docID.docIDType == "doi" &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
     let dataFromCrossref = await getDoiJSON(docID.doi);
@@ -192,7 +195,7 @@ async function getJson(
     }
   }
   if (
-    docID.isbn != undefined &&
+    docID.docIDType == "isbn" &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
     let dataFromNodeIsbn = await getIsbnJson(docID.isbn);
@@ -217,7 +220,7 @@ async function getJson(
     }
   }
   if (
-    docID.path != undefined &&
+    docID.docIDType == "path" &&
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
     let json: PathEntry = {
@@ -259,14 +262,18 @@ function isValidJsonEntry(json: Object) {
 function genDummyDB(output: string) {
   const n_entry = 500;
 
-  let jsonDB = new Object();
+  let jsonDB: JsonDB = {};
   for (let i = 0; i < n_entry; i++) {
     const id = "path_" + crypto.randomBytes(20).toString("hex");
-    jsonDB[id] = new Object();
-    jsonDB[id][ENTRY_TITLE] = crypto.randomBytes(40).toString("hex");
-    jsonDB[id][ENTRY_PATH] = crypto.randomBytes(40).toString("hex");
-    jsonDB[id]["abstract"] = crypto.randomBytes(280).toString("hex");
-    jsonDB[id][ENTRY_COMMENTS] = crypto.randomBytes(280).toString("hex");
+    const e: PathEntry = {
+      idType: "path",
+      path: crypto.randomBytes(40).toString("hex"),
+      title: crypto.randomBytes(40).toString("hex"),
+      tags: [],
+      userSpecifiedTitle: undefined,
+      comments: crypto.randomBytes(40).toString("hex"),
+    };
+    jsonDB[id] = e;
   }
 
   if (!validateJsonDB(jsonDB, undefined)) {
@@ -276,12 +283,12 @@ function genDummyDB(output: string) {
 }
 
 function registerWeb(
-  jsonDB: any,
+  jsonDB: JsonDB,
   url: string,
   title: string,
   comments: string,
   tags: string[]
-) {
+): E.Either<string, JsonDB> {
   logger.info(
     "url = " +
       url +
@@ -292,13 +299,7 @@ function registerWeb(
       " comments = " +
       comments
   );
-  const docID: DocID = {
-    url: url,
-    doi: undefined,
-    isbn: undefined,
-    path: undefined,
-    arxiv: undefined,
-  };
+  const docID: DocID = { docIDType: "url", url: url };
   logger.info("docID = " + JSON.stringify(docID));
 
   let json: UrlEntry = {
@@ -318,23 +319,22 @@ function registerWeb(
       throw new Error("validateJsonDB failed!");
     }
 
-    return jsonDB;
+    return E.right(jsonDB);
   } else {
-    logger.warn("Failed to register url_" + url);
-    return jsonDB;
+    return E.left("Failed to register url_" + url);
   }
 }
 
 async function registerNonBookPDF(
   papersDir: string,
   pdf: string,
-  jsonDB: any,
+  jsonDB: JsonDB,
   userSpecifiedTitle: string | undefined,
   comments: string,
   tags: string[],
   renameUsingTitle: boolean,
   downloadUrl: string | undefined
-) {
+): Promise<E.Either<string, JsonDB>> {
   logger.info(
     "papersDir = " +
       papersDir +
@@ -346,20 +346,18 @@ async function registerNonBookPDF(
       comments
   );
   const docID = await getDocID(pdf, papersDir, false, downloadUrl);
-  logger.info("docID = " + JSON.stringify(docID));
-  if (
-    docID.arxiv == undefined &&
-    docID.doi == undefined &&
-    docID.isbn == undefined &&
-    docID.path == undefined
-  ) {
+
+  if (E.isLeft(docID)) {
     logger.warn("Cannot get docID of " + pdf);
+    return docID;
   }
-  const t = await getJson(docID, pdf);
+
+  logger.info("docID = " + JSON.stringify(docID));
+  const t = await getJson(E.toUnion(docID), pdf);
 
   if (t == undefined) {
     logger.warn(pdf + " is not valid.");
-    return jsonDB;
+    return E.right(jsonDB);
   }
 
   const json = t[0];
@@ -379,7 +377,7 @@ async function registerNonBookPDF(
         "."
     );
     console.warn("mv ", '"' + pdf + '" duplicated');
-    return jsonDB;
+    return E.right(jsonDB);
   }
 
   // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
@@ -395,7 +393,7 @@ async function registerNonBookPDF(
 
     if (fs.existsSync(path.join(papersDir, newFilename))) {
       logger.warn(newFilename + " already exists. Skip registration.");
-      return jsonDB;
+      return E.right(jsonDB);
     }
     fs.renameSync(
       path.join(papersDir, oldFileneme),
@@ -412,7 +410,7 @@ async function registerNonBookPDF(
     );
   }
 
-  return jsonDB;
+  return E.right(jsonDB);
 }
 
 async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
@@ -436,8 +434,13 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     }
   }
 
-  let bookDB = new Object();
-  let jsonDB = new Object();
+  let bookChapters: {
+    [key: string]: {
+      isbnEntry: [IsbnEntry, string] | undefined;
+      pdfs: string[];
+    };
+  } = {};
+  let jsonDB: JsonDB = {};
   let exstingPdfs: string[] = [];
   if (fs.existsSync(path.join(papersDir, dbName))) {
     jsonDB = JSON.parse(
@@ -459,25 +462,30 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     logger.info("Processing " + p);
     let isBook = false;
     for (const bd of bookDirs) {
-      if (bookDB[bd] == undefined) {
-        bookDB[bd] = {};
+      if (bookChapters[bd] == undefined) {
+        bookChapters[bd] = { isbnEntry: undefined, pdfs: [] };
       }
+
       if (p.startsWith(bd)) {
         isBook = true;
         const docID = await getDocID(p, papersDir, true, undefined);
-        const t = await getJson(docID, p);
-        if (t != undefined && t[0][ENTRY_ID_TYPE] == ID_TYPE_ISBN) {
-          const json = t[0];
-          bookDB[bd][p] = json;
-          bookDB[bd]["id"] = t[1];
-        } else {
-          bookDB[bd][p] = new Object();
+        bookChapters[bd].pdfs.push(p);
+        if (E.isRight(docID)) {
+          const i: DocID = E.toUnion(docID);
+          const t = await getJson(i, p);
+          if (
+            t != undefined &&
+            t[0][ENTRY_ID_TYPE] == ID_TYPE_ISBN &&
+            i.docIDType == "isbn"
+          ) {
+            bookChapters[bd].isbnEntry = [t[0], i.isbn];
+          }
         }
       }
     }
 
     if (!isBook) {
-      jsonDB = await registerNonBookPDF(
+      const newDB = await registerNonBookPDF(
         papersDir,
         p,
         jsonDB,
@@ -487,38 +495,46 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
         false,
         undefined
       );
+      if (E.isRight(newDB)) {
+        jsonDB = E.toUnion(newDB);
+      }
     }
   }
 
-  for (const bookDir of Object.keys(bookDB)) {
-    let bookInfo: Object | undefined = undefined;
-    let bookID: string | undefined = "";
-    for (const path of Object.keys(bookDB[bookDir])) {
-      if (
-        bookDB[bookDir][path] != undefined &&
-        bookDB[bookDir][path][ENTRY_ID_TYPE] == ID_TYPE_ISBN
-      ) {
-        bookInfo = bookDB[bookDir][path];
-        bookID = bookDB[bookDir]["id"];
-      }
+  for (const bookDir of Object.keys(bookChapters)) {
+    let bookInfo = bookChapters[bookDir].isbnEntry;
+    if (bookInfo == undefined) {
+      logger.warn(
+        "PDFs in " + bookDir + " are ignored. Because we cannot find no ISBN."
+      );
+      continue;
     }
-    if (bookInfo != undefined && bookID != undefined) {
-      for (const chapterPath of Object.keys(bookDB[bookDir])) {
-        const chapterID = bookID + "_" + path.basename(chapterPath);
-        let chapterInfo = JSON.parse(JSON.stringify(bookInfo));
-        chapterInfo[ENTRY_TITLE] = path.join(
-          chapterInfo[ENTRY_TITLE],
-          path.basename(chapterPath, ".pdf")
-        );
-        chapterInfo[ENTRY_ID_TYPE] = ID_TYPE_BOOK;
-        chapterInfo[ENTRY_PATH] = chapterPath;
-        if (jsonDB.hasOwnProperty(chapterID)) {
-          logger.warn(chapterID, " is already registered.");
-        }
-        if (isValidJsonEntry(chapterInfo)) {
-          jsonDB[chapterID] = chapterInfo;
-        }
+    const isbnEntry: IsbnEntry = bookInfo[0];
+    const isbn: string = bookInfo[1];
+
+    for (const pdf of bookChapters[bookDir].pdfs) {
+      let title = "";
+      if (isbnEntry.dataFromNodeIsbn["title"] != undefined) {
+        title =
+          isbnEntry.dataFromNodeIsbn["title"] +
+          "_" +
+          path.basename(pdf, ".pdf");
+      } else {
+        title = path.join(bookDir, path.basename(pdf, ".pdf"));
       }
+
+      // TODO: Should we use userSpecifiedTitle here? Otherwise, we can rewrite
+      // isbnEntry.dataFromNodeIsbn["title"].
+      const bookEntry: BookEntry = {
+        idType: "book",
+        path: pdf,
+        tags: [],
+        comments: "",
+        userSpecifiedTitle: title,
+        dataFromNodeIsbn: isbnEntry.dataFromNodeIsbn,
+      };
+      const chapterID = "book_" + isbn + "_" + path.basename(pdf);
+      jsonDB[chapterID] = bookEntry;
     }
   }
 
