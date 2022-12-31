@@ -10,7 +10,11 @@ import {
   TextField,
 } from "@mui/material";
 import "./App.css";
-import { ApiResponse, RequestGetPdfFromUrl, RequestGetWebFromUrl } from "./api_schema";
+import {
+  ApiResponse,
+  RequestGetPdfFromUrl,
+  RequestGetWebFromUrl,
+} from "./api_schema";
 import { splitTagsStr } from "./stringUtils";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -77,7 +81,9 @@ function RegisterWebWithDialog(props: any) {
       body: JSON.stringify(r),
     })
       .then((response) => response.json())
-      .then((apiResponse: ApiResponse) => console.log("response = " + JSON.stringify(apiResponse)));
+      .then((apiResponse: ApiResponse) =>
+        console.log("response = " + JSON.stringify(apiResponse))
+      );
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
@@ -220,7 +226,9 @@ function RegisterPDFWithDialog(props: any) {
       body: JSON.stringify(r),
     })
       .then((response) => response.json())
-      .then((apiResponse: ApiResponse) => console.log("response = " + JSON.stringify(apiResponse)));
+      .then((apiResponse: ApiResponse) =>
+        console.log("response = " + JSON.stringify(apiResponse))
+      );
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
