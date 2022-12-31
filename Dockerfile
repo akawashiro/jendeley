@@ -6,6 +6,7 @@ WORKDIR /jendeley
 RUN diff /jendeley/jendeley-backend/src/api_schema.ts /jendeley/jendeley-frontend/src/api_schema.ts
 
 WORKDIR /jendeley/jendeley-backend
+RUN ./check-version.sh
 RUN npm install
 RUN npm run check:prettier
 RUN npm run build
