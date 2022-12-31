@@ -16,6 +16,7 @@ import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
+import { SnackbarProvider } from "notistack";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -257,51 +258,53 @@ function App() {
   };
 
   return (
-    <Box component="main" sx={{ m: 2 }}>
-      <MaterialReactTable
-        displayColumnDefOptions={{
-          "mrt-row-actions": {
-            muiTableHeadCellProps: {
-              align: "center",
+    <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
+      <Box component="main" sx={{ m: 2 }}>
+        <MaterialReactTable
+          displayColumnDefOptions={{
+            "mrt-row-actions": {
+              muiTableHeadCellProps: {
+                align: "center",
+              },
+              size: 10,
             },
-            size: 10,
-          },
-        }}
-        enableEditing
-        columns={columns}
-        data={tableData}
-        enableRowVirtualization
-        enablePagination={false}
-        initialState={{
-          showColumnFilters: true,
-          sorting: [{ id: "year", desc: true }],
-          columnVisibility: { id: true, path: false },
-          density: "comfortable",
-        }}
-        enableStickyHeader
-        enableColumnResizing
-        columnResizeMode="onEnd"
-        editingMode="cell"
-        muiTableBodyCellEditTextFieldProps={({ cell }) => ({
-          //onBlur is more efficient, but could use onChange instead
-          onBlur: (event) => {
-            handleSaveCell(cell, event.target.value);
-          },
-          variant: "outlined",
-          multiline: true,
-          margin: "none",
-          minRows: 7,
-        })}
-        renderTopToolbarCustomActions={({ table }) => {
-          return (
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <RegisterWebWithDialog setTableData={setTableData} />
-              <RegisterPDFWithDialog setTableData={setTableData} />
-            </div>
-          );
-        }}
-      />
-    </Box>
+          }}
+          enableEditing
+          columns={columns}
+          data={tableData}
+          enableRowVirtualization
+          enablePagination={false}
+          initialState={{
+            showColumnFilters: true,
+            sorting: [{ id: "year", desc: true }],
+            columnVisibility: { id: true, path: false },
+            density: "comfortable",
+          }}
+          enableStickyHeader
+          enableColumnResizing
+          columnResizeMode="onEnd"
+          editingMode="cell"
+          muiTableBodyCellEditTextFieldProps={({ cell }) => ({
+            //onBlur is more efficient, but could use onChange instead
+            onBlur: (event) => {
+              handleSaveCell(cell, event.target.value);
+            },
+            variant: "outlined",
+            multiline: true,
+            margin: "none",
+            minRows: 7,
+          })}
+          renderTopToolbarCustomActions={({ table }) => {
+            return (
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <RegisterWebWithDialog setTableData={setTableData} />
+                <RegisterPDFWithDialog setTableData={setTableData} />
+              </div>
+            );
+          }}
+        />
+      </Box>
+    </SnackbarProvider>
   );
 }
 
