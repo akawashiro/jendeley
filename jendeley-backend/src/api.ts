@@ -86,12 +86,16 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
     if (entryInDB.dataFromNodeIsbn["publisher"] != undefined) {
       publisher = entryInDB.dataFromNodeIsbn["publisher"];
     }
+    const title =
+      entryInDB.userSpecifiedTitle != undefined
+        ? entryInDB.userSpecifiedTitle
+        : entryInDB.dataFromNodeIsbn["title"];
     const abstract = "";
 
     const e = {
       id: id,
       idType: entryInDB.idType,
-      title: entryInDB.dataFromNodeIsbn["title"],
+      title: title,
       url: undefined,
       authors: authors,
       tags: entryInDB.tags,
