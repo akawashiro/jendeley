@@ -200,6 +200,7 @@ function App() {
         header: "year",
         enableEditing: false,
         size: 50,
+        muiTableHeadCellFilterTextFieldProps: { placeholder: 'year' },
       },
       {
         accessorKey: "publisher",
