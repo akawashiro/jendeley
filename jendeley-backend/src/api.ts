@@ -24,7 +24,7 @@ import {
   ApiDB,
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
-  ResponseGet,
+  ApiResponse,
 } from "./api_schema";
 import https from "https";
 import http from "http";
@@ -335,14 +335,14 @@ async function addWebFromUrl(
 
     fs.writeFileSync(dbPath, JSON.stringify(E.toUnion(newDBOrError)));
 
-    const r: ResponseGet = {
+    const r: ApiResponse = {
       isSucceeded: true,
       message: "addPdfFromUrl succeeded",
     };
     response.status(200).json(r);
   } else {
     const err: string = E.toUnion(newDBOrError);
-    const r: ResponseGet = {
+    const r: ApiResponse = {
       isSucceeded: false,
       message: err,
     };
@@ -424,14 +424,14 @@ async function addPdfFromUrl(
 
     fs.writeFileSync(dbPath, JSON.stringify(E.toUnion(newDBOrError)));
 
-    const r: ResponseGet = {
+    const r: ApiResponse = {
       isSucceeded: true,
       message: "addPdfFromUrl succeeded",
     };
     response.status(200).json(r);
   } else {
     const err: string = E.toUnion(newDBOrError);
-    const r: ResponseGet = {
+    const r: ApiResponse = {
       isSucceeded: false,
       message: err,
     };
@@ -483,20 +483,23 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
     }
 
     fs.writeFileSync(db_path, JSON.stringify(jsonDB));
+
+    const r: ApiResponse = {
+      isSucceeded: true,
+      message: JSON.stringify(entry) + " is deleted.",
+    };
+    response.status(200).json(r);
   } else {
-    logger.warn(
+    const msg =
       "Object from the client is not legitimated. entry_o = " +
-        JSON.stringify(entry_o)
-    );
+      JSON.stringify(entry_o);
+    const r: ApiResponse = {
+      isSucceeded: false,
+      message: msg,
+    };
+    logger.warn(msg);
+    response.status(500).json(r);
   }
-
-  response.writeHead(200, {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-  });
-
-  response.end();
 
   logger.info("Sent a response from delete_entry");
 }
