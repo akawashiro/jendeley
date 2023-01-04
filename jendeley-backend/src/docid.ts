@@ -427,15 +427,33 @@ async function getDocID(
   let num_pages = 0;
   try {
     const data = await pdfparse(dataBuffer);
-    texts = data.text.split(/\r?\n/);
-    num_pages = data.num_pages;
+    if (data.text != undefined) {
+      texts = data.text.split(/\r?\n/);
+    } else {
+      logger.warn("Cannot find any texts in " + pdf + ".");
+    }
+
+    if (data.num_pages != undefined) {
+      num_pages = data.num_pages;
+    } else {
+      logger.warn(
+        "Cannot get the number of page of " +
+          pdf +
+          ". This file is treated as 0 pages internally."
+      );
+    }
   } catch (err: any) {
     logger.warn(err.message);
     return E.left("Failed to extract text from " + pdfFullpath);
   }
 
   const ids = sortDocIDs(getDocIDFromTexts(texts), num_pages);
-  logger.info("getDocIDFromTexts(texts) = " + JSON.stringify(ids));
+  logger.info(
+    "sortDocIDs(getDocIDFromTexts(texts)) = " +
+      JSON.stringify(ids) +
+      " num_pages = " +
+      num_pages
+  );
   if (isBook) {
     for (const i of ids) {
       if (i.docIDType == "isbn") {
