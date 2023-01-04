@@ -6,6 +6,8 @@ import { logger } from "./logger";
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
 import * as E from "fp-ts/lib/Either";
 import { ERROR_GET_DOCID_FROM_URL, ERROR_GET_DOC_ID } from "./error_messages";
+import { log } from "console";
+import { Doc } from "prettier";
 
 type DocID =
   | { docIDType: "doi"; doi: string }
@@ -331,6 +333,37 @@ async function getDocIDFromTitle(
   return E.left("Failed to get DocID in getDocIDFromTitle");
 }
 
+function sortDocIDs(docIDs: DocID[], num_pages: number): DocID[] {
+  if (num_pages < 50) {
+    // This case the PDF should be paper. We sort docs from arxiv -> DOI -> ISBN -> Others.
+    let ret = docIDs.filter((d) => d.docIDType == "arxiv");
+    ret = ret.concat(docIDs.filter((d) => d.docIDType == "doi"));
+    ret = ret.concat(docIDs.filter((d) => d.docIDType == "isbn"));
+    ret = ret.concat(
+      docIDs.filter(
+        (d) =>
+          d.docIDType != "arxiv" &&
+          d.docIDType != "doi" &&
+          d.docIDType != "isbn"
+      )
+    );
+    return ret;
+  } else {
+    let ret = docIDs.filter((d) => d.docIDType == "isbn");
+    ret = ret.concat(docIDs.filter((d) => d.docIDType == "doi"));
+    ret = ret.concat(docIDs.filter((d) => d.docIDType == "arxiv"));
+    ret = ret.concat(
+      docIDs.filter(
+        (d) =>
+          d.docIDType != "arxiv" &&
+          d.docIDType != "doi" &&
+          d.docIDType != "isbn"
+      )
+    );
+    return ret;
+  }
+}
+
 async function getDocID(
   pdf: string,
   papersDir: string,
@@ -364,20 +397,18 @@ async function getDocID(
 
   // Parse the contents of PDF and try to extract DOI, ISBN or arXiv ID.
   let dataBuffer = fs.readFileSync(pdfFullpath);
-  const texts = await pdfparse(dataBuffer)
-    .then((data) => {
-      // See https://www.npmjs.com/package/pdf-parse for usage
-      return data.text.split(/\r?\n/);
-    })
-    .catch((e) => {
-      logger.warn(e.message);
-      return undefined;
-    });
-
-  if (texts == undefined) {
+  let texts: string[] = [];
+  let num_pages = 0;
+  try {
+    const data = await pdfparse(dataBuffer);
+    texts = data.text.split(/\r?\n/);
+    num_pages = data.num_pages;
+  } catch (err: any) {
+    logger.warn(err.message);
     return E.left("Failed to extract text from " + pdfFullpath);
   }
-  const ids = getDocIDFromTexts(texts);
+
+  const ids = sortDocIDs(getDocIDFromTexts(texts), num_pages);
   logger.info("getDocIDFromTexts(texts) = " + JSON.stringify(ids));
   if (isBook) {
     for (const i of ids) {
@@ -386,14 +417,12 @@ async function getDocID(
       }
     }
   } else {
-    if (ids.length == 1) {
+    if (ids.length >= 1) {
       return E.right(ids[0]);
     } else {
-      return E.left(
-        "There is multiple document identifiers in " +
-          pdf +
-          ". And I cannot which one to use."
-      );
+      const error_message = "There is no document identifiers in " + pdf;
+      logger.warn(error_message);
+      return E.left(error_message);
     }
   }
 
