@@ -6,8 +6,6 @@ import { logger } from "./logger";
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
 import * as E from "fp-ts/lib/Either";
 import { ERROR_GET_DOCID_FROM_URL, ERROR_GET_DOC_ID } from "./error_messages";
-import { log } from "console";
-import { Doc } from "prettier";
 
 type DocID =
   | { docIDType: "doi"; doi: string }
@@ -434,21 +432,8 @@ async function getDocID(
   let num_pages = 0;
   try {
     const data = await pdfparse(dataBuffer);
-    if (data.text != undefined) {
-      texts = data.text.split(/\r?\n/);
-    } else {
-      logger.warn("Cannot find any texts in " + pdf + ".");
-    }
-
-    if (data.num_pages != undefined) {
-      num_pages = data.num_pages;
-    } else {
-      logger.warn(
-        "Cannot get the number of page of " +
-          pdf +
-          ". This file is treated as 0 pages internally."
-      );
-    }
+    texts = data.text.split(/\r?\n/);
+    num_pages = data.numpages;
   } catch (err: any) {
     logger.warn(err.message);
     return E.left("Failed to extract text from " + pdfFullpath);
