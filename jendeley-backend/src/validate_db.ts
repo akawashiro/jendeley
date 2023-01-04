@@ -97,7 +97,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
           validDB = false;
         }
       } else {
-        logger.info("dbPath is undefined. Skip file existence check.");
+        logger.debug("dbPath is undefined. Skip file existence check.");
       }
     }
 
