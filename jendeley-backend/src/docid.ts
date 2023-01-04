@@ -5,6 +5,7 @@ import { JENDELEY_NO_ID } from "./constants";
 import { logger } from "./logger";
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
 import * as E from "fp-ts/lib/Either";
+import { ERROR_GET_DOCID_FROM_URL, ERROR_GET_DOC_ID } from "./error_messages";
 
 type DocID =
   | { docIDType: "doi"; doi: string }
@@ -128,7 +129,7 @@ function getDocIDFromUrl(url: string): E.Either<string, DocID> {
   for (const f of foundArxiv) {
     return E.right({ docIDType: "arxiv", arxiv: f[1] });
   }
-  return E.left("Failed to get DocID from URL.");
+  return E.left(ERROR_GET_DOCID_FROM_URL);
 }
 
 function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
@@ -398,7 +399,7 @@ async function getDocID(
 
   // The fallback case.
   logger.warn("Cannot decide docID of " + pdf);
-  return E.left("Cannot decide docID of " + pdf);
+  return E.left(ERROR_GET_DOC_ID + pdf);
 }
 
 export {
