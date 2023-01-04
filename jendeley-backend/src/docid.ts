@@ -253,6 +253,21 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
   return E.left("Failed getDocIDManuallyWritten.");
 }
 
+function removeSquareBrackets(str: string) {
+  let ret = "";
+  let level = 0;
+  for (let c of str) {
+    if (c == "[") {
+      level++;
+    } else if (c == "]") {
+      level--;
+    } else if (level == 0) {
+      ret += c;
+    }
+  }
+  return ret;
+}
+
 async function getTitleFromPDF(
   pdf: string,
   papersDir: string
@@ -268,26 +283,37 @@ async function getTitleFromPDF(
       );
       return {};
     });
+
   if (
     data["meta"] != undefined &&
     data["meta"]["metadata"] != undefined &&
-    data["meta"]["metadata"]["dc:title"] != undefined
+    data["meta"]["metadata"]["dc:title"] != undefined &&
+    data["meta"]["metadata"]["dc:title"] != ""
   ) {
     const title = data["meta"]["metadata"]["dc:title"];
     logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = " + title);
     return title;
-  } else if (
+  }
+
+  if (
     data["meta"] != undefined &&
     data["meta"]["info"] != undefined &&
-    data["meta"]["info"]["Title"] != undefined
+    data["meta"]["info"]["Title"] != undefined &&
+    data["meta"]["info"]["Title"] != ""
   ) {
     const title = data["meta"]["info"]["Title"];
     logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = " + title);
     return title;
-  } else {
-    logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = undefined");
-    return undefined;
   }
+
+  const tile_from_path = removeSquareBrackets(path.basename(pdf, ".pdf"));
+  logger.info("title_from_path = " + tile_from_path);
+  if (tile_from_path != "") {
+    return tile_from_path;
+  }
+
+  logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = undefined");
+  return undefined;
 }
 
 async function getDocIDFromTitle(
