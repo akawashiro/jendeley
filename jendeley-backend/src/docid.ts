@@ -422,7 +422,14 @@ async function getDocID(
   }
 
   // Parse the contents of PDF and try to extract DOI, ISBN or arXiv ID.
-  let dataBuffer = fs.readFileSync(pdfFullpath);
+  let dataBuffer: Buffer;
+  try {
+    dataBuffer = fs.readFileSync(pdfFullpath);
+  } catch (err) {
+    const msg = "Cannot read " + pdfFullpath + ".";
+    logger.warn(msg);
+    return E.left(msg);
+  }
   let texts: string[] = [];
   let num_pages = 0;
   try {
