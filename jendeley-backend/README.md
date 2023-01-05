@@ -62,8 +62,15 @@ Because `jendeley` is fully JSON-based, you can check the contents of the
 database easily. For example, you can use `jq` command to list up all titles in
 your database with the following command.
 ```
-> cat test_pdfs/db.json | jq '.[].title'
-"MobileNets: Efficient Convolutional Neural Networks for Mobile Vision\n  Applications"
-"Deep Residual Learning for Image Recognition"
-"A quantum hydrodynamical description for scrambling and many-body chaos"
+> cat jendeley_db.json | jq '.' | head
+{
+  "jendeley_meta": {
+    "idType": "meta",
+    "version": "0.0.17"
+  },
+  "doi_10.1145/1122445.1122456": {
+    "path": "/A Comprehensive Survey of Neural Architecture Search.pdf",
+    "idType": "doi",
+    "tags": [],
+    "comments": "",
 ```

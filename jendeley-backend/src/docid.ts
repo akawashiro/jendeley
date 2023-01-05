@@ -323,7 +323,8 @@ async function getDocIDFromTitle(
   if (
     titleFromPdf != undefined &&
     path.extname(titleFromPdf) != ".dvi" &&
-    path.extname(titleFromPdf) != ".pdf"
+    path.extname(titleFromPdf) != ".pdf" &&
+    path.extname(titleFromPdf) != ".tex"
   ) {
     titles.push(titleFromPdf);
   }
