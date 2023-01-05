@@ -1,4 +1,4 @@
-# This software is still experimental wait until 1.0.0 for heavy use.
+# This software is still experimental. Please wait until 1.0.0 for heavy use.
 # jendeley
 `jendeley` is a JSON-based PDF paper organizing software.
 - `jendeley` is JSON-based. You can see and edit your database easily.
@@ -29,7 +29,7 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 `jendeley` use filename also to find the document ID (e.g. [DOI](https://www.doi.org/) or [ISBN](https://en.wikipedia.org/wiki/ISBN))). `jendeley` recognizes the filename other than surrounded by `[` and `]` as the title of the file. So I recommend you to name file such way. For example,
 - `Register Allocation and Optimal Spill Code Scheduling in Software Pipelined Loops Using 0-1 Integer Linear Programming Formulation.pdf`
     - When the title of document includes spaces, the filename should also includes spaces.
-- `RustHorn CHC-based Verification for Rust Programs [matushita].pdf
+- `RustHorn CHC-based Verification for Rust Programs [matushita].pdf`
     - If you want to write additional information in the filename, please surround by `[` and `]`.
 
 #### When failed to scan your PDFs
