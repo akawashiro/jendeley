@@ -256,7 +256,7 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(jsonDB));
+    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
 
     const r: ApiResponse = {
       isSucceeded: true,
@@ -453,20 +453,20 @@ async function addPdfFromUrl(
   logger.info("Sent a response from add_pdf_from_url");
 }
 
-function deleteEntry(request: Request, response: Response, db_path: string) {
+function deleteEntry(request: Request, response: Response, dbPath: string) {
   logger.info("Get a delete_entry request url = " + request.url);
   const entry_o = request.body;
 
   if (entry_o["id"] != undefined) {
     const entry = entry_o as ApiEntry;
-    let jsonDB = JSON.parse(fs.readFileSync(db_path).toString());
+    let jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
     if (
       jsonDB[entry.id] != undefined &&
       jsonDB[entry.id][ENTRY_PATH] != undefined
     ) {
       logger.info("Delete " + jsonDB[entry.id]["path"]);
       const old_filename = path.join(
-        path.dirname(db_path),
+        path.dirname(dbPath),
         jsonDB[entry.id]["path"]
       );
       const dir = path.dirname(old_filename);
@@ -490,11 +490,11 @@ function deleteEntry(request: Request, response: Response, db_path: string) {
       delete jsonDB[entry.id];
     }
 
-    if (!validateJsonDB(jsonDB, db_path)) {
+    if (!validateJsonDB(jsonDB, dbPath)) {
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(db_path, JSON.stringify(jsonDB));
+    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
 
     const r: ApiResponse = {
       isSucceeded: true,
