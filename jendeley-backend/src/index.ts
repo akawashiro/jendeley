@@ -4,7 +4,8 @@ import { Command } from "commander";
 import { startServer } from "./server";
 import { genDB, genDummyDB } from "./gen";
 import { validateDB } from "./validate_db";
-import { JENDELEY_VERSION } from "./constants";
+import { JENDELEY_DIR, JENDELEY_VERSION } from "./constants";
+import { logger } from "./logger";
 
 async function main() {
   const program = new Command();
@@ -29,6 +30,10 @@ async function main() {
         options._optionValues.db_name == undefined
           ? "jendeley_db.json"
           : options._optionValues.db_name;
+      if (db_name == JENDELEY_DIR) {
+        logger.fatal(JENDELEY_DIR + " cannot used as the name of DB.");
+        process.exit(1);
+      }
       genDB(options._optionValues.papers_dir, book_dirs_str, db_name);
     });
 

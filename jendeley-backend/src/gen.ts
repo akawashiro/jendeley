@@ -312,10 +312,6 @@ function registerWeb(
     jsonDB["url_" + url] = json;
     logger.info("Register url_" + url);
 
-    if (!validateJsonDB(jsonDB, undefined)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
     return E.right(jsonDB);
   } else {
     return E.left("Failed to register url_" + url);
@@ -402,9 +398,8 @@ async function registerNonBookPDF(
   jsonDB[dbID] = json;
 
   if (!validateJsonDB(jsonDB, undefined)) {
-    throw new Error(
-      "validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2)
-    );
+    logger.fatal("validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2));
+    process.exit(1);
   }
 
   return E.right(jsonDB);

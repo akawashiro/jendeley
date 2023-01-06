@@ -30,7 +30,6 @@ import {
 import https from "https";
 import http from "http";
 import { registerWeb, registerNonBookPDF } from "./gen";
-import { validateJsonDB } from "./validate_db";
 import { ArxivEntry, DoiEntry, JsonDB, PathEntry, UrlEntry } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
 import { saveDB } from "./load_db";
@@ -40,18 +39,21 @@ function checkEntry(entry: ApiEntry) {
     logger.fatal(
       "id = " + entry.id + "entry = " + JSON.stringify(entry, undefined, 2)
     );
+    process.exit(1);
   }
 }
 
 function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   if (jsonDB[id] == undefined) {
-    throw Error("json[" + id + "] != undefined");
+    logger.fatal("json[" + id + "] != undefined");
+    process.exit(1);
   }
 
   const entryInDB = jsonDB[id];
 
   if (entryInDB.idType == "meta") {
-    throw Error("metadata = " + JSON.stringify(entryInDB));
+    logger.fatal("metadata = " + JSON.stringify(entryInDB));
+    process.exit(1);
   }
 
   if (entryInDB.idType == "url") {
@@ -204,7 +206,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
     return e;
   } else {
     if (entryInDB.idType != ID_TYPE_PATH) {
-      throw new Error(
+      logger.fatal(
         jsonDB[id][ENTRY_ID_TYPE] +
           " must be " +
           ID_TYPE_PATH +
@@ -212,6 +214,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
           id +
           " is not."
       );
+      process.exit(1);
     }
     const pathEntry: PathEntry = entryInDB;
     const authors = [];
@@ -251,10 +254,6 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
       jsonDB[entry.id][ENTRY_TAGS] = entry.tags;
       jsonDB[entry.id][ENTRY_COMMENTS] = entry.comments;
-    }
-
-    if (!validateJsonDB(jsonDB, dbPath)) {
-      throw new Error("validateJsonDB failed!");
     }
 
     saveDB(jsonDB, dbPath);
@@ -342,10 +341,6 @@ async function addWebFromUrl(
   const newDBOrError = registerWeb(jsonDB, req.url, title, req.comments, tags);
 
   if (E.isRight(newDBOrError)) {
-    if (!validateJsonDB(E.toUnion(newDBOrError), dbPath)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
     saveDB(E.toUnion(newDBOrError), dbPath);
 
     const r: ApiResponse = {
@@ -431,10 +426,6 @@ async function addPdfFromUrl(
   );
 
   if (E.isRight(newDBOrError)) {
-    if (!validateJsonDB(E.toUnion(newDBOrError), dbPath)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
     saveDB(E.toUnion(newDBOrError), dbPath);
 
     const r: ApiResponse = {
@@ -489,10 +480,6 @@ function deleteEntry(request: Request, response: Response, dbPath: string) {
     ) {
       logger.info("Delete " + entry.id);
       delete jsonDB[entry.id];
-    }
-
-    if (!validateJsonDB(jsonDB, dbPath)) {
-      throw new Error("validateJsonDB failed!");
     }
 
     saveDB(jsonDB, dbPath);
