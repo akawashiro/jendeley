@@ -15,11 +15,8 @@ import {
   ENTRY_TITLE,
   ENTRY_COMMENTS,
   ENTRY_TAGS,
-  ENTRY_URL,
   ID_TYPE_URL,
-  ID_TYPE_BOOK,
   ARXIV_API_URL,
-  ENTRY_DATA_FROM_ARXIV,
   JENDELEY_VERSION,
   DB_META_KEY,
 } from "./constants";
@@ -35,6 +32,7 @@ import {
   BookEntry,
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
+import { saveDB } from "./load_db";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -278,10 +276,7 @@ function genDummyDB(output: string) {
     jsonDB[id] = e;
   }
 
-  if (!validateJsonDB(jsonDB, undefined)) {
-    throw new Error("validateJsonDB failed!");
-  }
-  fs.writeFileSync(output, JSON.stringify(jsonDB, null, 2));
+  saveDB(jsonDB, output);
 }
 
 function registerWeb(
@@ -589,17 +584,8 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     fs.writeFileSync(registerShellscript, commands);
   }
 
-  try {
-    const dbPath = path.join(papersDir, dbName);
-
-    if (!validateJsonDB(jsonDB, dbPath)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
-    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
-  } catch (err) {
-    logger.warn(err);
-  }
+  const dbPath = path.join(papersDir, dbName);
+  saveDB(jsonDB, dbPath);
 }
 
 export {

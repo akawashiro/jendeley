@@ -33,6 +33,7 @@ import { registerWeb, registerNonBookPDF } from "./gen";
 import { validateJsonDB } from "./validate_db";
 import { ArxivEntry, DoiEntry, JsonDB, PathEntry, UrlEntry } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
+import { saveDB } from "./load_db";
 
 function checkEntry(entry: ApiEntry) {
   if (entry.title == undefined || entry.path == undefined) {
@@ -256,7 +257,7 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
+    saveDB(jsonDB, dbPath);
 
     const r: ApiResponse = {
       isSucceeded: true,
@@ -279,11 +280,11 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
   logger.info("Sent a response from update_entry");
 }
 
-function getPdf(request: Request, response: Response, db_path: string) {
+function getPdf(request: Request, response: Response, dbPath: string) {
   logger.info("Get a get_pdf request", request.url);
   const params = url.parse(request.url, true).query;
-  const pdf_path = unescape(base_64.decode(params.file as string));
-  const pdf = fs.readFileSync(path.join(path.dirname(db_path), pdf_path));
+  const pdfPath = unescape(base_64.decode(params.file as string));
+  const pdf = fs.readFileSync(path.join(path.dirname(dbPath), pdfPath));
 
   response.writeHead(200, {
     "Content-Type": "application/pdf",
@@ -296,16 +297,16 @@ function getPdf(request: Request, response: Response, db_path: string) {
 function getDB(request: Request, response: Response, dbPathDB: string) {
   logger.info("Get a get_db request" + request.url);
   const jsonDB = JSON.parse(fs.readFileSync(dbPathDB).toString());
-  let db_response: ApiDB = [];
+  let dbResponse: ApiDB = [];
 
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
     if (id == DB_META_KEY) continue;
     const e = getEntry(id, jsonDB);
-    db_response.push(e);
+    dbResponse.push(e);
   }
 
-  response.status(200).json(db_response);
+  response.status(200).json(dbResponse);
   logger.info("Sent a response from get_db");
 }
 
@@ -345,7 +346,7 @@ async function addWebFromUrl(
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(E.toUnion(newDBOrError)));
+    saveDB(E.toUnion(newDBOrError), dbPath);
 
     const r: ApiResponse = {
       isSucceeded: true,
@@ -434,7 +435,7 @@ async function addPdfFromUrl(
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(E.toUnion(newDBOrError)));
+    saveDB(E.toUnion(newDBOrError), dbPath);
 
     const r: ApiResponse = {
       isSucceeded: true,
@@ -494,7 +495,7 @@ function deleteEntry(request: Request, response: Response, dbPath: string) {
       throw new Error("validateJsonDB failed!");
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
+    saveDB(jsonDB, dbPath);
 
     const r: ApiResponse = {
       isSucceeded: true,
