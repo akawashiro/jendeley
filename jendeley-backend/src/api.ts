@@ -42,11 +42,26 @@ import * as E from "fp-ts/lib/Either";
 import { loadDB, saveDB } from "./load_db";
 
 function checkEntry(entry: ApiEntry) {
-  if (entry.title == undefined || entry.path == undefined) {
-    logger.fatal(
-      "id = " + entry.id + " entry = " + JSON.stringify(entry, undefined, 2)
-    );
-    process.exit(1);
+  if (entry.idType == "url") {
+    if (entry.title == undefined || entry.path != undefined) {
+      logger.fatal(
+        "Check failed in checkEntry: id = " +
+          entry.id +
+          " entry = " +
+          JSON.stringify(entry, undefined, 2)
+      );
+      process.exit(1);
+    }
+  } else {
+    if (entry.title == undefined || entry.path == undefined) {
+      logger.fatal(
+        "Check failed in checkEntry: id = " +
+          entry.id +
+          " entry = " +
+          JSON.stringify(entry, undefined, 2)
+      );
+      process.exit(1);
+    }
   }
 }
 
