@@ -122,6 +122,10 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
               );
               validDB = false;
             }
+            if (d == "") {
+              logger.warn("filepath: " + filepath + " includes empty string.");
+              validDB = false;
+            }
           }
         }
       } else {

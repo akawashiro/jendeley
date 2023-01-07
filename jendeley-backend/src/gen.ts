@@ -64,7 +64,12 @@ function walkPDF(papersDir: string[]): string[][] {
   for (const pd of pdfs) {
     const pf = concatDirs(papersDir);
     const pdf = concatDirs(pd);
-    r.push(pdf.replace(pf, "").split(path.sep));
+    r.push(
+      pdf
+        .replace(pf, "")
+        .split(path.sep)
+        .filter((p) => p != "")
+    );
   }
   return r;
 }
