@@ -27,3 +27,6 @@ Use `local-install.sh` on Linux or MacOS, `local-install.bat` on Windows.
 
 ## About `fp-ts`
 Although `jendeley` is using [fp-ts](https://gcanti.github.io/fp-ts/) now, I don't want to do functional programming in TypeScript. I just want to use `Either` type. So, I don't use difficult feature of functional programming such as monad in `jendeley`.
+
+## About path
+To make the database cross platform, the database must not include "/" or "\" in path fields. To accomplish this, we handle paths always as `string[]` instead of just `string`.
