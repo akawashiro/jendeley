@@ -10,7 +10,7 @@ function rightIsbn(isbn: string) {
   return E.right({ docIDType: "isbn", isbn: isbn });
 }
 
-function rightPath(path: string) {
+function rightPath(path: string[]) {
   return E.right({ docIDType: "path", path: path });
 }
 
@@ -68,7 +68,7 @@ test("ISBN from text 2", async () => {
 test("jendeley no id from path", async () => {
   const pdf = ["hoge [jendeley no id].pdf"];
   const docID = await getDocID(pdf, ["hoge"], false, undefined);
-  expect(docID).toStrictEqual(rightPath("hoge [jendeley no id].pdf"));
+  expect(docID).toStrictEqual(rightPath(["hoge [jendeley no id].pdf"]));
 });
 
 test("arXiv from URL", async () => {

@@ -122,6 +122,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
         ? entryInDB.userSpecifiedTitle
         : entryInDB.dataFromNodeIsbn["title"];
     const abstract = "";
+    const p = entryInDB.path.join(path.sep);
 
     const e = {
       id: id,
@@ -132,7 +133,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       tags: entryInDB.tags,
       comments: entryInDB.comments,
       abstract: abstract,
-      path: entryInDB.path,
+      path: p,
       year: year,
       publisher: publisher,
     };
@@ -141,7 +142,6 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   } else if (entryInDB.idType == ID_TYPE_DOI) {
     const doiEntry: DoiEntry = entryInDB;
     const title: string = doiEntry.dataFromCrossref["title"];
-    const path: string[] = doiEntry.path;
     let authors: string[] = [];
     if (doiEntry.dataFromCrossref["author"] != undefined) {
       for (let i = 0; i < doiEntry.dataFromCrossref["author"].length; i++) {
@@ -178,7 +178,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       tags: tags,
       comments: comments,
       abstract: abstract,
-      path: path,
+      path: doiEntry.path.join(path.sep),
       year: year,
       publisher: publisher,
     };
@@ -220,7 +220,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       tags: arxivEntry.tags,
       abstract: abstract,
       comments: arxivEntry.comments,
-      path: arxivEntry.path,
+      path: arxivEntry.path.join(path.sep),
       year: year,
       publisher: publisher,
     };
@@ -251,7 +251,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       tags: pathEntry.tags,
       abstract: abstract,
       comments: pathEntry.comments,
-      path: pathEntry.path,
+      path: pathEntry.path.join(path.sep),
       year: undefined,
       publisher: undefined,
     };

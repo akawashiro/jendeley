@@ -258,7 +258,7 @@ function getDocIDManuallyWritten(pdf: string[]): E.Either<string, DocID> {
     return E.right({ docIDType: "isbn", isbn: d });
   }
 
-  if (pdf.includes(JENDELEY_NO_ID)) {
+  if (filename.includes(JENDELEY_NO_ID)) {
     return E.right({ docIDType: "path", path: pdf });
   }
 
