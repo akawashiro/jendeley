@@ -91,10 +91,36 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
     } else {
       if (dbPath != undefined) {
         const dbDir = path.dirname(dbPath);
-        const filepath = jsonDB[id][ENTRY_PATH];
+        const filepath: string = jsonDB[id][ENTRY_PATH];
         if (!fs.existsSync(path.join(dbDir, filepath))) {
           logger.warn("File not exists: " + filepath + " id: " + id);
           validDB = false;
+        }
+
+        const forbidden_chars = [
+          "\\",
+          "/",
+          ":",
+          "*",
+          "?",
+          '"',
+          "<",
+          ">",
+          "|",
+          "\n",
+        ];
+        const filename = path.basename(filepath);
+        for (const fc of forbidden_chars) {
+          if (filename.indexOf(fc) > -1) {
+            logger.warn(
+              "filepath: " +
+                filepath +
+                " including forbidden char: '" +
+                fc +
+                "'. jendeley bans usage of these characters because of cross platform compatibility."
+            );
+            validDB = false;
+          }
         }
       } else {
         logger.debug("dbPath is undefined. Skip file existence check.");
