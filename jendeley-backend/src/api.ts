@@ -44,7 +44,7 @@ import { loadDB, saveDB } from "./load_db";
 function checkEntry(entry: ApiEntry) {
   if (entry.title == undefined || entry.path == undefined) {
     logger.fatal(
-      "id = " + entry.id + "entry = " + JSON.stringify(entry, undefined, 2)
+      "id = " + entry.id + " entry = " + JSON.stringify(entry, undefined, 2)
     );
     process.exit(1);
   }
@@ -256,7 +256,7 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
     entry_o[ENTRY_COMMENTS] != undefined
   ) {
     const entry = entry_o as ApiEntry;
-    let jsonDB = loadDB(dbPath);
+    let jsonDB = loadDB(dbPath, false);
     if (jsonDB[entry.id] != undefined) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
       jsonDB[entry.id][ENTRY_TAGS] = entry.tags;
@@ -302,7 +302,7 @@ function getPdf(request: Request, response: Response, dbPath: string) {
 
 function getDB(request: Request, response: Response, dbPath: string) {
   logger.info("Get a get_db request" + request.url);
-  const jsonDB = loadDB(dbPath);
+  const jsonDB = loadDB(dbPath, false);
   let dbResponse: ApiDB = [];
 
   for (const id of Object.keys(jsonDB)) {
@@ -339,7 +339,7 @@ async function addWebFromUrl(
       JSON.stringify(req)
   );
 
-  const jsonDB = loadDB(dbPath);
+  const jsonDB = loadDB(dbPath, false);
   const title = req.title == "" ? await getTitleFromUrl(req.url) : req.title;
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
@@ -416,7 +416,7 @@ async function addPdfFromUrl(
   };
 
   await download(req.url, path.join(path.dirname(dbPath), filename));
-  const jsonDB = loadDB(dbPath);
+  const jsonDB = loadDB(dbPath, false);
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
@@ -460,7 +460,7 @@ function deleteEntry(request: Request, response: Response, dbPath: string) {
 
   if (entry_o["id"] != undefined) {
     const entry = entry_o as ApiEntry;
-    let jsonDB = loadDB(dbPath);
+    let jsonDB = loadDB(dbPath, false);
     if (
       jsonDB[entry.id] != undefined &&
       jsonDB[entry.id][ENTRY_PATH] != undefined

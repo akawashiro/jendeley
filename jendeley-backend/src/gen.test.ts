@@ -75,6 +75,13 @@ test("arXiv from URL", async () => {
   expect(docID).toStrictEqual(rightArxiv("2212.07677"));
 });
 
+test("arXiv from path", async () => {
+  const pdf =
+    "A Program Logic for First-Order Encapsulated WebAssembly [jendeley arxiv 1811_03479v3].pdf";
+  const docID = await getDocID(pdf, "/hoge/", false, undefined);
+  expect(docID).toStrictEqual(rightArxiv("1811.03479v3"));
+});
+
 test("ISBN from path", async () => {
   const pdf = "hoge [jendeley isbn 9781467330763].pdf";
   const docID = await getDocID(pdf, "/hoge/", false, undefined);

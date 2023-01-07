@@ -28,18 +28,20 @@ function saveDB(jsonDB: JsonDB, dbPath: string) {
   }
 
   if (!validateJsonDB(jsonDB, dbPath)) {
-    logger.fatal("validateJsonDB failed!");
+    logger.fatal("Failed to save jsonDB because validateJsonDB failed!");
     process.exit(1);
   }
   fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
 }
 
-function loadDB(dbPath: string): JsonDB {
+function loadDB(dbPath: string, ignoreErrors: boolean): JsonDB {
   const jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
 
   if (!validateJsonDB(jsonDB, dbPath)) {
-    logger.fatal("validateJsonDB failed!");
-    process.exit(1);
+    logger.fatal("Failed to load DB because validateJsonDB");
+    if (!ignoreErrors) {
+      process.exit(1);
+    }
   }
   return jsonDB;
 }

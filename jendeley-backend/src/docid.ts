@@ -234,6 +234,17 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     return E.right({ docIDType: "doi", doi: d });
   }
 
+  const regexpArxiv = new RegExp(
+    "\\[\\s*jendeley\\s+arxiv\\s+([0-9]{4}_[0-9v]+)\\s*\\]",
+    "g"
+  );
+  const foundArxiv = [...pdf.matchAll(regexpArxiv)];
+  for (const f of foundArxiv) {
+    let d = f[1] as string;
+    d = d.substring(0, 4) + "." + d.substring(5);
+    return E.right({ docIDType: "arxiv", arxiv: d });
+  }
+
   const regexpISBN = new RegExp(
     ".*\\[\\s*jendeley\\s+isbn\\s+([0-9]{10,})\\s*\\]",
     "g"

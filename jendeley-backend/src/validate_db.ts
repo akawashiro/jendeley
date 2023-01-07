@@ -128,6 +128,20 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
         logger.warn(url + " is not valid. id: " + id);
       }
     }
+
+    const entry = jsonDB[id];
+    if (entry.idType == ID_TYPE_DOI) {
+      if (entry.dataFromCrossref["indexed"] == undefined) {
+        validDB = false;
+        logger.warn(
+          "Entry of id = " +
+            id +
+            " path = " +
+            entry.path +
+            " looks failed to get data from crossref. Please consider change filename to we can find manually written DocID."
+        );
+      }
+    }
   }
   return validDB;
 }
