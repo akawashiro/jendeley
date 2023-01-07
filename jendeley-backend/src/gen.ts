@@ -310,12 +310,25 @@ function registerWeb(
   };
 
   if (isValidJsonEntry(json)) {
-    jsonDB["url_" + url] = json;
-    logger.info("Register url_" + url);
+    const id = "url_" + url;
+    if (id in jsonDB) {
+      return E.left(
+        "Failed to register url_" +
+          url +
+          ". Because " +
+          url +
+          " is already registered."
+      );
+    } else {
+      jsonDB[id] = json;
+      logger.info("Register url_" + url);
 
-    return E.right(jsonDB);
+      return E.right(jsonDB);
+    }
   } else {
-    return E.left("Failed to register url_" + url);
+    return E.left(
+      "Failed to register url_" + url + ". Because got JSON is not valid."
+    );
   }
 }
 
