@@ -34,18 +34,22 @@ import {
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
 import { loadDB, saveDB } from "./load_db";
+import { concatDirs } from "./path_util";
 
-function walkPDFDFS(dir: string): string[] {
-  if (!fs.existsSync(dir)) {
+function walkPDFDFS(dir: string[]): string[][] {
+  if (!fs.existsSync(concatDirs(dir))) {
     return [];
-  } else if (fs.lstatSync(dir).isDirectory()) {
-    const ds = fs.readdirSync(dir, { withFileTypes: true });
-    var ret: Array<string> = [];
+  } else if (fs.lstatSync(concatDirs(dir)).isDirectory()) {
+    const ds = fs.readdirSync(concatDirs(dir), { withFileTypes: true });
+    var ret: string[][] = [];
     ds.forEach((d) => {
-      ret = ret.concat(walkPDFDFS(path.join(dir, d.name)));
+      ret = ret.concat(walkPDFDFS(dir.concat([d.name])));
     });
     return ret;
-  } else if (path.extname(dir) == ".pdf" && !dir.includes("_Note")) {
+  } else if (
+    path.extname(concatDirs(dir)) == ".pdf" &&
+    !dir.includes("_Note")
+  ) {
     // TODO: Ignore general pattern
     return [dir];
   } else {
@@ -54,11 +58,13 @@ function walkPDFDFS(dir: string): string[] {
 }
 
 // All paths returned from walkPDF are relative path from papersDir.
-function walkPDF(papersDir: string): string[] {
-  let r: string[] = [];
+function walkPDF(papersDir: string[]): string[][] {
+  let r: string[][] = [];
   const pdfs = walkPDFDFS(papersDir);
   for (const pd of pdfs) {
-    r.push(pd.replace(papersDir, ""));
+    const pf = concatDirs(papersDir);
+    const pdf = concatDirs(pd);
+    r.push(pdf.replace(pf, "").split(path.sep));
   }
   return r;
 }
@@ -140,7 +146,7 @@ async function getArxivJson(arxiv: string) {
 // Return [JSON, ID]
 async function getJson(
   docID: DocID,
-  path: string
+  pathPDF: string[]
 ): Promise<
   [ArxivEntry | DoiEntry | IsbnEntry | PathEntry, string] | undefined
 > {
@@ -152,7 +158,7 @@ async function getJson(
     let dataFromArxiv = await getArxivJson(docID.arxiv);
     if (dataFromArxiv != undefined) {
       let json: ArxivEntry = {
-        path: path,
+        path: pathPDF,
         idType: ID_TYPE_ARXIV,
         tags: [],
         comments: "",
@@ -166,7 +172,7 @@ async function getJson(
         "Failed to get information of " +
           JSON.stringify(docID) +
           " using arxiv " +
-          path
+          pathPDF
       );
     }
   }
@@ -177,7 +183,7 @@ async function getJson(
     let dataFromCrossref = await getDoiJSON(docID.doi);
     if (dataFromCrossref != undefined) {
       let json: DoiEntry = {
-        path: path,
+        path: pathPDF,
         idType: ID_TYPE_DOI,
         tags: [],
         comments: "",
@@ -191,7 +197,7 @@ async function getJson(
         "Failed to get information of " +
           JSON.stringify(docID) +
           " using doi " +
-          path
+          pathPDF
       );
     }
   }
@@ -202,7 +208,7 @@ async function getJson(
     let dataFromNodeIsbn = await getIsbnJson(docID.isbn);
     if (dataFromNodeIsbn != undefined) {
       let json: IsbnEntry = {
-        path: path,
+        path: pathPDF,
         idType: ID_TYPE_ISBN,
         tags: [],
         comments: "",
@@ -216,7 +222,7 @@ async function getJson(
         "Failed to get information of " +
           JSON.stringify(docID) +
           " using isbn " +
-          path
+          pathPDF
       );
     }
   }
@@ -225,8 +231,8 @@ async function getJson(
     (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
   ) {
     let json: PathEntry = {
-      path: path,
-      title: docID.path,
+      path: pathPDF,
+      title: docID.path.join(path.sep),
       idType: ID_TYPE_PATH,
       tags: [],
       comments: "",
@@ -241,7 +247,7 @@ async function getJson(
       "Failed to get information of " +
         JSON.stringify(docID) +
         " path = " +
-        path +
+        pathPDF +
         " json_r = " +
         JSON.stringify(json_r) +
         " db_id = " +
@@ -268,7 +274,7 @@ function genDummyDB(output: string) {
     const id = "path_" + crypto.randomBytes(20).toString("hex");
     const e: PathEntry = {
       idType: "path",
-      path: crypto.randomBytes(40).toString("hex"),
+      path: [crypto.randomBytes(40).toString("hex")],
       title: crypto.randomBytes(40).toString("hex"),
       tags: [],
       userSpecifiedTitle: undefined,
@@ -277,7 +283,7 @@ function genDummyDB(output: string) {
     jsonDB[id] = e;
   }
 
-  saveDB(jsonDB, output);
+  saveDB(jsonDB, [output]);
 }
 
 function registerWeb(
@@ -333,8 +339,8 @@ function registerWeb(
 }
 
 async function registerNonBookPDF(
-  papersDir: string,
-  pdf: string,
+  papersDir: string[],
+  pdf: [string],
   jsonDB: JsonDB,
   userSpecifiedTitle: string | undefined,
   comments: string,
@@ -393,74 +399,77 @@ async function registerNonBookPDF(
 
   // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
   if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
-    const newFilename = path.join(
-      path.dirname(pdf),
+    let newFilename: [string] = json[ENTRY_PATH];
+    newFilename[newFilename.length - 1] =
       json[ENTRY_TITLE].replace(/[/\\?%*:|"<>.]/g, "") +
-        " " +
-        path.basename(pdf)
-    );
-    const oldFileneme = json[ENTRY_PATH];
+      " " +
+      pdf[pdf.length - 1];
+    const oldFilename = json[ENTRY_PATH];
     json[ENTRY_PATH] = newFilename;
 
-    if (fs.existsSync(path.join(papersDir, newFilename))) {
+    if (fs.existsSync(concatDirs(papersDir.concat(newFilename)))) {
       return E.left(newFilename + " already exists. Skip registration.");
     }
     fs.renameSync(
-      path.join(papersDir, oldFileneme),
-      path.join(papersDir, newFilename)
+      concatDirs(papersDir.concat(oldFilename)),
+      concatDirs(papersDir.concat(newFilename))
     );
-    logger.info("Rename " + oldFileneme + " to " + newFilename);
+    logger.info("Rename " + oldFilename + " to " + newFilename);
   }
 
   return E.right([dbID, json]);
 }
 
 async function genDB(
-  papersDir: string,
+  papersDirUserArg: string,
   bookDirsStr: string,
   dbName: string,
   deleteUnreachableFiles: boolean
 ) {
-  papersDir = path.resolve(papersDir);
-  let bookDirs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
-  for (let i = 0; i < bookDirs.length; i++) {
-    bookDirs[i] = path.resolve(bookDirs[i]);
-    if (bookDirs[i].startsWith(papersDir)) {
-      bookDirs[i] = bookDirs[i].replace(papersDir, "");
+  const papersDir = path.resolve(papersDirUserArg).split(path.sep);
+  let bookDirStrs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
+  let bookDirs: string[][] = [];
+  for (let i = 0; i < bookDirStrs.length; i++) {
+    const pf = path.resolve(papersDirUserArg);
+    const bf = path.resolve(bookDirStrs[i]);
+    if (bf.startsWith(pf)) {
+      bookDirs[i] = bf.replace(pf, "").split(path.sep);
+    } else {
+      logger.fatal("Book directory " + bf + " is not in papers directory" + pf);
     }
   }
 
-  if (!fs.existsSync(papersDir)) {
-    logger.fatal("papersDir:", papersDir + " is not exist.");
+  if (!fs.existsSync(concatDirs(papersDir))) {
+    logger.fatal("papersDir:", concatDirs(papersDir) + " is not exist.");
     process.exit(1);
   }
   for (const bd of bookDirs) {
-    if (!fs.existsSync(path.join(papersDir, bd))) {
+    if (!fs.existsSync(concatDirs(papersDir.concat(bd)))) {
       logger.fatal(
-        "book directory:" + path.join(papersDir, bd) + " is not exist."
+        "book directory:" + concatDirs(papersDir.concat(bd)) + " is not exist."
       );
       process.exit(1);
     }
   }
 
   if (deleteUnreachableFiles) {
-    if (!fs.existsSync(path.join(papersDir, dbName))) {
+    if (!fs.existsSync(concatDirs(papersDir.concat([dbName])))) {
       logger.fatal(
         "You use --delete_unreachable_files but " +
-          path.join(papersDir, dbName) +
+          concatDirs(papersDir.concat([dbName])) +
           " does not exist."
       );
       process.exit(1);
     }
 
-    let jsonDB = loadDB(path.join(papersDir, dbName), true);
+    let jsonDB = loadDB(papersDir.concat([dbName]), true);
     let deletedIDs: string[] = [];
 
     for (const id of Object.keys(jsonDB)) {
       const e = jsonDB[id];
       if (e.idType != "url" && e.idType != "meta") {
         const p = e.path;
-        if (!fs.existsSync(path.join(papersDir, p))) {
+        if (!fs.existsSync(concatDirs(papersDir.concat(p)))) {
           logger.warn(p + " does not exist. Delete entry " + id);
           deletedIDs.push(id);
         }
@@ -470,7 +479,7 @@ async function genDB(
       delete jsonDB[id];
     }
 
-    saveDB(jsonDB, path.join(papersDir, dbName));
+    saveDB(jsonDB, papersDir.concat([dbName]));
   }
 
   let bookChapters: {
@@ -482,8 +491,8 @@ async function genDB(
   let jsonDB: JsonDB = {};
   jsonDB[DB_META_KEY] = { idType: "meta", version: JENDELEY_VERSION };
   let exstingPdfs: string[] = [];
-  if (fs.existsSync(path.join(papersDir, dbName))) {
-    jsonDB = loadDB(path.join(papersDir, dbName), false);
+  if (fs.existsSync(concatDirs(papersDir.concat([dbName])))) {
+    jsonDB = loadDB(papersDir.concat([dbName]), false);
     for (const id of Object.keys(jsonDB)) {
       exstingPdfs.push(jsonDB[id][ENTRY_PATH]);
     }
@@ -618,16 +627,16 @@ async function genDB(
         commands +
         "mv " +
         '"' +
-        path.join(papersDir, nr) +
+        concatDirs(papersDir.concat(nr)) +
         '"' +
         ' "' +
-        path.join(papersDir, nr) +
+        concatDirs(papersDir.concat(nr)) +
         '"\n';
     }
     fs.writeFileSync(registerShellscript, commands);
   }
 
-  const dbPath = path.join(papersDir, dbName);
+  const dbPath = papersDir.concat([dbName]);
   saveDB(jsonDB, dbPath);
 }
 

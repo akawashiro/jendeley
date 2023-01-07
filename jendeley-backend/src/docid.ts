@@ -6,12 +6,13 @@ import { logger } from "./logger";
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
 import * as E from "fp-ts/lib/Either";
 import { ERROR_GET_DOCID_FROM_URL, ERROR_GET_DOC_ID } from "./error_messages";
+import { concatDirs } from "./path_util";
 
 type DocID =
   | { docIDType: "doi"; doi: string }
   | { docIDType: "isbn"; isbn: string }
   | { docIDType: "arxiv"; arxiv: string }
-  | { docIDType: "path"; path: string }
+  | { docIDType: "path"; path: [string] }
   | { docIDType: "url"; url: string };
 
 // This returns multiple DocIDs when it has multiple identifiers for example
@@ -132,12 +133,14 @@ function getDocIDFromUrl(url: string): E.Either<string, DocID> {
   return E.left(ERROR_GET_DOCID_FROM_URL);
 }
 
-function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
+function getDocIDManuallyWritten(pdf: [string]): E.Either<string, DocID> {
+  const filename = pdf[pdf.length - 1];
+
   const regexpDOI1 = new RegExp(
     "\\[\\s*jendeley\\s+doi\\s+(10_[0-9]{4}_[0-9]{4,}([_-][0-9()-]{6,})?)\\s*\\]",
     "g"
   );
-  const foundDOI1 = [...pdf.matchAll(regexpDOI1)];
+  const foundDOI1 = [...filename.matchAll(regexpDOI1)];
   for (const f of foundDOI1) {
     let d = f[1] as string;
     d =
@@ -154,7 +157,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     "\\[\\s*jendeley\\s+doi\\s+(10_[0-9]{4}_[A-Z]{1,3}[0-9]+[0-9X])\\s*\\]",
     "g"
   );
-  const foundDOI2 = [...pdf.matchAll(regexpDOI2)];
+  const foundDOI2 = [...filename.matchAll(regexpDOI2)];
   for (const f of foundDOI2) {
     let d = f[1] as string;
     d =
@@ -171,7 +174,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     "\\[\\s*jendeley\\s+doi\\s+(10_[0-9]{4}_[a-zA-z]+_[0-9]+_[0-9]+)\\s*\\]",
     "g"
   );
-  const foundDOI3 = [...pdf.matchAll(regexpDOI3)];
+  const foundDOI3 = [...filename.matchAll(regexpDOI3)];
   for (const f of foundDOI3) {
     let d = f[1] as string;
     d =
@@ -188,7 +191,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     "\\[\\s*jendeley\\s+doi\\s+(10_[0-9]{4}_[0-9X-]+_[0-9]{1,})\\s*\\]",
     "g"
   );
-  const foundDOI4 = [...pdf.matchAll(regexpDOI4)];
+  const foundDOI4 = [...filename.matchAll(regexpDOI4)];
   for (const f of foundDOI4) {
     let d = f[1] as string;
     d =
@@ -204,7 +207,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     "\\[\\s*jendeley\\s+doi\\s+(10_[0-9]{4}_[a-zA-z]+-[0-9]+-[0-9]+)\\s*\\]",
     "g"
   );
-  const foundDOI6 = [...pdf.matchAll(regexpDOI6)];
+  const foundDOI6 = [...filename.matchAll(regexpDOI6)];
   for (const f of foundDOI6) {
     let d = f[1] as string;
     d =
@@ -221,7 +224,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     "\\[\\s*jendeley\\s+doi\\s+(10_[0-9]{4}_978-[0-9-]+)\\s*\\]",
     "g"
   );
-  const foundDOI7 = [...pdf.matchAll(regexpDOI7)];
+  const foundDOI7 = [...filename.matchAll(regexpDOI7)];
   for (const f of foundDOI7) {
     let d = f[1] as string;
     d =
@@ -238,7 +241,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     "\\[\\s*jendeley\\s+arxiv\\s+([0-9]{4}_[0-9v]+)\\s*\\]",
     "g"
   );
-  const foundArxiv = [...pdf.matchAll(regexpArxiv)];
+  const foundArxiv = [...filename.matchAll(regexpArxiv)];
   for (const f of foundArxiv) {
     let d = f[1] as string;
     d = d.substring(0, 4) + "." + d.substring(5);
@@ -249,7 +252,7 @@ function getDocIDManuallyWritten(pdf: string): E.Either<string, DocID> {
     ".*\\[\\s*jendeley\\s+isbn\\s+([0-9]{10,})\\s*\\]",
     "g"
   );
-  const foundISBN = [...pdf.matchAll(regexpISBN)];
+  const foundISBN = [...filename.matchAll(regexpISBN)];
   for (const f of foundISBN) {
     let d = f[1] as string;
     return E.right({ docIDType: "isbn", isbn: d });
@@ -278,17 +281,17 @@ function removeSquareBrackets(str: string) {
 }
 
 async function getTitleFromPDF(
-  pdf: string,
-  papersDir: string
+  pdf: string[],
+  papersDir: string[]
 ): Promise<string | undefined> {
   const pdfExtract = new PDFExtract();
   const options: PDFExtractOptions = {}; /* see below */
   const data = await pdfExtract
-    .extract(path.join(papersDir, pdf), options)
+    .extract(concatDirs(papersDir.concat(pdf)), options)
     .catch(() => {
       logger.warn(
         "Failed to extract data using pdfExtract from " +
-          path.join(papersDir, pdf)
+          concatDirs(papersDir.concat(pdf))
       );
       return {};
     });
@@ -315,7 +318,9 @@ async function getTitleFromPDF(
     return title;
   }
 
-  const tile_from_path = removeSquareBrackets(path.basename(pdf, ".pdf"));
+  const tile_from_path = removeSquareBrackets(
+    path.basename(pdf[pdf.length - 1], ".pdf")
+  );
   logger.info("title_from_path = " + tile_from_path);
   if (tile_from_path != "") {
     return tile_from_path;
@@ -326,8 +331,8 @@ async function getTitleFromPDF(
 }
 
 async function getDocIDFromTitle(
-  pdf: string,
-  papersDir: string
+  pdf: string[],
+  papersDir: string[]
 ): Promise<E.Either<string, DocID>> {
   let titles: string[] = [];
   const titleFromPdf = await getTitleFromPDF(pdf, papersDir);
@@ -401,12 +406,12 @@ function sortDocIDs(docIDs: DocID[], num_pages: number): DocID[] {
 }
 
 async function getDocID(
-  pdf: string,
-  papersDir: string,
+  pdf: string[],
+  papersDir: string[],
   isBook: boolean,
   downloadUrl: string | undefined
 ): Promise<E.Either<string, DocID>> {
-  const pdfFullpath = path.join(papersDir, pdf);
+  const pdfFullpath = concatDirs(papersDir.concat(pdf));
 
   // Handle docIDs embedded in filenames.
   const manuallyWrittenDocID = getDocIDManuallyWritten(pdf);

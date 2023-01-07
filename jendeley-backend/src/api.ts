@@ -141,7 +141,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   } else if (entryInDB.idType == ID_TYPE_DOI) {
     const doiEntry: DoiEntry = entryInDB;
     const title: string = doiEntry.dataFromCrossref["title"];
-    const path: string = doiEntry.path;
+    const path: [string] = doiEntry.path;
     let authors: string[] = [];
     if (doiEntry.dataFromCrossref["author"] != undefined) {
       for (let i = 0; i < doiEntry.dataFromCrossref["author"].length; i++) {
@@ -438,7 +438,7 @@ async function addPdfFromUrl(
   tags.push(date_tag);
   const idEntryOrError = await registerNonBookPDF(
     path.dirname(dbPath),
-    filename,
+    [filename],
     jsonDB,
     req.title,
     req.comments,
