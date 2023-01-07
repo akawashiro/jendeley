@@ -38,7 +38,12 @@ async function main() {
         logger.fatal(JENDELEY_DIR + " cannot used as the name of DB.");
         process.exit(1);
       }
-      genDB(options._optionValues.papers_dir, book_dirs_str, db_name);
+      genDB(
+        options._optionValues.papers_dir,
+        book_dirs_str,
+        db_name,
+        options._optionValues.delete_unreachable_files
+      );
     });
 
   program

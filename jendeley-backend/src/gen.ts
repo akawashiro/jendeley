@@ -405,7 +405,12 @@ async function registerNonBookPDF(
   return E.right(jsonDB);
 }
 
-async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
+async function genDB(
+  papersDir: string,
+  bookDirsStr: string,
+  dbName: string,
+  deleteUnreachableFiles: boolean
+) {
   papersDir = path.resolve(papersDir);
   let bookDirs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
   for (let i = 0; i < bookDirs.length; i++) {
@@ -426,6 +431,36 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
       );
       process.exit(1);
     }
+  }
+
+  if (deleteUnreachableFiles) {
+    if (!fs.existsSync(path.join(papersDir, dbName))) {
+      logger.fatal(
+        "You use --delete_unreachable_files but " +
+          path.join(papersDir, dbName) +
+          " does not exist."
+      );
+      process.exit(1);
+    }
+
+    let jsonDB = loadDB(path.join(papersDir, dbName));
+    let deletedIDs: string[] = [];
+
+    for (const id of Object.keys(jsonDB)) {
+      const e = jsonDB[id];
+      if (e.idType != "url" && e.idType != "meta") {
+        const p = e.path;
+        if (!fs.existsSync(path.join(papersDir, p))) {
+          logger.warn(p + " does not exist. Delete entry " + id);
+          deletedIDs.push(id);
+        }
+      }
+    }
+    for (const id of deletedIDs) {
+      delete jsonDB[id];
+    }
+
+    saveDB(jsonDB, path.join(papersDir, dbName));
   }
 
   let bookChapters: {
