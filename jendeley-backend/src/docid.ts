@@ -12,7 +12,7 @@ type DocID =
   | { docIDType: "doi"; doi: string }
   | { docIDType: "isbn"; isbn: string }
   | { docIDType: "arxiv"; arxiv: string }
-  | { docIDType: "path"; path: [string] }
+  | { docIDType: "path"; path: string[] }
   | { docIDType: "url"; url: string };
 
 // This returns multiple DocIDs when it has multiple identifiers for example
@@ -133,7 +133,7 @@ function getDocIDFromUrl(url: string): E.Either<string, DocID> {
   return E.left(ERROR_GET_DOCID_FROM_URL);
 }
 
-function getDocIDManuallyWritten(pdf: [string]): E.Either<string, DocID> {
+function getDocIDManuallyWritten(pdf: string[]): E.Either<string, DocID> {
   const filename = pdf[pdf.length - 1];
 
   const regexpDOI1 = new RegExp(

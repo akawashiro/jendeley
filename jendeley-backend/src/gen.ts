@@ -69,8 +69,8 @@ function walkPDF(papersDir: string[]): string[][] {
   return r;
 }
 
-function getTitleFromPath(pdf: string): string {
-  const basename = path.basename(pdf, ".pdf");
+function getTitleFromPath(pdf: string[]): string {
+  const basename = path.basename(pdf[pdf.length - 1], ".pdf");
   let r = "";
   let level = 0;
   for (let i = 0; i < basename.length; i++) {
@@ -340,7 +340,7 @@ function registerWeb(
 
 async function registerNonBookPDF(
   papersDir: string[],
-  pdf: [string],
+  pdf: string[],
   jsonDB: JsonDB,
   userSpecifiedTitle: string | undefined,
   comments: string,
@@ -399,7 +399,7 @@ async function registerNonBookPDF(
 
   // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
   if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
-    let newFilename: [string] = json[ENTRY_PATH];
+    let newFilename: string[] = json[ENTRY_PATH];
     newFilename[newFilename.length - 1] =
       json[ENTRY_TITLE].replace(/[/\\?%*:|"<>.]/g, "") +
       " " +
@@ -485,12 +485,12 @@ async function genDB(
   let bookChapters: {
     [key: string]: {
       isbnEntry: [IsbnEntry, string] | undefined;
-      pdfs: string[];
+      pdfs: string[][];
     };
   } = {};
   let jsonDB: JsonDB = {};
   jsonDB[DB_META_KEY] = { idType: "meta", version: JENDELEY_VERSION };
-  let exstingPdfs: string[] = [];
+  let exstingPdfs: string[][] = [];
   if (fs.existsSync(concatDirs(papersDir.concat([dbName])))) {
     jsonDB = loadDB(papersDir.concat([dbName]), false);
     for (const id of Object.keys(jsonDB)) {
@@ -509,14 +509,21 @@ async function genDB(
     logger.info("Processing " + p);
     let isBook = false;
     for (const bd of bookDirs) {
-      if (bookChapters[bd] == undefined) {
-        bookChapters[bd] = { isbnEntry: undefined, pdfs: [] };
+      if (bookChapters[concatDirs(papersDir.concat(bd))] == undefined) {
+        bookChapters[concatDirs(papersDir.concat(bd))] = {
+          isbnEntry: undefined,
+          pdfs: [],
+        };
       }
 
-      if (p.startsWith(bd)) {
+      if (
+        concatDirs(papersDir.concat(p)).startsWith(
+          concatDirs(papersDir.concat(bd))
+        )
+      ) {
         isBook = true;
         const docID = await getDocID(p, papersDir, true, undefined);
-        bookChapters[bd].pdfs.push(p);
+        bookChapters[concatDirs(papersDir.concat(bd))].pdfs.push(p);
         if (E.isRight(docID)) {
           const i: DocID = E.toUnion(docID);
           const t = await getJson(i, p);
@@ -525,7 +532,10 @@ async function genDB(
             t[0][ENTRY_ID_TYPE] == ID_TYPE_ISBN &&
             i.docIDType == "isbn"
           ) {
-            bookChapters[bd].isbnEntry = [t[0], i.isbn];
+            bookChapters[concatDirs(papersDir.concat(bd))].isbnEntry = [
+              t[0],
+              i.isbn,
+            ];
           }
         }
       }
@@ -568,9 +578,9 @@ async function genDB(
         title =
           isbnEntry.dataFromNodeIsbn["title"] +
           "_" +
-          path.basename(pdf, ".pdf");
+          path.basename(pdf[pdf.length - 1], ".pdf");
       } else {
-        title = path.join(bookDir, path.basename(pdf, ".pdf"));
+        title = path.join(bookDir, path.basename(pdf[pdf.length - 1], ".pdf"));
       }
 
       // TODO: Should we use userSpecifiedTitle here? Otherwise, we can rewrite
@@ -583,12 +593,13 @@ async function genDB(
         userSpecifiedTitle: title,
         dataFromNodeIsbn: isbnEntry.dataFromNodeIsbn,
       };
-      const chapterID = "book_" + isbn + "_" + path.basename(pdf);
+      const chapterID =
+        "book_" + isbn + "_" + path.basename(pdf[pdf.length - 1]);
       jsonDB[chapterID] = bookEntry;
     }
   }
 
-  let registeredPdfs: string[] = [];
+  let registeredPdfs: string[][] = [];
   for (const id of Object.keys(jsonDB)) {
     registeredPdfs.push(jsonDB[id][ENTRY_PATH]);
   }

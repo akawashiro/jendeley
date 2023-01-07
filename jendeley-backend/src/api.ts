@@ -12,7 +12,6 @@ import {
   ID_TYPE_ISBN,
   ID_TYPE_BOOK,
   ID_TYPE_DOI,
-  ENTRY_TITLE,
   ENTRY_COMMENTS,
   ENTRY_TAGS,
   ID_TYPE_ARXIV,
@@ -40,6 +39,7 @@ import {
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
 import { loadDB, saveDB } from "./load_db";
+import { concatDirs } from "./path_util";
 
 function checkEntry(entry: ApiEntry) {
   if (entry.idType == "url") {
@@ -141,7 +141,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   } else if (entryInDB.idType == ID_TYPE_DOI) {
     const doiEntry: DoiEntry = entryInDB;
     const title: string = doiEntry.dataFromCrossref["title"];
-    const path: [string] = doiEntry.path;
+    const path: string[] = doiEntry.path;
     let authors: string[] = [];
     if (doiEntry.dataFromCrossref["author"] != undefined) {
       for (let i = 0; i < doiEntry.dataFromCrossref["author"].length; i++) {
@@ -260,7 +260,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   }
 }
 
-function updateEntry(request: Request, response: Response, dbPath: string) {
+function updateEntry(request: Request, response: Response, dbPath: string[]) {
   logger.info("Get a update_entry request url = " + request.url);
   const entry_o = request.body;
 
@@ -301,11 +301,13 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
   logger.info("Sent a response from update_entry");
 }
 
-function getPdf(request: Request, response: Response, dbPath: string) {
+function getPdf(request: Request, response: Response, dbPath: string[]) {
   logger.info("Get a get_pdf request", request.url);
   const params = url.parse(request.url, true).query;
   const pdfPath = unescape(base_64.decode(params.file as string));
-  const pdf = fs.readFileSync(path.join(path.dirname(dbPath), pdfPath));
+  const pdf = fs.readFileSync(
+    path.join(concatDirs(dbPath.slice(0, dbPath.length - 1)), pdfPath)
+  );
 
   response.writeHead(200, {
     "Content-Type": "application/pdf",
@@ -315,7 +317,7 @@ function getPdf(request: Request, response: Response, dbPath: string) {
   logger.info("Sent a response from get_pdf");
 }
 
-function getDB(request: Request, response: Response, dbPath: string) {
+function getDB(request: Request, response: Response, dbPath: string[]) {
   logger.info("Get a get_db request" + request.url);
   const jsonDB = loadDB(dbPath, false);
   let dbResponse: ApiDB = [];
@@ -344,7 +346,7 @@ async function getTitleFromUrl(url: string): Promise<string> {
 async function addWebFromUrl(
   httpRequest: Request,
   response: Response,
-  dbPath: string
+  dbPath: string[]
 ) {
   const req = httpRequest.body as RequestGetWebFromUrl;
   logger.info(
@@ -385,7 +387,7 @@ async function addWebFromUrl(
 async function addPdfFromUrl(
   httpRequest: Request,
   response: Response,
-  dbPath: string
+  dbPath: string[]
 ) {
   // TODO: Handle RequestGetPdfFromUrl.isbn/doi/comments/tags
   const req = httpRequest.body as RequestGetPdfFromUrl;
@@ -430,14 +432,17 @@ async function addPdfFromUrl(
     }
   };
 
-  await download(req.url, path.join(path.dirname(dbPath), filename));
+  await download(
+    req.url,
+    concatDirs(dbPath.slice(0, dbPath.length - 1).concat([filename]))
+  );
   const jsonDB = loadDB(dbPath, false);
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
   const idEntryOrError = await registerNonBookPDF(
-    path.dirname(dbPath),
+    dbPath.slice(0, dbPath.length - 1),
     [filename],
     jsonDB,
     req.title,
@@ -469,7 +474,7 @@ async function addPdfFromUrl(
   logger.info("Sent a response from add_pdf_from_url");
 }
 
-function deleteEntry(request: Request, response: Response, dbPath: string) {
+function deleteEntry(request: Request, response: Response, dbPath: string[]) {
   logger.info("Get a delete_entry request url = " + request.url);
   const entry_o = request.body;
 
@@ -481,9 +486,8 @@ function deleteEntry(request: Request, response: Response, dbPath: string) {
       jsonDB[entry.id][ENTRY_PATH] != undefined
     ) {
       logger.info("Delete " + jsonDB[entry.id]["path"]);
-      const old_filename = path.join(
-        path.dirname(dbPath),
-        jsonDB[entry.id]["path"]
+      const old_filename = concatDirs(
+        dbPath.slice(0, dbPath.length - 1).concat(jsonDB[entry.id]["path"])
       );
       const dir = path.dirname(old_filename);
       const new_filename = path.join(
