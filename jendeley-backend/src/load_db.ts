@@ -25,7 +25,7 @@ function saveDB(jsonDB: JsonDB, dbPath: string) {
   );
   fs.cpSync(dbPath, backup);
 
-  if (!validateJsonDB(jsonDB, undefined)) {
+  if (!validateJsonDB(jsonDB, dbPath)) {
     logger.fatal("validateJsonDB failed!");
     process.exit(1);
   }
@@ -35,7 +35,7 @@ function saveDB(jsonDB: JsonDB, dbPath: string) {
 function loadDB(dbPath: string): JsonDB {
   const jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
 
-  if (!validateJsonDB(jsonDB, undefined)) {
+  if (!validateJsonDB(jsonDB, dbPath)) {
     logger.fatal("validateJsonDB failed!");
     process.exit(1);
   }
