@@ -14,9 +14,10 @@ import {
   getPdf,
   updateEntry,
 } from "./api";
+import { concatDirs } from "./path_util";
 
-function startServer(dbPath: string, noBrowser: boolean, port: number) {
-  if (fs.existsSync(dbPath)) {
+function startServer(dbPath: string[], noBrowser: boolean, port: number) {
+  if (fs.existsSync(concatDirs(dbPath))) {
     const app = express();
 
     app.use(cors());

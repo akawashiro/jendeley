@@ -17,9 +17,10 @@ import {
 } from "./constants";
 import { JsonDB } from "./db_schema";
 import { logger } from "./logger";
+import { concatDirs } from "./path_util";
 
 // We should call this function whenever rewrite DB.
-function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
+function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
   let validDB = true;
 
   if (jsonDB[DB_META_KEY] == undefined) {
@@ -90,11 +91,38 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
       }
     } else {
       if (dbPath != undefined) {
-        const dbDir = path.dirname(dbPath);
-        const filepath = jsonDB[id][ENTRY_PATH];
-        if (!fs.existsSync(path.join(dbDir, filepath))) {
+        const dbDir = dbPath.slice(0, dbPath.length - 1);
+        const filepath: string[] = jsonDB[id][ENTRY_PATH];
+        if (!fs.existsSync(concatDirs(dbDir.concat(filepath)))) {
           logger.warn("File not exists: " + filepath + " id: " + id);
           validDB = false;
+        }
+
+        const forbidden_chars = [
+          "\\",
+          "/",
+          ":",
+          "*",
+          "?",
+          '"',
+          "<",
+          ">",
+          "|",
+          "\n",
+        ];
+        for (const fc of forbidden_chars) {
+          for (const d of filepath) {
+            if (d.indexOf(fc) > -1) {
+              logger.warn(
+                "filepath: " +
+                  filepath +
+                  " including forbidden char: '" +
+                  fc +
+                  "'. jendeley bans usage of these characters because of cross platform compatibility."
+              );
+              validDB = false;
+            }
+          }
         }
       } else {
         logger.debug("dbPath is undefined. Skip file existence check.");
@@ -180,7 +208,7 @@ function validateDB(dbPath: string) {
     return false;
   }
 
-  const r = validateJsonDB(jsonDB, dbPath);
+  const r = validateJsonDB(jsonDB, dbPath.split(path.sep));
   if (!r) {
     logger.warn(dbPath + " is not valid.");
     process.exit(1);

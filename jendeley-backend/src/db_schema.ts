@@ -1,6 +1,6 @@
 type ArxivEntry = {
   idType: "arxiv";
-  path: string;
+  path: string[];
   tags: string[];
   comments: string;
   userSpecifiedTitle: string | undefined;
@@ -9,7 +9,7 @@ type ArxivEntry = {
 
 type DoiEntry = {
   idType: "doi";
-  path: string;
+  path: string[];
   tags: string[];
   comments: string;
   userSpecifiedTitle: string | undefined;
@@ -18,7 +18,7 @@ type DoiEntry = {
 
 type BookEntry = {
   idType: "book";
-  path: string;
+  path: string[];
   tags: string[];
   comments: string;
   userSpecifiedTitle: string | undefined;
@@ -27,7 +27,7 @@ type BookEntry = {
 
 type IsbnEntry = {
   idType: "isbn";
-  path: string;
+  path: string[];
   tags: string[];
   comments: string;
   userSpecifiedTitle: string | undefined;
@@ -36,7 +36,7 @@ type IsbnEntry = {
 
 type PathEntry = {
   idType: "path";
-  path: string;
+  path: string[];
   title: string;
   tags: string[];
   userSpecifiedTitle: string | undefined;

@@ -105,7 +105,7 @@ function RegisterWebWithDialog(props: any) {
         <DialogContent>
           <Stack spacing={2}>
             <TextField
-              label="URL of PDF"
+              label="URL of webpage"
               variant="outlined"
               size="small"
               value={webUrl}
