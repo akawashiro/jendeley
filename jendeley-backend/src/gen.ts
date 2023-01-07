@@ -32,7 +32,7 @@ import {
   BookEntry,
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
-import { saveDB } from "./load_db";
+import { loadDB, saveDB } from "./load_db";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -416,13 +416,15 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
   }
 
   if (!fs.existsSync(papersDir)) {
-    logger.warn("papersDir:", papersDir + " is not exist.");
-    return;
+    logger.fatal("papersDir:", papersDir + " is not exist.");
+    process.exit(1);
   }
   for (const bd of bookDirs) {
     if (!fs.existsSync(path.join(papersDir, bd))) {
-      logger.warn("bd:", path.join(papersDir, bd) + " is not exist.");
-      return;
+      logger.fatal(
+        "book directory:" + path.join(papersDir, bd) + " is not exist."
+      );
+      process.exit(1);
     }
   }
 
@@ -436,9 +438,7 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
   jsonDB[DB_META_KEY] = { idType: "meta", version: JENDELEY_VERSION };
   let exstingPdfs: string[] = [];
   if (fs.existsSync(path.join(papersDir, dbName))) {
-    jsonDB = JSON.parse(
-      fs.readFileSync(path.join(papersDir, dbName)).toString()
-    );
+    jsonDB = loadDB(path.join(papersDir, dbName));
     for (const id of Object.keys(jsonDB)) {
       exstingPdfs.push(jsonDB[id][ENTRY_PATH]);
     }

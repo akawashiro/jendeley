@@ -21,6 +21,10 @@ async function main() {
       "--db_name <db_name>",
       "Name of DB. DB is created under <papers_dir>. By default, <papers_dir>/db.json."
     )
+    .option(
+      "--delete_unreachable_files",
+      "Delete entries corresponding to unreachable files."
+    )
     .action((cmd, options) => {
       const book_dirs_str =
         options._optionValues.book_dirs == undefined

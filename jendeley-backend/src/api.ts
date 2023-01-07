@@ -32,7 +32,7 @@ import http from "http";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import { ArxivEntry, DoiEntry, JsonDB, PathEntry, UrlEntry } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
-import { saveDB } from "./load_db";
+import { loadDB, saveDB } from "./load_db";
 
 function checkEntry(entry: ApiEntry) {
   if (entry.title == undefined || entry.path == undefined) {
@@ -249,7 +249,7 @@ function updateEntry(request: Request, response: Response, dbPath: string) {
     entry_o[ENTRY_COMMENTS] != undefined
   ) {
     const entry = entry_o as ApiEntry;
-    let jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+    let jsonDB = loadDB(dbPath);
     if (jsonDB[entry.id] != undefined) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
       jsonDB[entry.id][ENTRY_TAGS] = entry.tags;
@@ -293,9 +293,9 @@ function getPdf(request: Request, response: Response, dbPath: string) {
   logger.info("Sent a response from get_pdf");
 }
 
-function getDB(request: Request, response: Response, dbPathDB: string) {
+function getDB(request: Request, response: Response, dbPath: string) {
   logger.info("Get a get_db request" + request.url);
-  const jsonDB = JSON.parse(fs.readFileSync(dbPathDB).toString());
+  const jsonDB = loadDB(dbPath);
   let dbResponse: ApiDB = [];
 
   for (const id of Object.keys(jsonDB)) {
@@ -332,7 +332,7 @@ async function addWebFromUrl(
       JSON.stringify(req)
   );
 
-  const jsonDB: JsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+  const jsonDB = loadDB(dbPath);
   const title = req.title == "" ? await getTitleFromUrl(req.url) : req.title;
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
@@ -409,7 +409,7 @@ async function addPdfFromUrl(
   };
 
   await download(req.url, path.join(path.dirname(dbPath), filename));
-  const jsonDB: JsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+  const jsonDB = loadDB(dbPath);
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
@@ -451,7 +451,7 @@ function deleteEntry(request: Request, response: Response, dbPath: string) {
 
   if (entry_o["id"] != undefined) {
     const entry = entry_o as ApiEntry;
-    let jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
+    let jsonDB = loadDB(dbPath);
     if (
       jsonDB[entry.id] != undefined &&
       jsonDB[entry.id][ENTRY_PATH] != undefined
