@@ -23,7 +23,9 @@ function saveDB(jsonDB: JsonDB, dbPath: string) {
     jendeley_hidden_dir,
     "backup_" + String(Date.now()) + "_" + path.basename(dbPath)
   );
-  fs.cpSync(dbPath, backup);
+  if (fs.existsSync(dbPath)) {
+    fs.cpSync(dbPath, backup);
+  }
 
   if (!validateJsonDB(jsonDB, dbPath)) {
     logger.fatal("validateJsonDB failed!");

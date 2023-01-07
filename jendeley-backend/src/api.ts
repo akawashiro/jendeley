@@ -30,7 +30,14 @@ import {
 import https from "https";
 import http from "http";
 import { registerWeb, registerNonBookPDF } from "./gen";
-import { ArxivEntry, DoiEntry, JsonDB, PathEntry, UrlEntry } from "./db_schema";
+import {
+  ArxivEntry,
+  DBEntry,
+  DoiEntry,
+  JsonDB,
+  PathEntry,
+  UrlEntry,
+} from "./db_schema";
 import * as E from "fp-ts/lib/Either";
 import { loadDB, saveDB } from "./load_db";
 
@@ -414,7 +421,7 @@ async function addPdfFromUrl(
   const date_tag = date.toISOString().split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
-  const newDBOrError = await registerNonBookPDF(
+  const idEntryOrError = await registerNonBookPDF(
     path.dirname(dbPath),
     filename,
     jsonDB,
@@ -425,8 +432,10 @@ async function addPdfFromUrl(
     req.url
   );
 
-  if (E.isRight(newDBOrError)) {
-    saveDB(E.toUnion(newDBOrError), dbPath);
+  if (E.isRight(idEntryOrError)) {
+    const t: [string, DBEntry] = E.toUnion(idEntryOrError);
+    jsonDB[t[0]] = t[1];
+    saveDB(jsonDB, dbPath);
 
     const r: ApiResponse = {
       isSucceeded: true,
@@ -434,7 +443,7 @@ async function addPdfFromUrl(
     };
     response.status(200).json(r);
   } else {
-    const err: string = E.toUnion(newDBOrError);
+    const err: string = E.toUnion(idEntryOrError);
     const r: ApiResponse = {
       isSucceeded: false,
       message: err,

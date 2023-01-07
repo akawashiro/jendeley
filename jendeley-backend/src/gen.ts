@@ -30,6 +30,7 @@ import {
   PathEntry,
   UrlEntry,
   BookEntry,
+  DBEntry,
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
 import { loadDB, saveDB } from "./load_db";
@@ -327,7 +328,7 @@ async function registerNonBookPDF(
   tags: string[],
   renameUsingTitle: boolean,
   downloadUrl: string | undefined
-): Promise<E.Either<string, JsonDB>> {
+): Promise<E.Either<string, [string, DBEntry]>> {
   logger.info(
     "papersDir = " +
       papersDir +
@@ -338,6 +339,11 @@ async function registerNonBookPDF(
       " comments = " +
       comments
   );
+  if (!validateJsonDB(jsonDB, undefined)) {
+    logger.fatal("validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2));
+    process.exit(1);
+  }
+
   const docID = await getDocID(pdf, papersDir, false, downloadUrl);
 
   if (E.isLeft(docID)) {
@@ -349,8 +355,7 @@ async function registerNonBookPDF(
   const t = await getJson(E.toUnion(docID), pdf);
 
   if (t == undefined) {
-    logger.warn(pdf + " is not valid.");
-    return E.right(jsonDB);
+    return E.left(pdf + " is not valid.");
   }
 
   const json = t[0];
@@ -363,14 +368,14 @@ async function registerNonBookPDF(
   json[ENTRY_TAGS] = tags;
 
   if (jsonDB.hasOwnProperty(dbID)) {
-    logger.warn(
+    // TODO: Make shell script to delete duplicated files.
+    console.warn("mv ", '"' + pdf + '" duplicated');
+    return E.left(
       pdf +
         " is duplicated. You can find another file in " +
         jsonDB[dbID][ENTRY_PATH] +
         "."
     );
-    console.warn("mv ", '"' + pdf + '" duplicated');
-    return E.right(jsonDB);
   }
 
   // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
@@ -385,8 +390,7 @@ async function registerNonBookPDF(
     json[ENTRY_PATH] = newFilename;
 
     if (fs.existsSync(path.join(papersDir, newFilename))) {
-      logger.warn(newFilename + " already exists. Skip registration.");
-      return E.right(jsonDB);
+      return E.left(newFilename + " already exists. Skip registration.");
     }
     fs.renameSync(
       path.join(papersDir, oldFileneme),
@@ -395,14 +399,7 @@ async function registerNonBookPDF(
     logger.info("Rename " + oldFileneme + " to " + newFilename);
   }
 
-  jsonDB[dbID] = json;
-
-  if (!validateJsonDB(jsonDB, undefined)) {
-    logger.fatal("validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2));
-    process.exit(1);
-  }
-
-  return E.right(jsonDB);
+  return E.right([dbID, json]);
 }
 
 async function genDB(
@@ -513,7 +510,7 @@ async function genDB(
     }
 
     if (!isBook) {
-      const newDB = await registerNonBookPDF(
+      const idEntryOrError = await registerNonBookPDF(
         papersDir,
         p,
         jsonDB,
@@ -523,8 +520,9 @@ async function genDB(
         false,
         undefined
       );
-      if (E.isRight(newDB)) {
-        jsonDB = E.toUnion(newDB);
+      if (E.isRight(idEntryOrError)) {
+        const t: [string, DBEntry] = E.toUnion(idEntryOrError);
+        jsonDB[t[0]] = t[1];
       }
     }
   }
