@@ -10,3 +10,4 @@ check-version.sh
 test_pdfs/*
 .git/*
 jest.config.js
+.eslintrc

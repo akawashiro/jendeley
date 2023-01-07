@@ -128,21 +128,65 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
         logger.warn(url + " is not valid. id: " + id);
       }
     }
+
+    // Check jendeley got valid data from API.
+    const entry = jsonDB[id];
+    if (entry.idType == ID_TYPE_DOI) {
+      if (entry.dataFromCrossref["indexed"] == undefined) {
+        validDB = false;
+        logger.warn(
+          "Entry of id = " +
+            id +
+            " path = " +
+            entry.path +
+            " looks failed to get data from crossref. Please consider change filename to we can find manually written DocID."
+        );
+      }
+    } else if (entry.idType == ID_TYPE_ARXIV) {
+      if (entry.dataFromArxiv["id"] == undefined) {
+        validDB = false;
+        logger.warn(
+          "Entry of id = " +
+            id +
+            " path = " +
+            entry.path +
+            " looks failed to get data from arxiv. Please consider change filename to we can find manually written DocID."
+        );
+      }
+    } else if (entry.idType == ID_TYPE_BOOK || entry.idType == ID_TYPE_ISBN) {
+      if (entry.dataFromNodeIsbn["title"] == undefined) {
+        validDB = false;
+        logger.warn(
+          "Entry of id = " +
+            id +
+            " path = " +
+            entry.path +
+            " looks failed to get data from isbn. Please consider change filename to we can find manually written DocID."
+        );
+      }
+    }
   }
   return validDB;
 }
 
-function validateDB(dbPath: string): boolean {
+function validateDB(dbPath: string) {
+  logger.info("validateDB start");
+
   dbPath = path.resolve(dbPath);
   const jsonDB = JSON.parse(fs.readFileSync(dbPath).toString());
 
-  logger.info("validateDB");
   if (!fs.existsSync(dbPath)) {
     logger.warn(dbPath + "does not exists.");
     return false;
   }
 
-  return validateJsonDB(jsonDB, dbPath);
+  const r = validateJsonDB(jsonDB, dbPath);
+  if (!r) {
+    logger.warn(dbPath + " is not valid.");
+    process.exit(1);
+  } else {
+    logger.info(dbPath + " is valid.");
+  }
 }
 
 export { validateJsonDB, validateDB };

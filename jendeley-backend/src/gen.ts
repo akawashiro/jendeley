@@ -340,7 +340,7 @@ async function registerNonBookPDF(
       comments
   );
   if (!validateJsonDB(jsonDB, undefined)) {
-    logger.fatal("validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2));
+    logger.fatal("validateJsonDB failed in registerNonBookPDF");
     process.exit(1);
   }
 
@@ -440,7 +440,7 @@ async function genDB(
       process.exit(1);
     }
 
-    let jsonDB = loadDB(path.join(papersDir, dbName));
+    let jsonDB = loadDB(path.join(papersDir, dbName), true);
     let deletedIDs: string[] = [];
 
     for (const id of Object.keys(jsonDB)) {
@@ -470,7 +470,7 @@ async function genDB(
   jsonDB[DB_META_KEY] = { idType: "meta", version: JENDELEY_VERSION };
   let exstingPdfs: string[] = [];
   if (fs.existsSync(path.join(papersDir, dbName))) {
-    jsonDB = loadDB(path.join(papersDir, dbName));
+    jsonDB = loadDB(path.join(papersDir, dbName), false);
     for (const id of Object.keys(jsonDB)) {
       exstingPdfs.push(jsonDB[id][ENTRY_PATH]);
     }
@@ -530,9 +530,11 @@ async function genDB(
   for (const bookDir of Object.keys(bookChapters)) {
     let bookInfo = bookChapters[bookDir].isbnEntry;
     if (bookInfo == undefined) {
-      logger.warn(
-        "PDFs in " + bookDir + " are ignored. Because we cannot find no ISBN."
-      );
+      if (bookChapters[bookDir].pdfs.length > 0) {
+        logger.warn(
+          "PDFs in " + bookDir + " are ignored. Because we cannot find no ISBN."
+        );
+      }
       continue;
     }
     const isbnEntry: IsbnEntry = bookInfo[0];
