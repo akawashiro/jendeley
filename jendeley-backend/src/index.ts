@@ -4,7 +4,8 @@ import { Command } from "commander";
 import { startServer } from "./server";
 import { genDB, genDummyDB } from "./gen";
 import { validateDB } from "./validate_db";
-import { JENDELEY_VERSION } from "./constants";
+import { JENDELEY_DIR, JENDELEY_VERSION } from "./constants";
+import { logger } from "./logger";
 
 async function main() {
   const program = new Command();
@@ -20,6 +21,10 @@ async function main() {
       "--db_name <db_name>",
       "Name of DB. DB is created under <papers_dir>. By default, <papers_dir>/db.json."
     )
+    .option(
+      "--delete_unreachable_files",
+      "Delete entries corresponding to unreachable files."
+    )
     .action((cmd, options) => {
       const book_dirs_str =
         options._optionValues.book_dirs == undefined
@@ -29,7 +34,16 @@ async function main() {
         options._optionValues.db_name == undefined
           ? "jendeley_db.json"
           : options._optionValues.db_name;
-      genDB(options._optionValues.papers_dir, book_dirs_str, db_name);
+      if (db_name == JENDELEY_DIR) {
+        logger.fatal(JENDELEY_DIR + " cannot used as the name of DB.");
+        process.exit(1);
+      }
+      genDB(
+        options._optionValues.papers_dir,
+        book_dirs_str,
+        db_name,
+        options._optionValues.delete_unreachable_files
+      );
     });
 
   program

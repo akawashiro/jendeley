@@ -57,15 +57,16 @@ type DBMetaData = {
   version: string;
 };
 
+type DBEntry =
+  | ArxivEntry
+  | DoiEntry
+  | IsbnEntry
+  | PathEntry
+  | UrlEntry
+  | BookEntry;
+
 type JsonDB = {
-  [key: string]:
-    | ArxivEntry
-    | DoiEntry
-    | IsbnEntry
-    | PathEntry
-    | UrlEntry
-    | BookEntry
-    | DBMetaData;
+  [key: string]: DBEntry | DBMetaData;
 };
 
 export type {
@@ -76,5 +77,6 @@ export type {
   UrlEntry,
   BookEntry,
   JsonDB,
+  DBEntry,
 };
 export {};

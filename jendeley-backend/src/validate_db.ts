@@ -92,7 +92,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string | undefined): boolean {
       if (dbPath != undefined) {
         const dbDir = path.dirname(dbPath);
         const filepath = jsonDB[id][ENTRY_PATH];
-        if (!path.join(dbDir, filepath)) {
+        if (!fs.existsSync(path.join(dbDir, filepath))) {
           logger.warn("File not exists: " + filepath + " id: " + id);
           validDB = false;
         }

@@ -15,11 +15,8 @@ import {
   ENTRY_TITLE,
   ENTRY_COMMENTS,
   ENTRY_TAGS,
-  ENTRY_URL,
   ID_TYPE_URL,
-  ID_TYPE_BOOK,
   ARXIV_API_URL,
-  ENTRY_DATA_FROM_ARXIV,
   JENDELEY_VERSION,
   DB_META_KEY,
 } from "./constants";
@@ -33,8 +30,10 @@ import {
   PathEntry,
   UrlEntry,
   BookEntry,
+  DBEntry,
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
+import { loadDB, saveDB } from "./load_db";
 
 function walkPDFDFS(dir: string): string[] {
   if (!fs.existsSync(dir)) {
@@ -278,10 +277,7 @@ function genDummyDB(output: string) {
     jsonDB[id] = e;
   }
 
-  if (!validateJsonDB(jsonDB, undefined)) {
-    throw new Error("validateJsonDB failed!");
-  }
-  fs.writeFileSync(output, JSON.stringify(jsonDB, null, 2));
+  saveDB(jsonDB, output);
 }
 
 function registerWeb(
@@ -317,10 +313,6 @@ function registerWeb(
     jsonDB["url_" + url] = json;
     logger.info("Register url_" + url);
 
-    if (!validateJsonDB(jsonDB, undefined)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
     return E.right(jsonDB);
   } else {
     return E.left("Failed to register url_" + url);
@@ -336,7 +328,7 @@ async function registerNonBookPDF(
   tags: string[],
   renameUsingTitle: boolean,
   downloadUrl: string | undefined
-): Promise<E.Either<string, JsonDB>> {
+): Promise<E.Either<string, [string, DBEntry]>> {
   logger.info(
     "papersDir = " +
       papersDir +
@@ -347,6 +339,11 @@ async function registerNonBookPDF(
       " comments = " +
       comments
   );
+  if (!validateJsonDB(jsonDB, undefined)) {
+    logger.fatal("validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2));
+    process.exit(1);
+  }
+
   const docID = await getDocID(pdf, papersDir, false, downloadUrl);
 
   if (E.isLeft(docID)) {
@@ -358,8 +355,7 @@ async function registerNonBookPDF(
   const t = await getJson(E.toUnion(docID), pdf);
 
   if (t == undefined) {
-    logger.warn(pdf + " is not valid.");
-    return E.right(jsonDB);
+    return E.left(pdf + " is not valid.");
   }
 
   const json = t[0];
@@ -372,14 +368,14 @@ async function registerNonBookPDF(
   json[ENTRY_TAGS] = tags;
 
   if (jsonDB.hasOwnProperty(dbID)) {
-    logger.warn(
+    // TODO: Make shell script to delete duplicated files.
+    console.warn("mv ", '"' + pdf + '" duplicated');
+    return E.left(
       pdf +
         " is duplicated. You can find another file in " +
         jsonDB[dbID][ENTRY_PATH] +
         "."
     );
-    console.warn("mv ", '"' + pdf + '" duplicated');
-    return E.right(jsonDB);
   }
 
   // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
@@ -394,8 +390,7 @@ async function registerNonBookPDF(
     json[ENTRY_PATH] = newFilename;
 
     if (fs.existsSync(path.join(papersDir, newFilename))) {
-      logger.warn(newFilename + " already exists. Skip registration.");
-      return E.right(jsonDB);
+      return E.left(newFilename + " already exists. Skip registration.");
     }
     fs.renameSync(
       path.join(papersDir, oldFileneme),
@@ -404,18 +399,15 @@ async function registerNonBookPDF(
     logger.info("Rename " + oldFileneme + " to " + newFilename);
   }
 
-  jsonDB[dbID] = json;
-
-  if (!validateJsonDB(jsonDB, undefined)) {
-    throw new Error(
-      "validateJsonDB failed!\n" + JSON.stringify(jsonDB, null, 2)
-    );
-  }
-
-  return E.right(jsonDB);
+  return E.right([dbID, json]);
 }
 
-async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
+async function genDB(
+  papersDir: string,
+  bookDirsStr: string,
+  dbName: string,
+  deleteUnreachableFiles: boolean
+) {
   papersDir = path.resolve(papersDir);
   let bookDirs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
   for (let i = 0; i < bookDirs.length; i++) {
@@ -426,14 +418,46 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
   }
 
   if (!fs.existsSync(papersDir)) {
-    logger.warn("papersDir:", papersDir + " is not exist.");
-    return;
+    logger.fatal("papersDir:", papersDir + " is not exist.");
+    process.exit(1);
   }
   for (const bd of bookDirs) {
     if (!fs.existsSync(path.join(papersDir, bd))) {
-      logger.warn("bd:", path.join(papersDir, bd) + " is not exist.");
-      return;
+      logger.fatal(
+        "book directory:" + path.join(papersDir, bd) + " is not exist."
+      );
+      process.exit(1);
     }
+  }
+
+  if (deleteUnreachableFiles) {
+    if (!fs.existsSync(path.join(papersDir, dbName))) {
+      logger.fatal(
+        "You use --delete_unreachable_files but " +
+          path.join(papersDir, dbName) +
+          " does not exist."
+      );
+      process.exit(1);
+    }
+
+    let jsonDB = loadDB(path.join(papersDir, dbName));
+    let deletedIDs: string[] = [];
+
+    for (const id of Object.keys(jsonDB)) {
+      const e = jsonDB[id];
+      if (e.idType != "url" && e.idType != "meta") {
+        const p = e.path;
+        if (!fs.existsSync(path.join(papersDir, p))) {
+          logger.warn(p + " does not exist. Delete entry " + id);
+          deletedIDs.push(id);
+        }
+      }
+    }
+    for (const id of deletedIDs) {
+      delete jsonDB[id];
+    }
+
+    saveDB(jsonDB, path.join(papersDir, dbName));
   }
 
   let bookChapters: {
@@ -446,9 +470,7 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
   jsonDB[DB_META_KEY] = { idType: "meta", version: JENDELEY_VERSION };
   let exstingPdfs: string[] = [];
   if (fs.existsSync(path.join(papersDir, dbName))) {
-    jsonDB = JSON.parse(
-      fs.readFileSync(path.join(papersDir, dbName)).toString()
-    );
+    jsonDB = loadDB(path.join(papersDir, dbName));
     for (const id of Object.keys(jsonDB)) {
       exstingPdfs.push(jsonDB[id][ENTRY_PATH]);
     }
@@ -488,7 +510,7 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     }
 
     if (!isBook) {
-      const newDB = await registerNonBookPDF(
+      const idEntryOrError = await registerNonBookPDF(
         papersDir,
         p,
         jsonDB,
@@ -498,8 +520,9 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
         false,
         undefined
       );
-      if (E.isRight(newDB)) {
-        jsonDB = E.toUnion(newDB);
+      if (E.isRight(idEntryOrError)) {
+        const t: [string, DBEntry] = E.toUnion(idEntryOrError);
+        jsonDB[t[0]] = t[1];
       }
     }
   }
@@ -589,17 +612,8 @@ async function genDB(papersDir: string, bookDirsStr: string, dbName: string) {
     fs.writeFileSync(registerShellscript, commands);
   }
 
-  try {
-    const dbPath = path.join(papersDir, dbName);
-
-    if (!validateJsonDB(jsonDB, dbPath)) {
-      throw new Error("validateJsonDB failed!");
-    }
-
-    fs.writeFileSync(dbPath, JSON.stringify(jsonDB, null, 2));
-  } catch (err) {
-    logger.warn(err);
-  }
+  const dbPath = path.join(papersDir, dbName);
+  saveDB(jsonDB, dbPath);
 }
 
 export {
