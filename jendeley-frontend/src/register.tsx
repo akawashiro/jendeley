@@ -310,7 +310,7 @@ function RegisterPDFWithDialog(props: any) {
         <DialogActions>
           <Button
             variant="contained"
-            disabled={isRegisterable}
+            disabled={!isRegisterable}
             onClick={handleRegister}
           >
             Register
