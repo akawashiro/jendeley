@@ -20,7 +20,7 @@ import { SnackbarProvider } from "notistack";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
-function authorChips(authors: string[]) {
+function AuthorChips(authors: string[]) {
   // TODO padding or margine
   return (
     <Box>
@@ -42,7 +42,7 @@ function authorChips(authors: string[]) {
   );
 }
 
-function tagChips(tags: string[]) {
+function TagChips(tags: string[]) {
   if (tags.length === 0) {
     return <EditIcon sx={{ color: grey[300] }} />;
   } else {
@@ -67,19 +67,19 @@ function tagChips(tags: string[]) {
   }
 }
 
-function commentsDiv(comments: string) {
+function CommentsDiv(comments: string) {
   if (comments === "") {
     return <EditIcon sx={{ color: grey[300] }} />;
   } else {
     return (
       <Box>
-        <p>{`${comments}`}</p>
+        `<p>{comments}</p>`
       </Box>
     );
   }
 }
 
-function abstractHTML(abstract: string) {
+function AbstractHTML(abstract: string) {
   const shortendAbstract =
     abstract.length > 200
       ? abstract.replaceAll("<jats:", "<").substring(0, 200) + "..."
@@ -174,14 +174,14 @@ function App() {
       },
       {
         accessorKey: "authors",
-        Cell: ({ cell }) => authorChips(cell.getValue<string[]>()),
+        Cell: ({ cell }) => AuthorChips(cell.getValue<string[]>()),
         header: "authors",
         enableEditing: false,
         filterFn: stringArrayFilterFn,
       },
       {
         accessorKey: "tags",
-        Cell: ({ cell }) => tagChips(cell.getValue<string[]>()),
+        Cell: ({ cell }) => TagChips(cell.getValue<string[]>()),
         header: "tags",
         filterFn: stringArrayFilterFn,
         enableEditing: true,
@@ -190,7 +190,7 @@ function App() {
       {
         accessorKey: "comments",
         header: "comments",
-        Cell: ({ cell }) => commentsDiv(cell.getValue<string>()),
+        Cell: ({ cell }) => CommentsDiv(cell.getValue<string>()),
         filterFn: "includesString",
         enableEditing: true,
         size: 200,
@@ -210,7 +210,7 @@ function App() {
       },
       {
         accessorKey: "abstract",
-        Cell: ({ cell }) => abstractHTML(cell.getValue<string>()),
+        Cell: ({ cell }) => AbstractHTML(cell.getValue<string>()),
         header: "abstract",
         filterFn: "includesString",
         enableEditing: false,
