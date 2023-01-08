@@ -136,7 +136,7 @@ function App() {
     console.log("Fetching from DB in loading");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => setTableData(() => json));
+      .then((json) => setTableData(json));
   }, []);
 
   const columns = useMemo<MRT_ColumnDef<ApiEntry>[]>(
