@@ -62,7 +62,6 @@ function RegisterWebWithDialog(props: any) {
   };
 
   const handleClose = () => {
-    setIsRegisterable(false);
     setWebUrl("");
     setTitle("");
     setTags("");
@@ -122,7 +121,7 @@ function RegisterWebWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="Title"
+              label="Title (Get from webpage when empty)"
               variant="outlined"
               size="small"
               value={title}
@@ -130,7 +129,7 @@ function RegisterWebWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="tags"
+              label="Tags"
               variant="outlined"
               size="small"
               value={tags}
@@ -138,7 +137,7 @@ function RegisterWebWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="comments"
+              label="Comments"
               variant="outlined"
               size="small"
               value={comments}
@@ -166,11 +165,21 @@ function RegisterWebWithDialog(props: any) {
   );
 }
 
+function isValidFilename(filename: string) {
+  const forbidden_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "\n"];
+  for (const fc of forbidden_chars) {
+    if (filename.indexOf(fc) > -1) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function RegisterPDFWithDialog(props: any) {
   const [pdfUrl, setPdfUrl] = React.useState("");
   const [doi, setDoi] = React.useState("");
   const [isbn, setIsbn] = React.useState("");
-  const [title, setTitle] = React.useState("");
+  const [filename, setFilename] = React.useState("");
   const [tags, setTags] = React.useState("");
   const [comments, setComments] = React.useState("");
   const [isRegisterable, setIsRegisterable] = React.useState(false);
@@ -181,11 +190,17 @@ function RegisterPDFWithDialog(props: any) {
   ) => {
     const url: string = event.target.value;
     setPdfUrl(url);
-    setIsRegisterable(isValidUrl(url));
+    // TODO: This `isValidFilename(filename)` does not works correctly because
+    // filename is updated synchronously.
+    setIsRegisterable(isValidUrl(url) && isValidFilename(filename));
   };
 
-  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
+  const handleFilenameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const f = event.target.value;
+    setFilename(f);
+    // TODO: This `isValidUrl(pdfUrl)` does not works correctly because
+    // filename is updated synchronously.
+    setIsRegisterable(isValidUrl(pdfUrl) && isValidFilename(f));
   };
 
   const handleDoiChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,7 +235,7 @@ function RegisterPDFWithDialog(props: any) {
   const handleClose = () => {
     setIsRegisterable(false);
     setPdfUrl("");
-    setTitle("");
+    setFilename("");
     setTags("");
     setComments("");
     setIsRegisterable(false);
@@ -231,7 +246,7 @@ function RegisterPDFWithDialog(props: any) {
     console.log("Register PDF.");
     const r: RequestGetPdfFromUrl = {
       url: pdfUrl,
-      title: title === "" ? undefined : title,
+      filename: filename === "" ? undefined : filename,
       isbn: isbn === "" ? undefined : isbn,
       doi: doi === "" ? undefined : doi,
       tags: splitTagsStr(tags),
@@ -280,15 +295,15 @@ function RegisterPDFWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="Title"
+              label="Filename"
               variant="outlined"
               size="small"
-              value={title}
-              onChange={handleTitleChange}
+              value={filename}
+              onChange={handleFilenameChange}
               sx={{ width: 500 }}
             />
             <TextField
-              label="tags"
+              label="Tags"
               variant="outlined"
               size="small"
               value={tags}
@@ -296,7 +311,7 @@ function RegisterPDFWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="comments"
+              label="Comments"
               variant="outlined"
               size="small"
               value={comments}
