@@ -427,7 +427,7 @@ async function registerNonBookPDF(
   if (renameUsingTitle && json.idType != "path") {
     let newFilename: string[] = JSON.parse(JSON.stringify(json.path));
     newFilename[newFilename.length - 1] =
-      getTitleFromJson(json).replace(/[/\\?%*:|"<>.]/g, "") +
+      getTitleFromJson(json).replace(/[\\/?%*:|"<>.\n]/g, "") +
       " " +
       pdf[pdf.length - 1];
     const oldFilename = pdf;
