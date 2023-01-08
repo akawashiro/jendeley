@@ -20,38 +20,41 @@ import { useSnackbar } from "notistack";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
+function isValidUrl(urlString: string) {
+  try {
+    return Boolean(new URL(urlString));
+  } catch (e) {
+    return false;
+  }
+}
+
 function RegisterWebWithDialog(props: any) {
   const [webUrl, setWebUrl] = React.useState("");
   const [title, setTitle] = React.useState("");
   const [tags, setTags] = React.useState("");
   const [comments, setComments] = React.useState("");
-  const [isRegisterable, setIsRegisterable] = React.useState(true);
+  const [isRegisterable, setIsRegisterable] = React.useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-  const handlePdfUrlFieldChange = (event: any) => {
-    setWebUrl(event.target.value);
-    setIsRegisterable(isValidUrl(webUrl));
+  const handleWebUrlFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const url: string = event.target.value;
+    setWebUrl(url);
+    setIsRegisterable(isValidUrl(url));
   };
 
-  const handleTitleChange = (event: any) => {
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
   };
 
-  const handleTagsChange = (event: any) => {
+  const handleTagsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTags(event.target.value);
   };
 
-  const handleCommentsChange = (event: any) => {
+  const handleCommentsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setComments(event.target.value);
   };
-
-  function isValidUrl(urlString: string) {
-    try {
-      return Boolean(new URL(urlString));
-    } catch (e) {
-      return false;
-    }
-  }
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -59,6 +62,12 @@ function RegisterWebWithDialog(props: any) {
   };
 
   const handleClose = () => {
+    setIsRegisterable(false);
+    setWebUrl("");
+    setTitle("");
+    setTags("");
+    setComments("");
+    setIsRegisterable(false);
     setOpen(false);
   };
 
@@ -109,7 +118,7 @@ function RegisterWebWithDialog(props: any) {
               variant="outlined"
               size="small"
               value={webUrl}
-              onChange={handlePdfUrlFieldChange}
+              onChange={handleWebUrlFieldChange}
               sx={{ width: 500 }}
             />
             <TextField
@@ -143,7 +152,7 @@ function RegisterWebWithDialog(props: any) {
         <DialogActions>
           <Button
             variant="contained"
-            disabled={isRegisterable}
+            disabled={!isRegisterable}
             onClick={handleRegister}
           >
             Register
@@ -164,31 +173,34 @@ function RegisterPDFWithDialog(props: any) {
   const [title, setTitle] = React.useState("");
   const [tags, setTags] = React.useState("");
   const [comments, setComments] = React.useState("");
-  const [isRegisterable, setIsRegisterable] = React.useState(true);
+  const [isRegisterable, setIsRegisterable] = React.useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-  const handlePdfUrlFieldChange = (event: any) => {
-    setPdfUrl(event.target.value);
-    setIsRegisterable(isValidUrl(pdfUrl));
+  const handlePdfUrlFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const url: string = event.target.value;
+    setPdfUrl(url);
+    setIsRegisterable(isValidUrl(url));
   };
 
-  const handleTitleChange = (event: any) => {
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
   };
 
-  const handleDoiChange = (event: any) => {
+  const handleDoiChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDoi(event.target.value);
   };
 
-  const handleIsbnChange = (event: any) => {
+  const handleIsbnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsbn(event.target.value);
   };
 
-  const handleTagsChange = (event: any) => {
+  const handleTagsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTags(event.target.value);
   };
 
-  const handleCommentsChange = (event: any) => {
+  const handleCommentsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setComments(event.target.value);
   };
 
@@ -206,6 +218,12 @@ function RegisterPDFWithDialog(props: any) {
   };
 
   const handleClose = () => {
+    setIsRegisterable(false);
+    setPdfUrl("");
+    setTitle("");
+    setTags("");
+    setComments("");
+    setIsRegisterable(false);
     setOpen(false);
   };
 
@@ -292,7 +310,7 @@ function RegisterPDFWithDialog(props: any) {
         <DialogActions>
           <Button
             variant="contained"
-            disabled={isRegisterable}
+            disabled={!isRegisterable}
             onClick={handleRegister}
           >
             Register
@@ -304,84 +322,6 @@ function RegisterPDFWithDialog(props: any) {
       </Dialog>
     </Box>
   );
-
-  // TODO: Enable after implementation
-  // return (
-  //   <Box>
-  //     <Button variant="contained" onClick={handleClickOpen}>
-  //       Register PDF
-  //     </Button>
-  //     <Dialog open={open} onClose={handleClose}>
-  //       <DialogTitle>Register PDF</DialogTitle>
-  //       <DialogContent>
-  //         <Stack spacing={2}>
-  //           <TextField
-  //             label="URL of PDF"
-  //             variant="outlined"
-  //             size="small"
-  //             value={pdfUrl}
-  //             onChange={handlePdfUrlFieldChange}
-  //             sx={{ width: 500 }}
-  //           />
-  //           <TextField
-  //             label="Title"
-  //             variant="outlined"
-  //             size="small"
-  //             value={title}
-  //             onChange={handleTitleChange}
-  //             sx={{ width: 500 }}
-  //           />
-  //           <TextField
-  //             label="Digital Object Identifier"
-  //             variant="outlined"
-  //             size="small"
-  //             value={doi}
-  //             onChange={handleDoiChange}
-  //             sx={{ width: 500 }}
-  //           />
-  //           <TextField
-  //             label="ISBN"
-  //             variant="outlined"
-  //             size="small"
-  //             value={isbn}
-  //             onChange={handleIsbnChange}
-  //             sx={{ width: 500 }}
-  //           />
-  //           <TextField
-  //             label="tags"
-  //             variant="outlined"
-  //             size="small"
-  //             value={tags}
-  //             onChange={handleTagsChange}
-  //             sx={{ width: 500 }}
-  //           />
-  //           <TextField
-  //             label="comments"
-  //             variant="outlined"
-  //             size="small"
-  //             value={comments}
-  //             onChange={handleCommentsChange}
-  //             sx={{ width: 500 }}
-  //             multiline={true}
-  //             rows={5}
-  //           />
-  //         </Stack>
-  //       </DialogContent>
-  //       <DialogActions>
-  //         <Button
-  //           variant="contained"
-  //           disabled={isRegisterable}
-  //           onClick={handleRegister}
-  //         >
-  //           Register
-  //         </Button>
-  //         <Button variant="contained" onClick={handleClose}>
-  //           Close
-  //         </Button>
-  //       </DialogActions>
-  //     </Dialog>
-  //   </Box>
-  // );
 }
 
 export { RegisterWebWithDialog, RegisterPDFWithDialog };
