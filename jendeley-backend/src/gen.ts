@@ -34,7 +34,26 @@ import {
 } from "./db_schema";
 import * as E from "fp-ts/lib/Either";
 import { loadDB, saveDB } from "./load_db";
-import { concatDirs } from "./path_util";
+import {
+  concatDirs,
+  isChild,
+  isEqualDirs,
+  pathStrToDirs,
+  showDirs,
+} from "./path_util";
+
+function getRegisterdFiles(jsonDB: JsonDB) {
+  let registeredFiles: string[][] = [];
+  for (const id of Object.keys(jsonDB)) {
+    const e = jsonDB[id];
+    if (e.idType == "url" || e.idType == "meta") {
+      continue;
+    } else {
+      registeredFiles.push(e.path);
+    }
+  }
+  return registeredFiles;
+}
 
 function walkPDFDFS(dir: string[]): string[][] {
   if (!fs.existsSync(concatDirs(dir))) {
@@ -64,7 +83,12 @@ function walkPDF(papersDir: string[]): string[][] {
   for (const pd of pdfs) {
     const pf = concatDirs(papersDir);
     const pdf = concatDirs(pd);
-    r.push(pdf.replace(pf, "").split(path.sep));
+    r.push(
+      pdf
+        .replace(pf, "")
+        .split(path.sep)
+        .filter((p) => p != "")
+    );
   }
   return r;
 }
@@ -426,14 +450,22 @@ async function genDB(
   dbName: string,
   deleteUnreachableFiles: boolean
 ) {
-  const papersDir = path.resolve(papersDirUserArg).split(path.sep);
+  const papersDir = pathStrToDirs(path.resolve(papersDirUserArg));
+  logger.info(
+    "papersDirUserArg = " +
+      papersDirUserArg +
+      " path.resolve(papersDirUserArg) = " +
+      path.resolve(papersDirUserArg) +
+      " papersDir = " +
+      showDirs(papersDir)
+  );
   let bookDirStrs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
   let bookDirs: string[][] = [];
   for (let i = 0; i < bookDirStrs.length; i++) {
     const pf = path.resolve(papersDirUserArg);
     const bf = path.resolve(bookDirStrs[i]);
     if (bf.startsWith(pf)) {
-      bookDirs[i] = bf.replace(pf, "").split(path.sep);
+      bookDirs[i] = pathStrToDirs(bf.replace(pf, ""));
     } else {
       logger.fatal("Book directory " + bf + " is not in papers directory" + pf);
     }
@@ -493,20 +525,24 @@ async function genDB(
   let exstingPdfs: string[][] = [];
   if (fs.existsSync(concatDirs(papersDir.concat([dbName])))) {
     jsonDB = loadDB(papersDir.concat([dbName]), false);
-    for (const id of Object.keys(jsonDB)) {
-      exstingPdfs.push(jsonDB[id][ENTRY_PATH]);
-    }
+    exstingPdfs = getRegisterdFiles(jsonDB);
   }
 
   let pdfs = walkPDF(papersDir);
   pdfs.sort();
   pdfs = pdfs.filter((p) => !p.includes(JENDELEY_NO_TRACK));
   for (const p of pdfs) {
-    if (exstingPdfs.includes(p)) {
+    let existsInDB = false;
+    for (const e of exstingPdfs) {
+      if (isEqualDirs(e, p)) {
+        existsInDB = true;
+      }
+    }
+    if (existsInDB) {
       continue;
     }
 
-    logger.info("Processing " + p);
+    logger.info("Processing " + showDirs(p));
     let isBook = false;
     for (const bd of bookDirs) {
       if (bookChapters[concatDirs(papersDir.concat(bd))] == undefined) {
@@ -516,11 +552,7 @@ async function genDB(
         };
       }
 
-      if (
-        concatDirs(papersDir.concat(p)).startsWith(
-          concatDirs(papersDir.concat(bd))
-        )
-      ) {
+      if (isChild(papersDir.concat(p), papersDir.concat(bd))) {
         isBook = true;
         const docID = await getDocID(p, papersDir, true, undefined);
         bookChapters[concatDirs(papersDir.concat(bd))].pdfs.push(p);
@@ -599,12 +631,20 @@ async function genDB(
     }
   }
 
-  let registeredPdfs: string[][] = [];
-  for (const id of Object.keys(jsonDB)) {
-    registeredPdfs.push(jsonDB[id][ENTRY_PATH]);
-  }
+  let registeredPdfs: string[][] = getRegisterdFiles(jsonDB);
 
-  const notRegisterdPdfs = pdfs.filter((x) => !registeredPdfs.includes(x));
+  let notRegisterdPdfs: string[][] = [];
+  for (const p of pdfs) {
+    let registered = false;
+    for (const r of registeredPdfs) {
+      if (isEqualDirs(p, r)) {
+        registered = true;
+      }
+    }
+    if (!registered) {
+      notRegisterdPdfs.push(p);
+    }
+  }
 
   if (notRegisterdPdfs.length > 0) {
     logger.warn(
