@@ -6,6 +6,8 @@ import { genDB, genDummyDB } from "./gen";
 import { validateDB } from "./validate_db";
 import { JENDELEY_DIR, JENDELEY_VERSION } from "./constants";
 import { logger } from "./logger";
+import { pathStrToDirs } from "./path_util";
+import path from "path";
 
 async function main() {
   const program = new Command();
@@ -63,7 +65,7 @@ async function main() {
     .action((cmd, options) => {
       const port_n = parseInt(options._optionValues.port, 10);
       startServer(
-        options._optionValues.db,
+        pathStrToDirs(path.resolve(options._optionValues.db)),
         options._optionValues.no_browser,
         port_n
       );
