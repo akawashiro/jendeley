@@ -70,9 +70,9 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
     if (typeof jsonDB[id][ENTRY_COMMENTS] != "string") {
       logger.warn(
         "Invalid comments in id:" +
-          id +
-          " comments: " +
-          jsonDB[id][ENTRY_COMMENTS]
+        id +
+        " comments: " +
+        jsonDB[id][ENTRY_COMMENTS]
       );
       validDB = false;
     }
@@ -82,10 +82,10 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
       if (ENTRY_PATH in jsonDB[id]) {
         logger.warn(
           ENTRY_PATH +
-            " should not exists in id_type of " +
-            ID_TYPE_URL +
-            " id: " +
-            id
+          " should not exists in id_type of " +
+          ID_TYPE_URL +
+          " id: " +
+          id
         );
         validDB = false;
       }
@@ -94,7 +94,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
         const dbDir = dbPath.slice(0, dbPath.length - 1);
         const filepath: string[] = jsonDB[id][ENTRY_PATH];
         if (!fs.existsSync(concatDirs(dbDir.concat(filepath)))) {
-          logger.warn("File not exists: " + filepath + " id: " + id);
+          logger.warn("File not exists: " + concatDirs(dbDir.concat(filepath)) + " id: " + id);
           validDB = false;
         }
 
@@ -115,10 +115,10 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             if (d.indexOf(fc) > -1) {
               logger.warn(
                 "filepath: " +
-                  filepath +
-                  " including forbidden char: '" +
-                  fc +
-                  "'. jendeley bans usage of these characters because of cross platform compatibility."
+                filepath +
+                " including forbidden char: '" +
+                fc +
+                "'. jendeley bans usage of these characters because of cross platform compatibility."
               );
               validDB = false;
             }
@@ -138,10 +138,10 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
       if (ENTRY_URL in jsonDB[id]) {
         logger.warn(
           ENTRY_PATH +
-            " should not exists in id_type of " +
-            ID_TYPE_URL +
-            " id: " +
-            id
+          " should not exists in id_type of " +
+          ID_TYPE_URL +
+          " id: " +
+          id
         );
         validDB = false;
       }
@@ -168,10 +168,10 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
         validDB = false;
         logger.warn(
           "Entry of id = " +
-            id +
-            " path = " +
-            entry.path +
-            " looks failed to get data from crossref. Please consider change filename to we can find manually written DocID."
+          id +
+          " path = " +
+          entry.path +
+          " looks failed to get data from crossref. Please consider change filename to we can find manually written DocID."
         );
       }
     } else if (entry.idType == ID_TYPE_ARXIV) {
@@ -179,10 +179,10 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
         validDB = false;
         logger.warn(
           "Entry of id = " +
-            id +
-            " path = " +
-            entry.path +
-            " looks failed to get data from arxiv. Please consider change filename to we can find manually written DocID."
+          id +
+          " path = " +
+          entry.path +
+          " looks failed to get data from arxiv. Please consider change filename to we can find manually written DocID."
         );
       }
     } else if (entry.idType == ID_TYPE_BOOK || entry.idType == ID_TYPE_ISBN) {
@@ -190,10 +190,10 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
         validDB = false;
         logger.warn(
           "Entry of id = " +
-            id +
-            " path = " +
-            entry.path +
-            " looks failed to get data from isbn. Please consider change filename to we can find manually written DocID."
+          id +
+          " path = " +
+          entry.path +
+          " looks failed to get data from isbn. Please consider change filename to we can find manually written DocID."
         );
       }
     }

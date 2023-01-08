@@ -1,7 +1,12 @@
 import path from "path";
+import os from "os";
 
 function concatDirs(dirs: string[]): string {
-  return path.sep + dirs.join(path.sep);
+  if (os.platform() === "win32") {
+    return dirs.join(path.sep);
+  } else {
+    return path.sep + dirs.join(path.sep);
+  }
 }
 
 function showDirs(dirs: string[]): string {
