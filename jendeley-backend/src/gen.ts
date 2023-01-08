@@ -401,7 +401,7 @@ async function registerNonBookPDF(
   }
 
   logger.info("docID = " + JSON.stringify(docID));
-  const t = await getJson(E.toUnion(docID), pdf);
+  const t = await getJson(E.toUnion(docID), JSON.parse(JSON.stringify(pdf)));
 
   if (t == undefined) {
     return E.left(pdf + " is not valid.");
@@ -424,18 +424,25 @@ async function registerNonBookPDF(
     );
   }
 
-  // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
-  if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
-    let newFilename: string[] = json.path;
+  // TODO: Condition of json.idType != "path" is not good
+  if (renameUsingTitle && json.idType != "path") {
+    let newFilename: string[] = JSON.parse(JSON.stringify(json.path));
     newFilename[newFilename.length - 1] =
       getTitleFromJson(json).replace(/[/\\?%*:|"<>.]/g, "") +
       " " +
       pdf[pdf.length - 1];
-    const oldFilename = json.path;
-    json[ENTRY_PATH] = newFilename;
+    const oldFilename = pdf;
+    json.path = newFilename;
 
+    if (!fs.existsSync(concatDirs(papersDir.concat(oldFilename)))) {
+      const err = oldFilename + " does not exists. Skip registration.";
+      logger.fatal(err);
+      process.exit(1);
+    }
     if (fs.existsSync(concatDirs(papersDir.concat(newFilename)))) {
-      return E.left(newFilename + " already exists. Skip registration.");
+      const err = newFilename + " already exists. Skip registration.";
+      logger.warn(err);
+      return E.left(err);
     }
     fs.renameSync(
       concatDirs(papersDir.concat(oldFilename)),

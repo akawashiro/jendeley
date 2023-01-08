@@ -452,7 +452,7 @@ async function addPdfFromUrl(
     undefined,
     req.comments,
     tags,
-    true,
+    req.filename == undefined,
     req.url
   );
 
