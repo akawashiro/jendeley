@@ -12,7 +12,6 @@ import {
   ID_TYPE_ISBN,
   ID_TYPE_PATH,
   ENTRY_PATH,
-  ENTRY_TITLE,
   ENTRY_COMMENTS,
   ENTRY_TAGS,
   ID_TYPE_URL,
@@ -200,10 +199,7 @@ async function getJson(
       );
     }
   }
-  if (
-    docID.docIDType == "doi" &&
-    (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
-  ) {
+  if (docID.docIDType == "doi" && json_r == undefined) {
     let dataFromCrossref = await getDoiJSON(docID.doi);
     if (dataFromCrossref != undefined) {
       let json: DoiEntry = {
@@ -225,10 +221,7 @@ async function getJson(
       );
     }
   }
-  if (
-    docID.docIDType == "isbn" &&
-    (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
-  ) {
+  if (docID.docIDType == "isbn" && json_r == undefined) {
     let dataFromNodeIsbn = await getIsbnJson(docID.isbn);
     if (dataFromNodeIsbn != undefined) {
       let json: IsbnEntry = {
@@ -250,10 +243,7 @@ async function getJson(
       );
     }
   }
-  if (
-    docID.docIDType == "path" &&
-    (json_r == undefined || json_r[ENTRY_TITLE] == undefined)
-  ) {
+  if (docID.docIDType == "path" && json_r == undefined) {
     let json: PathEntry = {
       path: pathPDF,
       title: docID.path.join(path.sep),
@@ -284,10 +274,7 @@ async function getJson(
 }
 
 function isValidJsonEntry(json: Object) {
-  return (
-    json[ENTRY_TITLE] != undefined &&
-    (json[ENTRY_PATH] != undefined || json[ENTRY_ID_TYPE] == ID_TYPE_URL)
-  );
+  return json[ENTRY_PATH] != undefined || json[ENTRY_ID_TYPE] == ID_TYPE_URL;
 }
 
 function genDummyDB(output: string) {
@@ -362,6 +349,24 @@ function registerWeb(
   }
 }
 
+function getTitleFromJson(json: ArxivEntry | DoiEntry | IsbnEntry): string {
+  let title: string | undefined = undefined;
+
+  if (json.idType == "arxiv") {
+    title = json.dataFromArxiv["title"];
+  } else if (json.idType == "doi") {
+    title = json.dataFromCrossref["title"];
+  } else {
+    title = json.dataFromNodeIsbn["title"];
+  }
+
+  if (title == undefined) {
+    logger.fatal("Cannot get title from json = " + JSON.stringify(json));
+    process.exit(1);
+  }
+  return title;
+}
+
 // TODO: userSpecifiedTitle is unnecessary anymore.
 async function registerNonBookPDF(
   papersDir: string[],
@@ -421,12 +426,12 @@ async function registerNonBookPDF(
 
   // TODO: Condition of json[ENTRY_ID_TYPE] != "path" is not good
   if (renameUsingTitle && json[ENTRY_ID_TYPE] != "path") {
-    let newFilename: string[] = json[ENTRY_PATH];
+    let newFilename: string[] = json.path;
     newFilename[newFilename.length - 1] =
-      json[ENTRY_TITLE].replace(/[/\\?%*:|"<>.]/g, "") +
+      getTitleFromJson(json).replace(/[/\\?%*:|"<>.]/g, "") +
       " " +
       pdf[pdf.length - 1];
-    const oldFilename = json[ENTRY_PATH];
+    const oldFilename = json.path;
     json[ENTRY_PATH] = newFilename;
 
     if (fs.existsSync(concatDirs(papersDir.concat(newFilename)))) {
