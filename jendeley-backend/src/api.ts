@@ -398,7 +398,11 @@ async function addPdfFromUrl(
       JSON.stringify(req)
   );
 
-  const filename = "[jendeley download " + Date.now().toString() + "].pdf";
+  const filename =
+    (req.filename != undefined ? req.filename : "") +
+    "[jendeley download " +
+    Date.now().toString() +
+    "].pdf";
   const download = (uri: string, filename: string) => {
     const options = {
       headers: {
@@ -445,7 +449,7 @@ async function addPdfFromUrl(
     dbPath.slice(0, dbPath.length - 1),
     [filename],
     jsonDB,
-    req.title,
+    undefined,
     req.comments,
     tags,
     true,

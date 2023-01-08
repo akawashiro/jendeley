@@ -362,6 +362,7 @@ function registerWeb(
   }
 }
 
+// TODO: userSpecifiedTitle is unnecessary anymore.
 async function registerNonBookPDF(
   papersDir: string[],
   pdf: string[],
@@ -404,9 +405,6 @@ async function registerNonBookPDF(
   const json = t[0];
   const dbID = t[1];
 
-  if (userSpecifiedTitle != undefined) {
-    json[ENTRY_TITLE] = userSpecifiedTitle;
-  }
   json[ENTRY_COMMENTS] = comments;
   json[ENTRY_TAGS] = tags;
 

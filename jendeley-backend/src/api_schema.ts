@@ -20,7 +20,7 @@ type ApiDB = ApiEntry[];
 
 type RequestGetPdfFromUrl = {
   url: string;
-  title: string | undefined;
+  filename: string | undefined;
   doi: string | undefined;
   isbn: string | undefined;
   tags: string[];
