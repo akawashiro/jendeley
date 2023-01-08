@@ -12,8 +12,6 @@ import {
   ID_TYPE_ISBN,
   ID_TYPE_PATH,
   ENTRY_PATH,
-  ENTRY_COMMENTS,
-  ENTRY_TAGS,
   ID_TYPE_URL,
   ARXIV_API_URL,
   JENDELEY_VERSION,
@@ -410,8 +408,8 @@ async function registerNonBookPDF(
   const json = t[0];
   const dbID = t[1];
 
-  json[ENTRY_COMMENTS] = comments;
-  json[ENTRY_TAGS] = tags;
+  json.comments = comments;
+  json.tags = tags;
 
   if (jsonDB.hasOwnProperty(dbID)) {
     // TODO: Make shell script to delete duplicated files.
@@ -420,7 +418,8 @@ async function registerNonBookPDF(
       pdf +
         " is duplicated. You can find another file in " +
         jsonDB[dbID][ENTRY_PATH] +
-        "."
+        " with id = " +
+        dbID
     );
   }
 
@@ -571,7 +570,7 @@ async function genDB(
           const t = await getJson(i, p);
           if (
             t != undefined &&
-            t[0][ENTRY_ID_TYPE] == ID_TYPE_ISBN &&
+            t[0].idType == ID_TYPE_ISBN &&
             i.docIDType == "isbn"
           ) {
             bookChapters[concatDirs(papersDir.concat(bd))].isbnEntry = [
