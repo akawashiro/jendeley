@@ -454,14 +454,24 @@ async function addPdfFromUrl(
 
   if (E.isRight(idEntryOrError)) {
     const t: [string, DBEntry] = E.toUnion(idEntryOrError);
-    jsonDB[t[0]] = t[1];
-    saveDB(jsonDB, dbPath);
 
-    const r: ApiResponse = {
-      isSucceeded: true,
-      message: "addPdfFromUrl succeeded",
-    };
-    response.status(200).json(r);
+    if (t[0] in jsonDB) {
+      const r: ApiResponse = {
+        isSucceeded: false,
+        message:
+          "addPdfFromUrl failed. You have registered the same document already.",
+      };
+      response.status(500).json(r);
+    } else {
+      jsonDB[t[0]] = t[1];
+      saveDB(jsonDB, dbPath);
+
+      const r: ApiResponse = {
+        isSucceeded: true,
+        message: "addPdfFromUrl succeeded",
+      };
+      response.status(200).json(r);
+    }
   } else {
     const err: string = E.toUnion(idEntryOrError);
     const r: ApiResponse = {
