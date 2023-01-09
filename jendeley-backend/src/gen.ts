@@ -251,7 +251,7 @@ async function getJson(
       userSpecifiedTitle: undefined,
     };
     json_r = json;
-    db_id = "path_" + docID.path;
+    db_id = "path_" + docID.path.join("_");
   }
 
   if (json_r == undefined || db_id == undefined) {
@@ -427,7 +427,7 @@ async function registerNonBookPDF(
   if (renameUsingTitle && json.idType != "path") {
     let newFilename: string[] = JSON.parse(JSON.stringify(json.path));
     newFilename[newFilename.length - 1] =
-      getTitleFromJson(json).replace(/[/\\?%*:|"<>.]/g, "") +
+      getTitleFromJson(json).replace(/[\\/?%*:|"<>.\n]/g, "") +
       " " +
       pdf[pdf.length - 1];
     const oldFilename = pdf;

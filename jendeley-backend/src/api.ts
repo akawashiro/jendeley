@@ -399,10 +399,23 @@ async function addPdfFromUrl(
   );
 
   const filename =
-    (req.filename != undefined ? req.filename : "") +
-    "[jendeley download " +
-    Date.now().toString() +
-    "].pdf";
+    req.filename != undefined
+      ? req.filename
+      : "[jendeley download " + Date.now().toString() + "].pdf";
+
+  if (
+    fs.existsSync(
+      concatDirs(dbPath.slice(0, dbPath.length - 1).concat([filename]))
+    )
+  ) {
+    const err: string = filename + " is already exists.";
+    const r: ApiResponse = {
+      isSucceeded: false,
+      message: err,
+    };
+    response.status(500).json(r);
+  }
+
   const download = (uri: string, filename: string) => {
     const options = {
       headers: {
@@ -436,10 +449,10 @@ async function addPdfFromUrl(
     }
   };
 
-  await download(
-    req.url,
-    concatDirs(dbPath.slice(0, dbPath.length - 1).concat([filename]))
+  const fullpathOfDownloadFile = concatDirs(
+    dbPath.slice(0, dbPath.length - 1).concat([filename])
   );
+  await download(req.url, fullpathOfDownloadFile);
   const jsonDB = loadDB(dbPath, false);
   const date = new Date();
   const date_tag = date.toISOString().split("T")[0];
@@ -460,6 +473,7 @@ async function addPdfFromUrl(
     const t: [string, DBEntry] = E.toUnion(idEntryOrError);
 
     if (t[0] in jsonDB) {
+      fs.rmSync(fullpathOfDownloadFile);
       const r: ApiResponse = {
         isSucceeded: false,
         message:
@@ -477,6 +491,7 @@ async function addPdfFromUrl(
       response.status(200).json(r);
     }
   } else {
+    fs.rmSync(fullpathOfDownloadFile);
     const err: string = E.toUnion(idEntryOrError);
     const r: ApiResponse = {
       isSucceeded: false,
@@ -500,19 +515,19 @@ function deleteEntry(request: Request, response: Response, dbPath: string[]) {
       jsonDB[entry.id][ENTRY_PATH] != undefined
     ) {
       logger.info("Delete " + jsonDB[entry.id]["path"]);
-      const old_filename = concatDirs(
+      const oldFilename = concatDirs(
         dbPath.slice(0, dbPath.length - 1).concat(jsonDB[entry.id]["path"])
       );
-      const dir = path.dirname(old_filename);
-      const new_filename = path.join(
+      const dir = path.dirname(oldFilename);
+      const newFilename = path.join(
         dir,
-        path.basename(old_filename, ".pdf") + " " + JENDELEY_NO_TRACK + ".pdf"
+        path.basename(oldFilename, ".pdf") + " " + JENDELEY_NO_TRACK + ".pdf"
       );
-      if (fs.existsSync(old_filename) && !fs.existsSync(new_filename)) {
-        logger.info("Rename " + old_filename + " to " + new_filename);
-        fs.renameSync(old_filename, new_filename);
+      if (fs.existsSync(oldFilename) && !fs.existsSync(newFilename)) {
+        logger.info("Rename " + oldFilename + " to " + newFilename);
+        fs.renameSync(oldFilename, newFilename);
       } else {
-        logger.warn("Failed to rename " + old_filename + " to " + new_filename);
+        logger.warn("Failed to rename " + oldFilename + " to " + newFilename);
       }
       delete jsonDB[entry.id];
     } else if (
