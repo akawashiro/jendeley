@@ -8,7 +8,7 @@ import {
   IconButton,
 } from "@mui/material";
 import "./App.css";
-import { IDType, ApiEntry } from "./api_schema";
+import { IDType, ApiEntry, ApiDB } from "./api_schema";
 import { Delete } from "@mui/icons-material";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -27,9 +27,9 @@ function DeleteButton(props: any) {
   async function deleteRow(
     id: string,
     idType: IDType,
-    tableData: any,
-    setTableData: any,
-    setConnectionError: any
+    tableData: ApiDB,
+    setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
+    setConnectionError: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     console.log("Delete " + id);
 
