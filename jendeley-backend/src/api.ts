@@ -359,7 +359,9 @@ async function addWebFromUrl(
   const jsonDB = loadDB(dbPath, false);
   const title = req.title == "" ? await getTitleFromUrl(req.url) : req.title;
   const date = new Date();
-  const date_tag = date.toISOString().split("T")[0];
+  const date_tag = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
   const newDBOrError = registerWeb(jsonDB, req.url, title, req.comments, tags);
