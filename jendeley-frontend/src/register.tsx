@@ -17,6 +17,7 @@ import {
 } from "./api_schema";
 import { splitTagsStr } from "./stringUtils";
 import { useSnackbar } from "notistack";
+import path from "path";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -166,11 +167,18 @@ function RegisterWebWithDialog(props: any) {
 }
 
 function isValidFilename(filename: string) {
+  if (filename == "") {
+    return true;
+  }
+
   const forbidden_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "\n"];
   for (const fc of forbidden_chars) {
     if (filename.indexOf(fc) > -1) {
       return false;
     }
+  }
+  if (path.extname(filename) != ".pdf") {
+    return false;
   }
   return true;
 }
@@ -295,7 +303,7 @@ function RegisterPDFWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="Filename"
+              label="Filename (Can use metadata e.g. hoge [jendeley isbn 9781467330763].pdf)"
               variant="outlined"
               size="small"
               value={filename}
