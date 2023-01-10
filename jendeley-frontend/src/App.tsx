@@ -102,7 +102,7 @@ function stringArrayFilterFn(
   return false;
 }
 
-function cellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
+function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
   if (row.original.idType === "url") {
     return (
       <a
@@ -161,7 +161,7 @@ function App() {
       },
       {
         accessorKey: "title",
-        Cell: ({ cell, row }) => cellHref(cell, row),
+        Cell: ({ cell, row }) => CellHref(cell, row),
         header: "title",
         enableEditing: false,
         filterFn: "includesString",
