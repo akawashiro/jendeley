@@ -45,8 +45,8 @@ function RegisterWebWithDialog(props: any) {
     const url: string = event.target.value;
     setWebUrl(url);
     setIsRegisterable(isValidUrl(url));
-    setWebUrlError(!isValidUrl(url) && url != "");
-    if (!isValidUrl(url) && url != "") {
+    setWebUrlError(!isValidUrl(url) && url !== "");
+    if (!isValidUrl(url) && url !== "") {
       setWebUrlHelperText("Non valid URL: " + url);
     } else {
       setWebUrlHelperText("");
@@ -177,7 +177,7 @@ function RegisterWebWithDialog(props: any) {
 }
 
 function isValidFilename(filename: string) {
-  if (filename == "") {
+  if (filename === "") {
     return true;
   }
 
@@ -187,7 +187,7 @@ function isValidFilename(filename: string) {
       return false;
     }
   }
-  if (path.extname(filename) != ".pdf") {
+  if (path.extname(filename) !== ".pdf") {
     return false;
   }
   return true;
@@ -212,8 +212,8 @@ function RegisterPDFWithDialog(props: any) {
   ) => {
     const url: string = event.target.value;
     setPdfUrl(url);
-    setPdfUrlError(!isValidUrl(url) && url != "");
-    if (!isValidUrl(url) && url != "") {
+    setPdfUrlError(!isValidUrl(url) && url !== "");
+    if (!isValidUrl(url) && url !== "") {
       setPdfUrlHelperText("Non valid URL: " + url);
     } else {
       setPdfUrlHelperText("");
@@ -226,8 +226,8 @@ function RegisterPDFWithDialog(props: any) {
   const handleFilenameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const f = event.target.value;
     setFilename(f);
-    setFilenameError(!isValidFilename(f) && f != "");
-    if (!isValidFilename(f) && f != "") {
+    setFilenameError(!isValidFilename(f) && f !== "");
+    if (!isValidFilename(f) && f !== "") {
       setFilenameErrorText(
         "Non valid filename: " + f + ". Filename must end with .pdf."
       );
