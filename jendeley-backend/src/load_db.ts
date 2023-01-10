@@ -23,9 +23,31 @@ function saveDB(jsonDB: JsonDB, dbPath: string[]) {
     process.exit(1);
   }
 
+  const backups = fs.readdirSync(jendeley_hidden_dir);
+  const sorted = backups.sort((a, b) => {
+    let aStat = fs.statSync(path.join(jendeley_hidden_dir, a));
+    let bStat = fs.statSync(path.join(jendeley_hidden_dir, b));
+
+    return (
+      new Date(bStat.birthtime).getTime() - new Date(aStat.birthtime).getTime()
+    );
+  });
+
+  // TODO: Make configurable
+  const maxBackups = 10;
+  let nBackups = 0;
+  const backupPrefix = "backup_jendeley_";
+  for (const b of sorted) {
+    nBackups++;
+    if (nBackups >= maxBackups) {
+      logger.info("Delete old backup file: " + b);
+      fs.rmSync(path.join(jendeley_hidden_dir, b));
+    }
+  }
+
   const backup = path.join(
     jendeley_hidden_dir,
-    "backup_" + String(Date.now()) + "_" + path.basename(concatDirs(dbPath))
+    backupPrefix + String(Date.now()) + "_" + path.basename(concatDirs(dbPath))
   );
   if (fs.existsSync(concatDirs(dbPath))) {
     fs.cpSync(concatDirs(dbPath), backup);
