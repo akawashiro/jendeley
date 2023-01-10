@@ -52,6 +52,9 @@ function DeleteButton(props: any) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(e),
+    }).catch((error) => {
+      console.log(error);
+      setConnectionError(true);
     });
     console.log("response of update_entry:", response);
 

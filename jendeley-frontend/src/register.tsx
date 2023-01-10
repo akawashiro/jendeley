@@ -105,6 +105,10 @@ function RegisterWebWithDialog(props: any) {
         } else {
           enqueueSnackbar(apiResponse.message, { variant: "error" });
         }
+      })
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
       });
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
@@ -310,6 +314,10 @@ function RegisterPDFWithDialog(props: any) {
         } else {
           enqueueSnackbar(apiResponse.message, { variant: "error" });
         }
+      })
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
       });
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")

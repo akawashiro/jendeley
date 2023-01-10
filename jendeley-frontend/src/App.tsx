@@ -255,6 +255,9 @@ function App() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(e),
+    }).catch((error) => {
+      console.log(error);
+      setConnectionError(true);
     });
     console.log("response of update_entry:", response);
     //send/receive api updates here
@@ -263,9 +266,13 @@ function App() {
 
   if (connectionError) {
     return (
-      <Alert severity="error" variant="filled">
-        Cannot connect to the backend server. Please check it is running and
-        reload this page.
+      <Alert
+        severity="error"
+        variant="filled"
+        sx={{ fontSize: 64 }}
+        icon={false}
+      >
+        Cannot connect to the backend server. Please check and reload this page.
       </Alert>
     );
   } else {
