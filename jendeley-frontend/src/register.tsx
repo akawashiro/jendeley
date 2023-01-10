@@ -112,7 +112,7 @@ function RegisterWebWithDialog(props: any) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Register web article</DialogTitle>
         <DialogContent>
-          <Stack spacing={2}>
+          <Stack sx={{ m: 1 }} spacing={2}>
             <TextField
               label="URL of webpage"
               variant="outlined"
@@ -130,7 +130,7 @@ function RegisterWebWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="Tags"
+              label="Tags (Concatenate multiple tags with comma)"
               variant="outlined"
               size="small"
               value={tags}
@@ -293,7 +293,7 @@ function RegisterPDFWithDialog(props: any) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Register PDF</DialogTitle>
         <DialogContent>
-          <Stack spacing={2}>
+          <Stack sx={{ m: 1 }} spacing={2}>
             <TextField
               label="URL of PDF"
               variant="outlined"
@@ -311,7 +311,7 @@ function RegisterPDFWithDialog(props: any) {
               sx={{ width: 500 }}
             />
             <TextField
-              label="Tags"
+              label="Tags (Concatenate multiple tags with comma)"
               variant="outlined"
               size="small"
               value={tags}
