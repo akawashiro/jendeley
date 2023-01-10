@@ -73,7 +73,7 @@ function CommentsDiv(comments: string) {
   } else {
     return (
       <Box>
-        `<p>{comments}</p>`
+        <p>{comments}</p>
       </Box>
     );
   }
