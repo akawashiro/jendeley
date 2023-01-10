@@ -28,7 +28,8 @@ function DeleteButton(props: any) {
     id: string,
     idType: IDType,
     tableData: any,
-    setTableData: any
+    setTableData: any,
+    setConnectionError: any
   ) {
     console.log("Delete " + id);
 
@@ -56,7 +57,11 @@ function DeleteButton(props: any) {
 
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => setTableData(json));
+      .then((json) => setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        setConnectionError(true);
+      });
 
     setOpen(false);
   }
@@ -78,7 +83,8 @@ function DeleteButton(props: any) {
                 props.id,
                 props.idType,
                 props.tableData,
-                props.setTableData
+                props.setTableData,
+                props.setConnectionError
               )
             }
             autoFocus

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
-import ReactDOM from "react-dom/client";
+import Alert from "@mui/material/Alert";
 import base_64 from "base-64";
 import { Box } from "@mui/material";
 import "./App.css";
@@ -131,12 +131,17 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
 
 function App() {
   const [tableData, setTableData] = React.useState<ApiDB>([]);
+  const [connectionError, setConnectionError] = React.useState(false);
 
   React.useEffect(() => {
     console.log("Fetching from DB in loading");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => setTableData(json));
+      .then((json) => setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        setConnectionError(true);
+      });
   }, []);
 
   const columns = useMemo<MRT_ColumnDef<ApiEntry>[]>(
@@ -256,55 +261,70 @@ function App() {
     setTableData([...tableData]);
   };
 
-  return (
-    <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
-      <Box component="main" sx={{ m: 2 }}>
-        <MaterialReactTable
-          displayColumnDefOptions={{
-            "mrt-row-actions": {
-              muiTableHeadCellProps: {
-                align: "center",
+  if (connectionError) {
+    return (
+      <Alert severity="error" variant="filled">
+        Cannot connect to the backend server. Please check it is running and
+        reload this page.
+      </Alert>
+    );
+  } else {
+    return (
+      <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
+        <Box component="main" sx={{ m: 2 }}>
+          <MaterialReactTable
+            displayColumnDefOptions={{
+              "mrt-row-actions": {
+                muiTableHeadCellProps: {
+                  align: "center",
+                },
+                size: 10,
               },
-              size: 10,
-            },
-          }}
-          enableEditing
-          columns={columns}
-          data={tableData}
-          enableRowVirtualization
-          enablePagination={false}
-          initialState={{
-            showColumnFilters: true,
-            sorting: [{ id: "year", desc: true }],
-            columnVisibility: { id: true, path: false },
-            density: "comfortable",
-          }}
-          enableStickyHeader
-          enableColumnResizing
-          columnResizeMode="onEnd"
-          editingMode="cell"
-          muiTableBodyCellEditTextFieldProps={({ cell }) => ({
-            //onBlur is more efficient, but could use onChange instead
-            onBlur: (event) => {
-              handleSaveCell(cell, event.target.value);
-            },
-            variant: "outlined",
-            multiline: true,
-            margin: "none",
-            minRows: 7,
-          })}
-          renderTopToolbarCustomActions={({ table }) => {
-            return (
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <RegisterWebWithDialog setTableData={setTableData} />
-                <RegisterPDFWithDialog setTableData={setTableData} />
-              </div>
-            );
-          }}
-        />
-      </Box>
-    </SnackbarProvider>
-  );
+            }}
+            enableEditing
+            columns={columns}
+            data={tableData}
+            enableRowVirtualization
+            enablePagination={false}
+            initialState={{
+              showColumnFilters: true,
+              sorting: [{ id: "year", desc: true }],
+              columnVisibility: { id: true, path: false },
+              density: "comfortable",
+            }}
+            enableStickyHeader
+            enableColumnResizing
+            columnResizeMode="onEnd"
+            editingMode="cell"
+            muiTableBodyCellEditTextFieldProps={({ cell }) => ({
+              //onBlur is more efficient, but could use onChange instead
+              onBlur: (event) => {
+                handleSaveCell(cell, event.target.value);
+              },
+              variant: "outlined",
+              multiline: true,
+              margin: "none",
+              minRows: 7,
+            })}
+            renderTopToolbarCustomActions={({ table }) => {
+              return (
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <RegisterWebWithDialog
+                    setTableData={setTableData}
+                    setConnectionError={setConnectionError}
+                  />
+                  <RegisterPDFWithDialog
+                    setTableData={setTableData}
+                    setConnectionError={setConnectionError}
+                  />
+                </div>
+              );
+            }}
+          />
+        </Box>
+      </SnackbarProvider>
+    );
+  }
 }
 
 export default App;
