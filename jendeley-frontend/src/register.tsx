@@ -31,6 +31,8 @@ function isValidUrl(urlString: string) {
 
 function RegisterWebWithDialog(props: any) {
   const [webUrl, setWebUrl] = React.useState("");
+  const [webUrlError, setWebUrlError] = React.useState(false);
+  const [webUrlHelperText, setWebUrlHelperText] = React.useState("");
   const [title, setTitle] = React.useState("");
   const [tags, setTags] = React.useState("");
   const [comments, setComments] = React.useState("");
@@ -43,6 +45,12 @@ function RegisterWebWithDialog(props: any) {
     const url: string = event.target.value;
     setWebUrl(url);
     setIsRegisterable(isValidUrl(url));
+    setWebUrlError(!isValidUrl(url) && url != "");
+    if (!isValidUrl(url) && url != "") {
+      setWebUrlHelperText("Non valid URL: " + url);
+    } else {
+      setWebUrlHelperText("");
+    }
   };
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,12 +122,14 @@ function RegisterWebWithDialog(props: any) {
         <DialogContent>
           <Stack sx={{ m: 1 }} spacing={2}>
             <TextField
+              error={webUrlError}
               label="URL of webpage"
               variant="outlined"
               size="small"
               value={webUrl}
               onChange={handleWebUrlFieldChange}
               sx={{ width: 500 }}
+              helperText={webUrlHelperText}
             />
             <TextField
               label="Title (Get from webpage when empty)"
@@ -185,9 +195,13 @@ function isValidFilename(filename: string) {
 
 function RegisterPDFWithDialog(props: any) {
   const [pdfUrl, setPdfUrl] = React.useState("");
+  const [pdfUrlError, setPdfUrlError] = React.useState(false);
+  const [pdfUrlHelperText, setPdfUrlHelperText] = React.useState("");
   const [doi, setDoi] = React.useState("");
   const [isbn, setIsbn] = React.useState("");
   const [filename, setFilename] = React.useState("");
+  const [filenameError, setFilenameError] = React.useState(false);
+  const [filenameErrorText, setFilenameErrorText] = React.useState("");
   const [tags, setTags] = React.useState("");
   const [comments, setComments] = React.useState("");
   const [isRegisterable, setIsRegisterable] = React.useState(false);
@@ -198,6 +212,12 @@ function RegisterPDFWithDialog(props: any) {
   ) => {
     const url: string = event.target.value;
     setPdfUrl(url);
+    setPdfUrlError(!isValidUrl(url) && url != "");
+    if (!isValidUrl(url) && url != "") {
+      setPdfUrlHelperText("Non valid URL: " + url);
+    } else {
+      setPdfUrlHelperText("");
+    }
     // TODO: This `isValidFilename(filename)` does not works correctly because
     // filename is updated synchronously.
     setIsRegisterable(isValidUrl(url) && isValidFilename(filename));
@@ -206,6 +226,14 @@ function RegisterPDFWithDialog(props: any) {
   const handleFilenameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const f = event.target.value;
     setFilename(f);
+    setFilenameError(!isValidFilename(f) && f != "");
+    if (!isValidFilename(f) && f != "") {
+      setPdfUrlHelperText(
+        "Non valid filename: " + f + ". Filename must end with .pdf."
+      );
+    } else {
+      setPdfUrlHelperText("");
+    }
     // TODO: This `isValidUrl(pdfUrl)` does not works correctly because
     // filename is updated synchronously.
     setIsRegisterable(isValidUrl(pdfUrl) && isValidFilename(f));
@@ -295,20 +323,24 @@ function RegisterPDFWithDialog(props: any) {
         <DialogContent>
           <Stack sx={{ m: 1 }} spacing={2}>
             <TextField
+              error={pdfUrlError}
               label="URL of PDF"
               variant="outlined"
               size="small"
               value={pdfUrl}
               onChange={handlePdfUrlFieldChange}
               sx={{ width: 500 }}
+              helperText={pdfUrlHelperText}
             />
             <TextField
+              error={filenameError}
               label="Filename (Can use metadata e.g. hoge [jendeley isbn 9781467330763].pdf)"
               variant="outlined"
               size="small"
               value={filename}
               onChange={handleFilenameChange}
               sx={{ width: 500 }}
+              helperText={filenameErrorText}
             />
             <TextField
               label="Tags (Concatenate multiple tags with comma)"
