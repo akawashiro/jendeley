@@ -228,11 +228,11 @@ function RegisterPDFWithDialog(props: any) {
     setFilename(f);
     setFilenameError(!isValidFilename(f) && f != "");
     if (!isValidFilename(f) && f != "") {
-      setPdfUrlHelperText(
+      setFilenameErrorText(
         "Non valid filename: " + f + ". Filename must end with .pdf."
       );
     } else {
-      setPdfUrlHelperText("");
+      setFilenameErrorText("");
     }
     // TODO: This `isValidUrl(pdfUrl)` does not works correctly because
     // filename is updated synchronously.
