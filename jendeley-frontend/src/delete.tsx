@@ -8,7 +8,7 @@ import {
   IconButton,
 } from "@mui/material";
 import "./App.css";
-import { IDType, ApiEntry } from "./api_schema";
+import { IDType, ApiEntry, ApiDB } from "./api_schema";
 import { Delete } from "@mui/icons-material";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -27,8 +27,9 @@ function DeleteButton(props: any) {
   async function deleteRow(
     id: string,
     idType: IDType,
-    tableData: any,
-    setTableData: any
+    tableData: ApiDB,
+    setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
+    setConnectionError: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     console.log("Delete " + id);
 
@@ -51,12 +52,19 @@ function DeleteButton(props: any) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(e),
+    }).catch((error) => {
+      console.log(error);
+      setConnectionError(true);
     });
     console.log("response of update_entry:", response);
 
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => setTableData(() => json));
+      .then((json) => setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        setConnectionError(true);
+      });
 
     setOpen(false);
   }
@@ -78,7 +86,8 @@ function DeleteButton(props: any) {
                 props.id,
                 props.idType,
                 props.tableData,
-                props.setTableData
+                props.setTableData,
+                props.setConnectionError
               )
             }
             autoFocus

@@ -105,11 +105,19 @@ function RegisterWebWithDialog(props: any) {
         } else {
           enqueueSnackbar(apiResponse.message, { variant: "error" });
         }
+      })
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
       });
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => props.setTableData(() => json));
+      .then((json) => props.setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
+      });
   }
 
   return (
@@ -306,11 +314,19 @@ function RegisterPDFWithDialog(props: any) {
         } else {
           enqueueSnackbar(apiResponse.message, { variant: "error" });
         }
+      })
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
       });
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => props.setTableData(() => json));
+      .then((json) => props.setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
+      });
   }
 
   return (
