@@ -16,11 +16,18 @@ import {
 } from "./api";
 import { concatDirs } from "./path_util";
 
-function startServer(dbPath: string[], noBrowser: boolean, port: number) {
+function startServer(
+  dbPath: string[],
+  noBrowser: boolean,
+  allowCors: boolean,
+  port: number
+) {
   if (fs.existsSync(concatDirs(dbPath))) {
     const app = express();
 
-    app.use(cors());
+    if (allowCors) {
+      app.use(cors());
+    }
 
     const built_frontend_dir = path.join(__dirname, "..", "built-frontend");
     if (!fs.existsSync(built_frontend_dir)) {
