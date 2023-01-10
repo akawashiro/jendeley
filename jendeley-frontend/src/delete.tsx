@@ -56,7 +56,7 @@ function DeleteButton(props: any) {
 
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => setTableData(() => json));
+      .then((json) => setTableData(json));
 
     setOpen(false);
   }

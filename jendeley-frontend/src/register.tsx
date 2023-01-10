@@ -109,7 +109,7 @@ function RegisterWebWithDialog(props: any) {
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => props.setTableData(() => json));
+      .then((json) => props.setTableData(json));
   }
 
   return (
@@ -310,7 +310,7 @@ function RegisterPDFWithDialog(props: any) {
     console.log("Fetching from DB in registration");
     fetch(REACT_APP_API_URL + "/api/get_db")
       .then((response) => response.json())
-      .then((json) => props.setTableData(() => json));
+      .then((json) => props.setTableData(json));
   }
 
   return (
