@@ -367,7 +367,8 @@ async function getDocIDFromTitle(
           return E.right({ docIDType: "doi", doi: doi });
         }
       }
-    } catch {
+    } catch (error) {
+      logger.warn("error = " + error);
       logger.warn("Failed to get information from doi: " + URL);
     }
   }

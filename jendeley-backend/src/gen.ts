@@ -102,7 +102,7 @@ function getTitleFromPath(pdf: string[]): string {
   return r;
 }
 
-async function getDoiJSON(doi: string): Promise<Object> {
+async function getDoiJSON(doi: string): Promise<E.Either<string, Object>> {
   let { got } = await import("got");
 
   // See here for API documentation
@@ -111,10 +111,16 @@ async function getDoiJSON(doi: string): Promise<Object> {
   const options = { headers: { Accept: "application/json" } };
   try {
     const data = (await got(URL, options).json()) as Object;
-    return data;
-  } catch {
-    logger.warn("Failed to get information from doi: " + URL);
-    return new Object();
+    logger.info("data = " + JSON.stringify(data));
+    return E.right(data);
+  } catch (error) {
+    logger.warn("error = " + error);
+    const error_message =
+      "Failed to get information from DOI: " +
+      URL +
+      " in getDoiJSON. This DOI is not registered.";
+    logger.warn(error_message);
+    return E.left(error_message);
   }
 }
 
@@ -169,16 +175,15 @@ async function getJson(
   docID: DocID,
   pathPDF: string[]
 ): Promise<
-  [ArxivEntry | DoiEntry | IsbnEntry | PathEntry, string] | undefined
+  E.Either<
+    string,
+    { dbID: string; dbEntry: ArxivEntry | DoiEntry | IsbnEntry | PathEntry }
+  >
 > {
-  let json_r: ArxivEntry | DoiEntry | IsbnEntry | PathEntry | undefined =
-    undefined;
-  let db_id: string | undefined = undefined;
-
   if (docID.docIDType == "arxiv") {
-    let dataFromArxiv = await getArxivJson(docID.arxiv);
+    const dataFromArxiv = await getArxivJson(docID.arxiv);
     if (dataFromArxiv != undefined) {
-      let json: ArxivEntry = {
+      const json: ArxivEntry = {
         path: pathPDF,
         idType: ID_TYPE_ARXIV,
         tags: [],
@@ -186,43 +191,37 @@ async function getJson(
         userSpecifiedTitle: undefined,
         dataFromArxiv: dataFromArxiv,
       };
-      json_r = json;
-      db_id = "arxiv_" + docID.arxiv;
+      const dbID = "arxiv_" + docID.arxiv;
+      return E.right({ dbID: dbID, dbEntry: json });
     } else {
-      logger.warn(
+      const error_message =
         "Failed to get information of " +
-          JSON.stringify(docID) +
-          " using arxiv " +
-          pathPDF
-      );
+        JSON.stringify(docID) +
+        " using arxiv. Path: " +
+        pathPDF;
+      logger.warn(error_message);
+      return E.left(error_message);
     }
-  }
-  if (docID.docIDType == "doi" && json_r == undefined) {
-    let dataFromCrossref = await getDoiJSON(docID.doi);
-    if (dataFromCrossref != undefined) {
-      let json: DoiEntry = {
+  } else if (docID.docIDType == "doi") {
+    const dataFromCrossref = await getDoiJSON(docID.doi);
+    if (E.isRight(dataFromCrossref)) {
+      const json: DoiEntry = {
         path: pathPDF,
         idType: ID_TYPE_DOI,
         tags: [],
         comments: "",
         userSpecifiedTitle: undefined,
-        dataFromCrossref: dataFromCrossref,
+        dataFromCrossref: E.toUnion(dataFromCrossref),
       };
-      json_r = json;
-      db_id = "doi_" + docID.doi;
+      const dbID = "doi_" + docID.doi;
+      return E.right({ dbID: dbID, dbEntry: json });
     } else {
-      logger.warn(
-        "Failed to get information of " +
-          JSON.stringify(docID) +
-          " using doi " +
-          pathPDF
-      );
+      return dataFromCrossref;
     }
-  }
-  if (docID.docIDType == "isbn" && json_r == undefined) {
-    let dataFromNodeIsbn = await getIsbnJson(docID.isbn);
+  } else if (docID.docIDType == "isbn") {
+    const dataFromNodeIsbn = await getIsbnJson(docID.isbn);
     if (dataFromNodeIsbn != undefined) {
-      let json: IsbnEntry = {
+      const json: IsbnEntry = {
         path: pathPDF,
         idType: ID_TYPE_ISBN,
         tags: [],
@@ -230,19 +229,18 @@ async function getJson(
         userSpecifiedTitle: undefined,
         dataFromNodeIsbn: dataFromNodeIsbn,
       };
-      json_r = json;
-      db_id = "isbn_" + docID.isbn;
+      const dbID = "isbn_" + docID.isbn;
+      return E.right({ dbID: dbID, dbEntry: json });
     } else {
-      logger.warn(
+      const error_message =
         "Failed to get information of " +
-          JSON.stringify(docID) +
-          " using isbn " +
-          pathPDF
-      );
+        JSON.stringify(docID) +
+        " using isbn. Path: " +
+        pathPDF;
+      return E.left(error_message);
     }
-  }
-  if (docID.docIDType == "path" && json_r == undefined) {
-    let json: PathEntry = {
+  } else if (docID.docIDType == "path") {
+    const json: PathEntry = {
       path: pathPDF,
       title: docID.path.join(path.sep),
       idType: ID_TYPE_PATH,
@@ -250,24 +248,13 @@ async function getJson(
       comments: "",
       userSpecifiedTitle: undefined,
     };
-    json_r = json;
-    db_id = "path_" + docID.path.join("_");
-  }
-
-  if (json_r == undefined || db_id == undefined) {
-    logger.warn(
-      "Failed to get information of " +
-        JSON.stringify(docID) +
-        " path = " +
-        pathPDF +
-        " json_r = " +
-        JSON.stringify(json_r) +
-        " db_id = " +
-        JSON.stringify(db_id)
-    );
-    return undefined;
+    const dbID = "path_" + docID.path.join("_");
+    return E.right({ dbID: dbID, dbEntry: json });
   } else {
-    return [json_r, db_id];
+    logger.fatal(
+      "Invalid docID.docIDType = " + docID.docIDType + "for getJson."
+    );
+    process.exit(1);
   }
 }
 
@@ -401,12 +388,12 @@ async function registerNonBookPDF(
   logger.info("docID = " + JSON.stringify(docID));
   const t = await getJson(E.toUnion(docID), JSON.parse(JSON.stringify(pdf)));
 
-  if (t == undefined) {
-    return E.left(pdf + " is not valid.");
+  if (E.isLeft(t)) {
+    return t;
   }
 
-  const json = t[0];
-  const dbID = t[1];
+  const json: ArxivEntry | DoiEntry | IsbnEntry | PathEntry = t.right.dbEntry;
+  const dbID: string = t.right.dbID;
 
   json.comments = comments;
   json.tags = tags;
@@ -569,12 +556,12 @@ async function genDB(
           const i: DocID = E.toUnion(docID);
           const t = await getJson(i, p);
           if (
-            t != undefined &&
-            t[0].idType == ID_TYPE_ISBN &&
+            E.isRight(t) &&
+            t.right.dbEntry.idType == ID_TYPE_ISBN &&
             i.docIDType == "isbn"
           ) {
             bookChapters[concatDirs(papersDir.concat(bd))].isbnEntry = [
-              t[0],
+              t.right.dbEntry,
               i.isbn,
             ];
           }
