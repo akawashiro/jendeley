@@ -44,12 +44,10 @@ test("JSON from path", async () => {
 
   if (E.isRight(docID)) {
     const t = await getJson(E.toUnion(docID), pdf);
-    expect(t).toBeTruthy();
-    if (t == undefined) return;
-    const json = t[0];
-    expect(json).toBeTruthy();
-    if (json == undefined) return;
-    expect(json["title"]).toBe(
+    if (E.isLeft(t)) return;
+    const json = t.right.dbEntry;
+    if (json.idType !== "path") return;
+    expect(json.title).toBe(
       "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf"
     );
   }
