@@ -371,7 +371,7 @@ async function addWebFromUrl(
 
     const r: ApiResponse = {
       isSucceeded: true,
-      message: "addPdfFromUrl succeeded",
+      message: "addWebFromUrl succeeded",
     };
     response.status(200).json(r);
   } else {
