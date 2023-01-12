@@ -1,8 +1,19 @@
-# jendeley
+# jendeley <!-- omit in toc -->
 `jendeley` is a JSON-based PDF paper organizing software.
 - `jendeley` is JSON-based. You can see and edit your database easily.
 - `jendeley` is working locally. Your important database is owned only by you. Not cloud.
 - `jendeley` is browser based. You can run it anywhere node.js runs.
+
+## Table of Contents <!-- omit in toc -->
+- [Quickstart](#quickstart)
+- [Install](#install)
+- [Scan your PDFs](#scan-your-pdfs)
+    - [Recommended filename style](#recommended-filename-style)
+    - [When failed to scan your PDFs](#when-failed-to-scan-your-pdfs)
+- [Launch jendeley UI](#launch-jendeley-ui)
+    - [If you want to launch `jendeley` automatically](#if-you-want-to-launch-jendeley-automatically)
+- [Use web interface](#use-web-interface)
+- [Check and edit your database](#check-and-edit-your-database)
 
 ## Quickstart
 ```
@@ -13,12 +24,12 @@ jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 Then you can see a screen like this!
 ![image](https://user-images.githubusercontent.com/3770618/209427855-374e6523-8910-4c98-a9ec-05bd62ae9b8e.png)
 
-## How to install
+## Install
 ```
 npm install @a_kawashiro/jendeley -g
 ```
 
-## How to scan your PDFs
+## Scan your PDFs
 This command emits the database to `<YOUR PDFs DIR>/jendeley_db.json`. When `jendeley` failed to scan some PDFs, it emit a shellscript `edit_and_run.sh`. Please read the next subsection and rename files using it.
 ```
 jendeley scan --papers_dir <YOUR PDFs DIR>
@@ -56,7 +67,9 @@ ExecStart=jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_b
 WantedBy=default.target
 ```
 
-## Check your database
+## Use web interface
+
+## Check and edit your database
 Because `jendeley` is fully JSON-based, you can check the contents of the
 database easily. For example, you can use `jq` command to list up all titles in
 your database with the following command.
@@ -73,3 +86,5 @@ your database with the following command.
     "tags": [],
     "comments": "",
 ```
+
+You can edit you database using your favorite editor. But after editting, you should check your database is valid as jendeley databse using `jendeley validate --db <PATH TO THE DATABASE>`.
