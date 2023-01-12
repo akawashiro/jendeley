@@ -33,7 +33,7 @@
   "bugs": {
     "url": "https://github.com/akawashiro/jendeley/issues"
   },
-  "homepage": "https://github.com/akawashiro/jendeley/tree/main/jendeley-backend#readme",
+  "homepage": "https://akawashiro.github.io/jendeley/",
   "devDependencies": {
     "@types/base-64": "^1.0.0",
     "@types/cors": "^2.8.13",
