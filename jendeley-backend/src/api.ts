@@ -457,7 +457,9 @@ async function addPdfFromUrl(
   await download(req.url, fullpathOfDownloadFile);
   const jsonDB = loadDB(dbPath, false);
   const date = new Date();
-  const date_tag = date.toISOString().split("T")[0];
+  const date_tag = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split("T")[0];
   const tags = req.tags;
   tags.push(date_tag);
   const idEntryOrError = await registerNonBookPDF(
