@@ -1,3 +1,11 @@
+---
+title: "jendeley"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
 # jendeley
 `jendeley` is a JSON-based PDF paper organizing software.
 - `jendeley` is JSON-based. You can see and edit your database easily.
