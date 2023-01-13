@@ -190,6 +190,7 @@ async function getJson(
         comments: "",
         userSpecifiedTitle: undefined,
         dataFromArxiv: dataFromArxiv,
+        reservedForUser: undefined,
       };
       const dbID = "arxiv_" + docID.arxiv;
       return genRight({ dbID: dbID, dbEntry: json });
@@ -212,6 +213,7 @@ async function getJson(
         comments: "",
         userSpecifiedTitle: undefined,
         dataFromCrossref: dataFromCrossref.right,
+        reservedForUser: undefined,
       };
       const dbID = "doi_" + docID.doi;
       return genRight({ dbID: dbID, dbEntry: json });
@@ -228,6 +230,7 @@ async function getJson(
         comments: "",
         userSpecifiedTitle: undefined,
         dataFromNodeIsbn: dataFromNodeIsbn,
+        reservedForUser: undefined,
       };
       const dbID = "isbn_" + docID.isbn;
       return genRight({ dbID: dbID, dbEntry: json });
@@ -247,6 +250,7 @@ async function getJson(
       tags: [],
       comments: "",
       userSpecifiedTitle: undefined,
+      reservedForUser: undefined,
     };
     const dbID = "path_" + docID.path.join("_");
     return genRight({ dbID: dbID, dbEntry: json });
@@ -275,6 +279,7 @@ function genDummyDB(output: string) {
       tags: [],
       userSpecifiedTitle: undefined,
       comments: crypto.randomBytes(40).toString("hex"),
+      reservedForUser: undefined,
     };
     jsonDB[id] = e;
   }
@@ -309,6 +314,7 @@ function registerWeb(
     tags: tags,
     userSpecifiedTitle: undefined,
     idType: ID_TYPE_URL,
+    reservedForUser: undefined,
   };
 
   if (isValidJsonEntry(json)) {
@@ -620,6 +626,7 @@ async function genDB(
         comments: "",
         userSpecifiedTitle: title,
         dataFromNodeIsbn: isbnEntry.dataFromNodeIsbn,
+        reservedForUser: undefined,
       };
       const chapterID =
         "book_" + isbn + "_" + path.basename(pdf[pdf.length - 1]);
