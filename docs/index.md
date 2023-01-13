@@ -75,9 +75,7 @@ WantedBy=default.target
 ![howtouse](https://user-images.githubusercontent.com/3770618/212287575-b553971c-e59f-40f7-8fb4-fd6ac68d1665.png)
 
 ## Check and edit your database (advanced)
-Because `jendeley` is fully JSON-based, you can check the contents of the
-database easily. For example, you can use `jq` command to list up all titles in
-your database with the following command.
+Because `jendeley` is fully JSON-based, you can check the contents of the database easily. 
 ```
 > cat jendeley_db.json | jq '.' | head
 {
@@ -92,4 +90,4 @@ your database with the following command.
     "comments": "",
 ```
 
-You can edit you database using your favorite editor. But after editting, you should check your database is valid as jendeley databse using `jendeley validate --db <PATH TO THE DATABASE>`.
+You can edit you database using your favorite editor. But after editing, you should check your database is valid as jendeley database using `jendeley validate --db <PATH TO THE DATABASE>`.
