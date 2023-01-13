@@ -1,21 +1,21 @@
 import { getJson, getTitleFromPath } from "./gen";
 import { DocID, getDocID, getDocIDFromTexts, getDocIDFromTitle } from "./docid";
-import * as E from "fp-ts/lib/Either";
+import { Either, genRight } from "./either";
 
-function rightDoi(doi: string): E.Either<string, DocID> {
-  return E.right({ docIDType: "doi", doi: doi });
+function rightDoi(doi: string): Either<string, DocID> {
+  return genRight({ docIDType: "doi", doi: doi });
 }
 
 function rightIsbn(isbn: string) {
-  return E.right({ docIDType: "isbn", isbn: isbn });
+  return genRight({ docIDType: "isbn", isbn: isbn });
 }
 
 function rightPath(path: string[]) {
-  return E.right({ docIDType: "path", path: path });
+  return genRight({ docIDType: "path", path: path });
 }
 
 function rightArxiv(arxiv: string) {
-  return E.right({ docIDType: "arxiv", arxiv: arxiv });
+  return genRight({ docIDType: "arxiv", arxiv: arxiv });
 }
 
 test.skip("DOI from title", async () => {
@@ -42,9 +42,9 @@ test("JSON from path", async () => {
   ];
   const docID = await getDocID(pdf, ["hoge"], false, undefined);
 
-  if (E.isRight(docID)) {
-    const t = await getJson(E.toUnion(docID), pdf);
-    if (E.isLeft(t)) return;
+  if (docID._tag === "right") {
+    const t = await getJson(docID.right, pdf);
+    if (t._tag === "left") return;
     const json = t.right.dbEntry;
     if (json.idType !== "path") return;
     expect(json.title).toBe(

@@ -29,7 +29,7 @@ import {
   BookEntry,
   DBEntry,
 } from "./db_schema";
-import * as E from "fp-ts/lib/Either";
+import { Either, genLeft, genRight } from "./either";
 import { loadDB, saveDB } from "./load_db";
 import {
   concatDirs,
@@ -102,7 +102,7 @@ function getTitleFromPath(pdf: string[]): string {
   return r;
 }
 
-async function getDoiJSON(doi: string): Promise<E.Either<string, Object>> {
+async function getDoiJSON(doi: string): Promise<Either<string, Object>> {
   let { got } = await import("got");
 
   // See here for API documentation
@@ -112,7 +112,7 @@ async function getDoiJSON(doi: string): Promise<E.Either<string, Object>> {
   try {
     const data = (await got(URL, options).json()) as Object;
     logger.info("data = " + JSON.stringify(data));
-    return E.right(data);
+    return genRight(data);
   } catch (error) {
     logger.warn("error = " + error);
     const error_message =
@@ -120,7 +120,7 @@ async function getDoiJSON(doi: string): Promise<E.Either<string, Object>> {
       URL +
       " in getDoiJSON. This DOI is not registered.";
     logger.warn(error_message);
-    return E.left(error_message);
+    return genLeft(error_message);
   }
 }
 
@@ -175,7 +175,7 @@ async function getJson(
   docID: DocID,
   pathPDF: string[]
 ): Promise<
-  E.Either<
+  Either<
     string,
     { dbID: string; dbEntry: ArxivEntry | DoiEntry | IsbnEntry | PathEntry }
   >
@@ -192,7 +192,7 @@ async function getJson(
         dataFromArxiv: dataFromArxiv,
       };
       const dbID = "arxiv_" + docID.arxiv;
-      return E.right({ dbID: dbID, dbEntry: json });
+      return genRight({ dbID: dbID, dbEntry: json });
     } else {
       const error_message =
         "Failed to get information of " +
@@ -200,21 +200,21 @@ async function getJson(
         " using arxiv. Path: " +
         pathPDF;
       logger.warn(error_message);
-      return E.left(error_message);
+      return genLeft(error_message);
     }
   } else if (docID.docIDType == "doi") {
     const dataFromCrossref = await getDoiJSON(docID.doi);
-    if (E.isRight(dataFromCrossref)) {
+    if (dataFromCrossref._tag === "right") {
       const json: DoiEntry = {
         path: pathPDF,
         idType: ID_TYPE_DOI,
         tags: [],
         comments: "",
         userSpecifiedTitle: undefined,
-        dataFromCrossref: E.toUnion(dataFromCrossref),
+        dataFromCrossref: dataFromCrossref.right,
       };
       const dbID = "doi_" + docID.doi;
-      return E.right({ dbID: dbID, dbEntry: json });
+      return genRight({ dbID: dbID, dbEntry: json });
     } else {
       return dataFromCrossref;
     }
@@ -230,14 +230,14 @@ async function getJson(
         dataFromNodeIsbn: dataFromNodeIsbn,
       };
       const dbID = "isbn_" + docID.isbn;
-      return E.right({ dbID: dbID, dbEntry: json });
+      return genRight({ dbID: dbID, dbEntry: json });
     } else {
       const error_message =
         "Failed to get information of " +
         JSON.stringify(docID) +
         " using isbn. Path: " +
         pathPDF;
-      return E.left(error_message);
+      return genLeft(error_message);
     }
   } else if (docID.docIDType == "path") {
     const json: PathEntry = {
@@ -249,7 +249,7 @@ async function getJson(
       userSpecifiedTitle: undefined,
     };
     const dbID = "path_" + docID.path.join("_");
-    return E.right({ dbID: dbID, dbEntry: json });
+    return genRight({ dbID: dbID, dbEntry: json });
   } else {
     logger.fatal(
       "Invalid docID.docIDType = " + docID.docIDType + "for getJson."
@@ -288,7 +288,7 @@ function registerWeb(
   title: string,
   comments: string,
   tags: string[]
-): E.Either<string, JsonDB> {
+): Either<string, JsonDB> {
   logger.info(
     "url = " +
       url +
@@ -314,7 +314,7 @@ function registerWeb(
   if (isValidJsonEntry(json)) {
     const id = "url_" + url;
     if (id in jsonDB) {
-      return E.left(
+      return genLeft(
         "Failed to register url_" +
           url +
           ". Because " +
@@ -325,10 +325,10 @@ function registerWeb(
       jsonDB[id] = json;
       logger.info("Register url_" + url);
 
-      return E.right(jsonDB);
+      return genRight(jsonDB);
     }
   } else {
-    return E.left(
+    return genLeft(
       "Failed to register url_" + url + ". Because got JSON is not valid."
     );
   }
@@ -362,7 +362,7 @@ async function registerNonBookPDF(
   tags: string[],
   renameUsingTitle: boolean,
   downloadUrl: string | undefined
-): Promise<E.Either<string, [string, DBEntry]>> {
+): Promise<Either<string, [string, DBEntry]>> {
   logger.info(
     "papersDir = " +
       papersDir +
@@ -380,15 +380,15 @@ async function registerNonBookPDF(
 
   const docID = await getDocID(pdf, papersDir, false, downloadUrl);
 
-  if (E.isLeft(docID)) {
+  if (docID._tag === "left") {
     logger.warn("Cannot get docID of " + pdf);
     return docID;
   }
 
   logger.info("docID = " + JSON.stringify(docID));
-  const t = await getJson(E.toUnion(docID), JSON.parse(JSON.stringify(pdf)));
+  const t = await getJson(docID.right, JSON.parse(JSON.stringify(pdf)));
 
-  if (E.isLeft(t)) {
+  if (t._tag === "left") {
     return t;
   }
 
@@ -401,7 +401,7 @@ async function registerNonBookPDF(
   if (jsonDB.hasOwnProperty(dbID)) {
     // TODO: Make shell script to delete duplicated files.
     console.warn("mv ", '"' + pdf + '" duplicated');
-    return E.left(
+    return genLeft(
       pdf +
         " is duplicated. You can find another file in " +
         jsonDB[dbID][ENTRY_PATH] +
@@ -428,7 +428,7 @@ async function registerNonBookPDF(
     if (fs.existsSync(concatDirs(papersDir.concat(newFilename)))) {
       const err = newFilename + " already exists. Skip registration.";
       logger.warn(err);
-      return E.left(err);
+      return genLeft(err);
     }
     fs.renameSync(
       concatDirs(papersDir.concat(oldFilename)),
@@ -437,7 +437,7 @@ async function registerNonBookPDF(
     logger.info("Rename " + oldFilename + " to " + newFilename);
   }
 
-  return E.right([dbID, json]);
+  return genRight([dbID, json]);
 }
 
 async function genDB(
@@ -552,11 +552,11 @@ async function genDB(
         isBook = true;
         const docID = await getDocID(p, papersDir, true, undefined);
         bookChapters[concatDirs(papersDir.concat(bd))].pdfs.push(p);
-        if (E.isRight(docID)) {
-          const i: DocID = E.toUnion(docID);
+        if (docID._tag === "right") {
+          const i: DocID = docID.right;
           const t = await getJson(i, p);
           if (
-            E.isRight(t) &&
+            t._tag === "right" &&
             t.right.dbEntry.idType == ID_TYPE_ISBN &&
             i.docIDType == "isbn"
           ) {
@@ -580,8 +580,8 @@ async function genDB(
         false,
         undefined
       );
-      if (E.isRight(idEntryOrError)) {
-        const t: [string, DBEntry] = E.toUnion(idEntryOrError);
+      if (idEntryOrError._tag === "right") {
+        const t: [string, DBEntry] = idEntryOrError.right;
         jsonDB[t[0]] = t[1];
       }
     }
