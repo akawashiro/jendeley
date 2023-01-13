@@ -72,6 +72,7 @@ WantedBy=default.target
 ```
 
 ## Use web interface
+![howtouse](https://user-images.githubusercontent.com/3770618/212287575-b553971c-e59f-40f7-8fb4-fd6ac68d1665.png)
 
 ## Check and edit your database
 Because `jendeley` is fully JSON-based, you can check the contents of the
