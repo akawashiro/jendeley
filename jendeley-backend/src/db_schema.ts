@@ -5,6 +5,7 @@ type ArxivEntry = {
   comments: string;
   userSpecifiedTitle: string | undefined;
   dataFromArxiv: any;
+  reservedForUser: any | undefined;
 };
 
 type DoiEntry = {
@@ -14,6 +15,7 @@ type DoiEntry = {
   comments: string;
   userSpecifiedTitle: string | undefined;
   dataFromCrossref: any;
+  reservedForUser: any | undefined;
 };
 
 type BookEntry = {
@@ -23,6 +25,7 @@ type BookEntry = {
   comments: string;
   userSpecifiedTitle: string | undefined;
   dataFromNodeIsbn: any;
+  reservedForUser: any | undefined;
 };
 
 type IsbnEntry = {
@@ -32,6 +35,7 @@ type IsbnEntry = {
   comments: string;
   userSpecifiedTitle: string | undefined;
   dataFromNodeIsbn: any;
+  reservedForUser: any | undefined;
 };
 
 type PathEntry = {
@@ -41,6 +45,7 @@ type PathEntry = {
   tags: string[];
   userSpecifiedTitle: string | undefined;
   comments: string;
+  reservedForUser: any | undefined;
 };
 
 type UrlEntry = {
@@ -50,6 +55,7 @@ type UrlEntry = {
   tags: string[];
   userSpecifiedTitle: string | undefined;
   comments: string;
+  reservedForUser: any | undefined;
 };
 
 type DBMetaData = {
