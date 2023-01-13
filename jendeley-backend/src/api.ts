@@ -37,7 +37,7 @@ import {
   PathEntry,
   UrlEntry,
 } from "./db_schema";
-import * as E from "fp-ts/lib/Either";
+import { Either, isRight } from "./either";
 import { loadDB, saveDB } from "./load_db";
 import { concatDirs } from "./path_util";
 
@@ -366,8 +366,8 @@ async function addWebFromUrl(
   tags.push(date_tag);
   const newDBOrError = registerWeb(jsonDB, req.url, title, req.comments, tags);
 
-  if (E.isRight(newDBOrError)) {
-    saveDB(E.toUnion(newDBOrError), dbPath);
+  if (newDBOrError._tag === "right") {
+    saveDB(newDBOrError.right, dbPath);
 
     const r: ApiResponse = {
       isSucceeded: true,
@@ -375,7 +375,7 @@ async function addWebFromUrl(
     };
     response.status(200).json(r);
   } else {
-    const err: string = E.toUnion(newDBOrError);
+    const err: string = newDBOrError.left;
     const r: ApiResponse = {
       isSucceeded: false,
       message: err,
@@ -473,8 +473,8 @@ async function addPdfFromUrl(
     req.url
   );
 
-  if (E.isRight(idEntryOrError)) {
-    const t: [string, DBEntry] = E.toUnion(idEntryOrError);
+  if (idEntryOrError._tag === "right") {
+    const t: [string, DBEntry] = idEntryOrError.right;
 
     if (t[0] in jsonDB) {
       fs.rmSync(fullpathOfDownloadFile);
@@ -496,7 +496,7 @@ async function addPdfFromUrl(
     }
   } else {
     fs.rmSync(fullpathOfDownloadFile);
-    const err: string = E.toUnion(idEntryOrError);
+    const err: string = idEntryOrError.left;
     const r: ApiResponse = {
       isSucceeded: false,
       message: err,
