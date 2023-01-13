@@ -13,7 +13,7 @@
 - [Launch jendeley UI](#launch-jendeley-ui)
     - [Launch `jendeley` automatically](#launch-jendeley-automatically)
 - [Use web interface](#use-web-interface)
-- [Check and edit your database](#check-and-edit-your-database)
+- [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
 
 ## Quickstart
 ```
@@ -73,7 +73,7 @@ WantedBy=default.target
 
 ## Use web interface
 
-## Check and edit your database
+## Check and edit your database (advanced)
 Because `jendeley` is fully JSON-based, you can check the contents of the
 database easily. For example, you can use `jq` command to list up all titles in
 your database with the following command.
