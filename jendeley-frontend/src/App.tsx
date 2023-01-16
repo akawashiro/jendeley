@@ -296,7 +296,7 @@ function App() {
             initialState={{
               showColumnFilters: true,
               sorting: [{ id: "year", desc: true }],
-              columnVisibility: { id: true, path: false },
+              columnVisibility: { id: true, path: false, publisher: false, abstract: false },
               density: "comfortable",
             }}
             enableStickyHeader
