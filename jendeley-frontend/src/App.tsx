@@ -11,7 +11,11 @@ import MaterialReactTable, {
   MRT_Row,
 } from "material-react-table";
 import sanitizeHTML from "sanitize-html";
-import { RegisterWebWithDialog, RegisterPDFFromWeb, RegisterPDFFromFile } from "./register";
+import {
+  RegisterWebWithDialog,
+  RegisterPDFFromWeb,
+  RegisterPDFFromFile,
+} from "./register";
 import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
