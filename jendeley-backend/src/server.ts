@@ -7,6 +7,7 @@ import { Request, Response } from "express";
 import bodyParser from "body-parser";
 import { logger } from "./logger";
 import {
+  addPdfFromFile,
   addPdfFromUrl,
   addWebFromUrl,
   deleteEntry,
@@ -24,7 +25,7 @@ function startServer(
 ) {
   if (fs.existsSync(concatDirs(dbPath))) {
     const app = express();
-
+    app.use(bodyParser.json({ limit: "1gb" }));
     if (allowCors) {
       app.use(cors());
     }
@@ -46,6 +47,14 @@ function startServer(
     });
 
     let jsonParser = bodyParser.json();
+
+    app.put(
+      "/api/add_pdf_from_file",
+      jsonParser,
+      async (httpRequest: Request, response: Response) => {
+        addPdfFromFile(httpRequest, response, dbPath);
+      }
+    );
 
     app.put(
       "/api/add_pdf_from_url",
