@@ -11,7 +11,7 @@ import MaterialReactTable, {
   MRT_Row,
 } from "material-react-table";
 import sanitizeHTML from "sanitize-html";
-import { RegisterWebWithDialog, RegisterPDFWithDialog } from "./register";
+import { RegisterWebWithDialog, RegisterPDFFromWeb, RegisterPDFFromFile } from "./register";
 import { splitTagsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -296,7 +296,12 @@ function App() {
             initialState={{
               showColumnFilters: true,
               sorting: [{ id: "year", desc: true }],
-              columnVisibility: { id: true, path: false, publisher: false, abstract: false },
+              columnVisibility: {
+                id: true,
+                path: false,
+                publisher: false,
+                abstract: false,
+              },
               density: "comfortable",
             }}
             enableStickyHeader
@@ -320,7 +325,11 @@ function App() {
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
                   />
-                  <RegisterPDFWithDialog
+                  <RegisterPDFFromWeb
+                    setTableData={setTableData}
+                    setConnectionError={setConnectionError}
+                  />
+                  <RegisterPDFFromFile
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
                   />

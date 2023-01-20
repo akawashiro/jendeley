@@ -12,6 +12,7 @@ import {
 import "./App.css";
 import {
   ApiResponse,
+  RequestGetPdfFromFile,
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
 } from "./api_schema";
@@ -201,7 +202,193 @@ function isValidFilename(filename: string) {
   return true;
 }
 
-function RegisterPDFWithDialog(props: any) {
+function RegisterPDFFromFile(props: any) {
+  const [file, setFile] = React.useState<File>();
+  const [doi, setDoi] = React.useState("");
+  const [isbn, setIsbn] = React.useState("");
+  const [filename, setFilename] = React.useState("");
+  const [filenameError, setFilenameError] = React.useState(false);
+  const [filenameErrorText, setFilenameErrorText] = React.useState("");
+  const [tags, setTags] = React.useState("");
+  const [comments, setComments] = React.useState("");
+  const [isRegisterable, setIsRegisterable] = React.useState(false);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+
+      let f = filename;
+      if (filename == "") {
+        f = e.target.files[0].name;
+        setFilename(f);
+      }
+      setIsRegisterable(isValidFilename(f));
+    }
+  };
+
+  const handleFilenameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const f = event.target.value;
+    setFilename(f);
+    setFilenameError(!isValidFilename(f) && f !== "");
+    if (!isValidFilename(f) && f !== "") {
+      setFilenameErrorText(
+        "Non valid filename: " + f + ". Filename must end with .pdf."
+      );
+    } else {
+      setFilenameErrorText("");
+    }
+    // TODO: This `isValidUrl(pdfUrl)` does not works correctly because
+    // filename is updated synchronously.
+    setIsRegisterable(isValidFilename(f));
+  };
+
+  const handleDoiChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDoi(event.target.value);
+  };
+
+  const handleIsbnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsbn(event.target.value);
+  };
+
+  const handleTagsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTags(event.target.value);
+  };
+
+  const handleCommentsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setComments(event.target.value);
+  };
+
+  function isValidUrl(urlString: string) {
+    try {
+      return Boolean(new URL(urlString));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsRegisterable(false);
+    setFilename("");
+    setTags("");
+    setComments("");
+    setIsRegisterable(false);
+    setOpen(false);
+  };
+
+  async function handleRegister() {
+    console.log("Register PDF.");
+    const r: RequestGetPdfFromFile = {
+      filename: filename === "" ? undefined : filename,
+      fileBase64: "",
+      isbn: isbn === "" ? undefined : isbn,
+      doi: doi === "" ? undefined : doi,
+      tags: splitTagsStr(tags),
+      comments: comments,
+    };
+    console.log("Add PDF from URL");
+    setOpen(false);
+    await fetch(REACT_APP_API_URL + "/api/add_pdf_from_file", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(r),
+    })
+      .then((response) => response.json())
+      .then((apiResponse: ApiResponse) => {
+        console.log("response = " + JSON.stringify(apiResponse));
+        if (apiResponse.isSucceeded) {
+          enqueueSnackbar(apiResponse.message, { variant: "info" });
+        } else {
+          enqueueSnackbar(apiResponse.message, { variant: "error" });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
+      });
+    console.log("Fetching from DB in registration");
+    fetch(REACT_APP_API_URL + "/api/get_db")
+      .then((response) => response.json())
+      .then((json) => props.setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        props.setConnectionError(true);
+      });
+  }
+
+  return (
+    <Box>
+      <Button variant="contained" onClick={handleClickOpen}>
+        Upload PDF
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Upload PDF</DialogTitle>
+        <DialogContent>
+          <Stack sx={{ m: 1 }} spacing={2}>
+            <Button variant="contained" component="label">
+              Select PDF File
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileChange}
+                hidden
+              />
+            </Button>
+            <TextField
+              error={filenameError}
+              label="Filename (Can use metadata e.g. hoge [jendeley isbn 9781467330763].pdf)"
+              variant="outlined"
+              size="small"
+              value={filename}
+              onChange={handleFilenameChange}
+              sx={{ width: 500 }}
+              helperText={filenameErrorText}
+            />
+            <TextField
+              label="Tags (Concatenate multiple tags with comma)"
+              variant="outlined"
+              size="small"
+              value={tags}
+              onChange={handleTagsChange}
+              sx={{ width: 500 }}
+            />
+            <TextField
+              label="Comments"
+              variant="outlined"
+              size="small"
+              value={comments}
+              onChange={handleCommentsChange}
+              sx={{ width: 500 }}
+              multiline={true}
+              rows={5}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            disabled={!isRegisterable}
+            onClick={handleRegister}
+          >
+            Register
+          </Button>
+          <Button variant="contained" onClick={handleClose}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+}
+
+function RegisterPDFFromWeb(props: any) {
   const [pdfUrl, setPdfUrl] = React.useState("");
   const [pdfUrlError, setPdfUrlError] = React.useState(false);
   const [pdfUrlHelperText, setPdfUrlHelperText] = React.useState("");
@@ -395,4 +582,4 @@ function RegisterPDFWithDialog(props: any) {
   );
 }
 
-export { RegisterWebWithDialog, RegisterPDFWithDialog };
+export { RegisterWebWithDialog, RegisterPDFFromWeb, RegisterPDFFromFile };

@@ -25,6 +25,7 @@ import {
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
   ApiResponse,
+  RequestGetPdfFromFile,
 } from "./api_schema";
 import https from "https";
 import http from "http";
@@ -386,6 +387,26 @@ async function addWebFromUrl(
   logger.info("Sent a response from add_web_from_url");
 }
 
+async function addPdfFromFile(
+  httpRequest: Request,
+  response: Response,
+  dbPath: string[]
+) {
+  // TODO: Handle RequestGetPdfFromFile.isbn/doi/comments/tags
+  const req = httpRequest.body as RequestGetPdfFromFile;
+  logger.info(
+    "Get a add_pdf_from_file request url = " +
+      httpRequest.url +
+      " req = " +
+      JSON.stringify(req)
+  );
+  const r: ApiResponse = {
+    isSucceeded: true,
+    message: "addWebFromUrl succeeded",
+  };
+  response.status(200).json(r);
+}
+
 async function addPdfFromUrl(
   httpRequest: Request,
   response: Response,
@@ -571,6 +592,7 @@ export {
   addWebFromUrl,
   updateEntry,
   addPdfFromUrl,
+  addPdfFromFile,
   getPdf,
   getTitleFromUrl,
 };

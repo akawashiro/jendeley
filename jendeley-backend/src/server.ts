@@ -7,6 +7,7 @@ import { Request, Response } from "express";
 import bodyParser from "body-parser";
 import { logger } from "./logger";
 import {
+  addPdfFromFile,
   addPdfFromUrl,
   addWebFromUrl,
   deleteEntry,
@@ -46,6 +47,14 @@ function startServer(
     });
 
     let jsonParser = bodyParser.json();
+
+    app.put(
+      "/api/add_pdf_from_file",
+      jsonParser,
+      async (httpRequest: Request, response: Response) => {
+        addPdfFromFile(httpRequest, response, dbPath);
+      }
+    );
 
     app.put(
       "/api/add_pdf_from_url",
