@@ -124,10 +124,10 @@ function RegisterWebWithDialog(props: any) {
   return (
     <Box>
       <Button variant="contained" onClick={handleClickOpen}>
-        Register web article
+        Register webpage
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Register web article</DialogTitle>
+        <DialogTitle>Register webpage</DialogTitle>
         <DialogContent>
           <Stack sx={{ m: 1 }} spacing={2}>
             <TextField
@@ -537,10 +537,10 @@ function RegisterPDFFromWeb(props: any) {
   return (
     <Box>
       <Button variant="contained" onClick={handleClickOpen}>
-        Register PDF
+        Register PDF from URL
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Register PDF</DialogTitle>
+        <DialogTitle>Register PDF from URL</DialogTitle>
         <DialogContent>
           <Stack sx={{ m: 1 }} spacing={2}>
             <TextField
