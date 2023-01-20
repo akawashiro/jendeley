@@ -219,7 +219,7 @@ function RegisterPDFFromFile(props: any) {
       setFile(e.target.files[0]);
 
       let f = filename;
-      if (filename == "") {
+      if (filename === "") {
         f = e.target.files[0].name;
         setFilename(f);
       }

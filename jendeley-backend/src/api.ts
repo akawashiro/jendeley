@@ -38,7 +38,7 @@ import {
   PathEntry,
   UrlEntry,
 } from "./db_schema";
-import { Either, isRight } from "./either";
+import { Either, genLeft, genRight, isRight } from "./either";
 import { loadDB, saveDB } from "./load_db";
 import { concatDirs } from "./path_util";
 
@@ -335,13 +335,19 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
 }
 
 // Rewrite using Either
-async function getTitleFromUrl(url: string): Promise<string> {
+async function getTitleFromUrl(url: string): Promise<Either<string, string>> {
   let { got } = await import("got");
 
-  const res = await got(url);
-  const root = cheerio.load(res.body);
-  const title = root("title").text();
-  return title;
+  try {
+    const res = await got(url);
+    const root = cheerio.load(res.body);
+    const title = root("title").text();
+    return genRight(title);
+  } catch {
+    const err = "Failed to get title from " + url;
+    logger.warn(err);
+    return genLeft(err);
+  }
 }
 
 async function addWebFromUrl(
@@ -357,8 +363,24 @@ async function addWebFromUrl(
       JSON.stringify(req)
   );
 
+  let title = "";
+  if (req.title !== "") {
+    title = req.title;
+  } else {
+    const titleOrError = await getTitleFromUrl(req.url);
+    if (titleOrError._tag === "left") {
+      const r: ApiResponse = {
+        isSucceeded: false,
+        message: titleOrError.left,
+      };
+      response.status(500).json(r);
+      return;
+    } else {
+      title = titleOrError.right;
+    }
+  }
+
   const jsonDB = loadDB(dbPath, false);
-  const title = req.title == "" ? await getTitleFromUrl(req.url) : req.title;
   const date = new Date();
   const date_tag = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
