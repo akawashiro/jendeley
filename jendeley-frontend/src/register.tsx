@@ -296,45 +296,48 @@ function RegisterPDFFromFile(props: any) {
     } else {
       console.log("Upload PDF.");
       const fileBase64 = await getBase64(file);
-
-      const r: RequestGetPdfFromFile = {
-        filename: filename === "" ? undefined : filename,
-        fileBase64: fileBase64,
-        isbn: isbn === "" ? undefined : isbn,
-        doi: doi === "" ? undefined : doi,
-        tags: splitTagsStr(tags),
-        comments: comments,
-      };
-      console.log("Add PDF from URL");
-      setOpen(false);
-      await fetch(REACT_APP_API_URL + "/api/add_pdf_from_file", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(r),
-      })
-        .then((response) => response.json())
-        .then((apiResponse: ApiResponse) => {
-          console.log("response = " + JSON.stringify(apiResponse));
-          if (apiResponse.isSucceeded) {
-            enqueueSnackbar(apiResponse.message, { variant: "info" });
-          } else {
-            enqueueSnackbar(apiResponse.message, { variant: "error" });
-          }
+      if (typeof fileBase64 !== "string") {
+        setOpen(false);
+      } else {
+        const r: RequestGetPdfFromFile = {
+          filename: filename,
+          fileBase64: fileBase64,
+          isbn: isbn === "" ? undefined : isbn,
+          doi: doi === "" ? undefined : doi,
+          tags: splitTagsStr(tags),
+          comments: comments,
+        };
+        console.log("Add PDF from URL");
+        setOpen(false);
+        await fetch(REACT_APP_API_URL + "/api/add_pdf_from_file", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(r),
         })
-        .catch((error) => {
-          console.log(error);
-          props.setConnectionError(true);
-        });
-      console.log("Fetching from DB in registration");
-      fetch(REACT_APP_API_URL + "/api/get_db")
-        .then((response) => response.json())
-        .then((json) => props.setTableData(json))
-        .catch((error) => {
-          console.log(error);
-          props.setConnectionError(true);
-        });
+          .then((response) => response.json())
+          .then((apiResponse: ApiResponse) => {
+            console.log("response = " + JSON.stringify(apiResponse));
+            if (apiResponse.isSucceeded) {
+              enqueueSnackbar(apiResponse.message, { variant: "info" });
+            } else {
+              enqueueSnackbar(apiResponse.message, { variant: "error" });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            props.setConnectionError(true);
+          });
+        console.log("Fetching from DB in registration");
+        fetch(REACT_APP_API_URL + "/api/get_db")
+          .then((response) => response.json())
+          .then((json) => props.setTableData(json))
+          .catch((error) => {
+            console.log(error);
+            props.setConnectionError(true);
+          });
+      }
     }
   }
 
