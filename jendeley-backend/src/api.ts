@@ -397,14 +397,81 @@ async function addPdfFromFile(
   logger.info(
     "Get a add_pdf_from_file request url = " +
       httpRequest.url +
-      " req = " +
-      JSON.stringify(req)
+      " req.filename = " +
+      JSON.stringify(req.filename)
   );
-  const r: ApiResponse = {
-    isSucceeded: true,
-    message: "addWebFromUrl succeeded",
-  };
-  response.status(200).json(r);
+
+  if (
+    fs.existsSync(
+      concatDirs(dbPath.slice(0, dbPath.length - 1).concat([req.filename]))
+    )
+  ) {
+    const err: string = req.filename + " is already exists.";
+    const r: ApiResponse = {
+      isSucceeded: false,
+      message: err,
+    };
+    response.status(500).json(r);
+  } else {
+    const data = req.fileBase64.replace(/^data:application\/pdf+;base64,/, "");
+    const buf = new Buffer(data, "base64");
+
+    const fullpathOfUploadFile = concatDirs(
+      dbPath.slice(0, dbPath.length - 1).concat([req.filename])
+    );
+    fs.writeFileSync(fullpathOfUploadFile, buf);
+
+    const jsonDB = loadDB(dbPath, false);
+    const date = new Date();
+    const date_tag = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .split("T")[0];
+    const tags = req.tags;
+    tags.push(date_tag);
+    const idEntryOrError = await registerNonBookPDF(
+      dbPath.slice(0, dbPath.length - 1),
+      [req.filename],
+      jsonDB,
+      undefined,
+      req.comments,
+      tags,
+      req.filename == undefined,
+      undefined
+    );
+
+    if (idEntryOrError._tag === "right") {
+      const t: [string, DBEntry] = idEntryOrError.right;
+
+      if (t[0] in jsonDB) {
+        fs.rmSync(fullpathOfUploadFile);
+        const r: ApiResponse = {
+          isSucceeded: false,
+          message:
+            "addPdfFromFile failed. You have registered the same document already.",
+        };
+        response.status(500).json(r);
+      } else {
+        jsonDB[t[0]] = t[1];
+        saveDB(jsonDB, dbPath);
+
+        const r: ApiResponse = {
+          isSucceeded: true,
+          message: "addPdfFromFile succeeded",
+        };
+        response.status(200).json(r);
+      }
+    } else {
+      fs.rmSync(fullpathOfUploadFile);
+      const err: string = idEntryOrError.left;
+      const r: ApiResponse = {
+        isSucceeded: false,
+        message: err,
+      };
+      response.status(500).json(r);
+    }
+
+    logger.info("Sent a response from add_pdf_from_file");
+  }
 }
 
 async function addPdfFromUrl(
@@ -476,6 +543,7 @@ async function addPdfFromUrl(
     dbPath.slice(0, dbPath.length - 1).concat([filename])
   );
   await download(req.url, fullpathOfDownloadFile);
+
   const jsonDB = loadDB(dbPath, false);
   const date = new Date();
   const date_tag = new Date(date.getTime() - date.getTimezoneOffset() * 60000)

@@ -25,7 +25,7 @@ function startServer(
 ) {
   if (fs.existsSync(concatDirs(dbPath))) {
     const app = express();
-
+    app.use(bodyParser.json({ limit: "1gb" }));
     if (allowCors) {
       app.use(cors());
     }

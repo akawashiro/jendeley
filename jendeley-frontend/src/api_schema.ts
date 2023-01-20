@@ -19,7 +19,7 @@ type ApiEntry = {
 type ApiDB = ApiEntry[];
 
 type RequestGetPdfFromFile = {
-  filename: string | undefined;
+  filename: string;
   fileBase64: string;
   doi: string | undefined;
   isbn: string | undefined;
