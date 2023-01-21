@@ -11,17 +11,25 @@
 ### データベースの初期化
 `jendeley scan --papers_dir <YOUR PDFs DIR>` でデータベースを初期化します。スキャンしたいPDFがない場合は適当なディレクトリを作ってそこを指定すれば良いです。
 ### Web UIの起動
-先程指定した `<YOUR PDFs DIR>` の中に `jendeley_db.json` というファイルができているはずなのでこのパスを指定して `jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json` のように起動します。 TODO: 画像
+先程指定した `<YOUR PDFs DIR>` の中に `jendeley_db.json` というファイルができているはずなのでこのパスを指定して `jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json` のように起動します。 
+
+![Web UI](./webui.png "Web UI")
 ### ウェブページの追加
 データベースへのウェブページの追加は`REGISTER WEBPAGE` ボタンから行えます。このとき、タグやコメントを書くことができます。タグはコンマ(`,`)区切りの文字列です。なお、追加した日のタグは自動で追加されます。
+
+![Register webpage](./register_webpage.png "Register webpage")
 ### ウェブ上のPDFファイルの追加
-`REGISTER PDF FROM URL`ボタンでウェブ上のPDFファイルをURLから直接追加できます。データベースにPDFファイルを追加する際、`jendeley` はPDFファイルの[Digital object identifier(DOI)](https://www.doi.org/)または[International Standard Book Number(ISBN)](https://en.wikipedia.org/wiki/ISBN)を特定し、PDFファイルの著者、出版日時などの情報をデータベースに追加します。PDFファイルによってはDOIまたはISBNが特定できない、もしくは対応するDOIまたはISBNが存在しないことがあります。この場合は、ファイル名を指定することで `jendeley` に追加の情報を伝えることができます。詳しくは[ファイル名を使ったDOIまたはISBNの指定](#ファイル名を使ったDOIまたはISBNの指定)で説明します。TODO: 画像
+`REGISTER PDF FROM URL`ボタンでウェブ上のPDFファイルをURLから直接追加できます。データベースにPDFファイルを追加する際、`jendeley` はPDFファイルの[Digital object identifier(DOI)](https://www.doi.org/)または[International Standard Book Number(ISBN)](https://en.wikipedia.org/wiki/ISBN)を特定し、PDFファイルの著者、出版日時などの情報をデータベースに追加します。PDFファイルによってはDOIまたはISBNが特定できない、もしくは対応するDOIまたはISBNが存在しないことがあります。この場合は、ファイル名を指定することで `jendeley` に追加の情報を伝えることができます。詳しくは[ファイル名を使ったDOIまたはISBNの指定](#ファイル名を使ったDOIまたはISBNの指定)で説明します。
+
+![Register PDF from URL](register_pdf_from_url.png "Register PDF from URL")
 ### ローカルのPDFファイルの追加
 `UPLOAD PDF` ボタンでローカルのPDFファイルを追加することも可能です。
 ### タグ、コメントの使い方
-タグやコメントは追加したあとで編集することもできます。編集したいエントリのタグ、コメント部分をダブルクリックすると編集できるようになります。TODO: 画像
+タグやコメントは追加したあとで編集することもできます。編集したいエントリのタグ、コメント部分をダブルクリックすると編集できるようになります。
+![Edit comments](edit_comments.png "Edit comments")
 
-また、タグやコメントを使ってデータベースをフィルタすることも可能です。TODO: 画像
+また、タグやコメントを使ってデータベースをフィルタすることも可能です。
+![Filter by tag](filter_by_tag.png "Filter by tag")
 
 ## 発展的な使い方
 ### ファイル名を使ったDOIまたはISBNの指定
