@@ -1,5 +1,9 @@
 # jendeley - JSONベースの情報管理ソフトウェア
-`jendeley` はJSONベースの情報管理ソフトウェアです。論文・電子書籍・仕様書・ウェブページといった様々なドキュメントを整理し、検索することができます。
+
+日々読んだり検索したりする様々なドキュメントを整理するために `jendeley`というソフトウェアを作りました。 `jendeley` はJSONベースの情報管理ソフトウェアです。論文・電子書籍・仕様書・ウェブページといった様々なドキュメントを整理し、検索することができます。
+ <a href="https://github.com/akawashiro/jendeley"><img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/akawashiro/jendeley.png" width="460px"></a> 
+
+
 ## 動機
 プログラマには様々なドキュメントが必要です。しかも、それらは様々な形で提供されます。例えば、最新の機械学習モデルについての論文、古典的なコンパイラの本、使用するCPU・アクセラレータの仕様書、プログラミング言語のドキュメント、有用な個人ブログ等々です。また、これらのドキュメントは関連付けし整理して保管する必要があります。更に、これらのドキュメントは何年後に参照するかがわからないため、長期に渡って参照可能な形式で保存しなければなりません。
 
@@ -47,6 +51,9 @@ DOIを指定したい場合は、ファイル名に`[jendeley doi <DOIの区切�
 
 ### gitを使ったデータベースの管理
 `jendeley` はデータベースを可能な限りテキストとしての差分が小さくなるように編集します。このため、`git` を使ってデータベースを管理することができます。僕は `<YOUR PDFs DIR>` をDropboxに入れた上で `git` 管理しています。
+
+## お願い
+[Githubのjendeleyのリポジトリ](https://github.com/akawashiro/jendeley)にスターしてください。
 
 ## 謝辞
 最初のユーザとしてインストールして感想をくださった [Shuhei Kadowaki](https://twitter.com/kdwkshh)さんと[たまろん](https://twitter.com/tamaroning)さん、不慣れなフロントエンド開発についてアドバイスをくださった[あさくら](https://twitter.com/asakura_dev)さんと[gky360](https://twitter.com/gky360)にこの場を借りてお礼を申し上げます。
