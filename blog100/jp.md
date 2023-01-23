@@ -1,6 +1,7 @@
 # jendeley - JSONベースの情報管理ソフトウェア
 
 日々読んだり検索したりする様々なドキュメントを整理するために `jendeley`というソフトウェアを作りました。 `jendeley` はJSONベースの情報管理ソフトウェアです。論文・電子書籍・仕様書・ウェブページといった様々なドキュメントを整理し、検索することができます。
+
  <a href="https://github.com/akawashiro/jendeley"><img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/akawashiro/jendeley.png" width="460px"></a> 
 
 
