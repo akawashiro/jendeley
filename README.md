@@ -43,3 +43,25 @@ Use `local-install.sh` on Linux or MacOS, `local-install.bat` on Windows.
 
 ## About path representaion
 To make the database cross platform, the database must not include "/" or "\" in path fields. To accomplish this, we handle paths always as `string[]` instead of just `string`.
+
+## Environment
+I am checking `jendeley` on Linux and Windows.
+
+Linux is the following.
+```
+> cat /etc/lsb-release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=22.04
+DISTRIB_CODENAME=jammy
+DISTRIB_DESCRIPTION="Ubuntu 22.04.1 LTS"
+> uname -a
+Linux goshun 5.15.0-58-generic #64-Ubuntu SMP Thu Jan 5 11:43:13 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+> node --version
+v18.13.0
+```
+
+Windows is the following.
+```
+> node --version
+v19.3.0
+```
