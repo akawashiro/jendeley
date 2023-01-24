@@ -45,7 +45,29 @@ DOIを指定したい場合は、ファイル名に`[jendeley doi <DOIの区切�
 チップのリファレンスマニュアルなど、DOIもISBNも持たない文書の場合は `[jendeley no id]` をファイル名含めてください。`ARM reference manual [jendeley no id].pdf` 等です。
 
 ### JSONファイルの編集
-`jendeley` のデータベースはプレーンなテキストファイルであり、テキストエディタ等でユーザが編集することを想定しています。編集した後は、`jendeley validate --db jendeley_db.json` でデータベースが `jendeley` のデータベースとして妥当なものであることをチェックしてください。
+`jendeley` のデータベースはプレーンなテキストファイルです。例えばタグは単なる文字列のリストとして、コメントは単なる文字列として保存されています。
+```
+> head -n 18 test_pdfs/jendeley_db.json
+{
+  "jendeley_meta": {
+    "idType": "meta",
+    "version": "0.0.25"
+  },
+  "arxiv_2212.12976": {
+    "path": [
+      "Modular Formal Verification of Rust Programs with Unsafe Blocks [jendeley download 1673165594267].pdf"
+    ],
+    "idType": "arxiv",
+    "tags": [
+      "hoge"
+    ],
+    "comments": "hogehogefuga",
+    "dataFromArxiv": {
+      "id": "http://arxiv.org/abs/2212.12976v1",
+      "updated": "2022-12-26T00:19:19Z",
+      "published": "2022-12-26T00:19:19Z",
+```
+このデータレースはテキストエディタ等でユーザが編集することを想定しています。編集した後は、`jendeley validate --db jendeley_db.json` で `jendeley` のデータベースとして妥当なものであることをチェックしてください。
 
 ### 同じデータベースの複数のコンピュータでの共有
 `jendeley` のデータベースはクロスプラットホームで動作するように設計されています。具体的にはLinux, Windows, MacOSで同じデータベースを共有できます。このため、`<YOUR PDFs DIR>`をDropbox等で共有すれば同じデータベースを複数のコンピュータで使用することができます。
