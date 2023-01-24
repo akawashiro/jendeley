@@ -1,4 +1,3 @@
-# This software is still experimental. Please wait until 1.0.0 for heavy use.
 # jendeley
 `jendeley` is a JSON-based PDF paper organizing software.
 - `jendeley` is JSON-based. You can see and edit your database easily.
@@ -13,3 +12,5 @@ jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
 Then you can see a screen like this!
 ![image](https://user-images.githubusercontent.com/3770618/209427855-374e6523-8910-4c98-a9ec-05bd62ae9b8e.png)
+
+Please check [user document](https://akawashiro.github.io/jendeley/) for more details.
