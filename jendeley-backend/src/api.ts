@@ -566,53 +566,71 @@ async function addPdfFromUrl(
   );
   await download(req.url, fullpathOfDownloadFile);
 
-  const jsonDB = loadDB(dbPath, false);
-  const date = new Date();
-  const date_tag = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    .toISOString()
-    .split("T")[0];
-  const tags = req.tags;
-  tags.push(date_tag);
-  const idEntryOrError = await registerNonBookPDF(
-    dbPath.slice(0, dbPath.length - 1),
-    [filename],
-    jsonDB,
-    undefined,
-    req.comments,
-    tags,
-    req.filename == undefined,
-    req.url
-  );
-
-  if (idEntryOrError._tag === "right") {
-    const t: [string, DBEntry] = idEntryOrError.right;
-
-    if (t[0] in jsonDB) {
-      fs.rmSync(fullpathOfDownloadFile);
-      const r: ApiResponse = {
-        isSucceeded: false,
-        message:
-          "addPdfFromUrl failed. You have registered the same document already.",
-      };
-      response.status(500).json(r);
-    } else {
-      jsonDB[t[0]] = t[1];
-      saveDB(jsonDB, dbPath);
-
-      const r: ApiResponse = {
-        isSucceeded: true,
-        message: "addPdfFromUrl succeeded",
-      };
-      response.status(200).json(r);
-    }
-  } else {
+  const binaryContents = fs.readFileSync(fullpathOfDownloadFile);
+  // PDF magic number. See https://en.wikipedia.org/wiki/List_of_file_signatures.
+  if (
+    binaryContents[0] !== 0x25 ||
+    binaryContents[1] !== 0x50 ||
+    binaryContents[2] !== 0x44 ||
+    binaryContents[3] !== 0x46 ||
+    binaryContents[4] !== 0x2d
+  ) {
     fs.rmSync(fullpathOfDownloadFile);
-    const err: string = idEntryOrError.left;
+    const err: string = fullpathOfDownloadFile + " is invalid as PDF.";
     const r: ApiResponse = {
       isSucceeded: false,
       message: err,
     };
     response.status(500).json(r);
+  } else {
+    const jsonDB = loadDB(dbPath, false);
+    const date = new Date();
+    const date_tag = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .split("T")[0];
+    const tags = req.tags;
+    tags.push(date_tag);
+    const idEntryOrError = await registerNonBookPDF(
+      dbPath.slice(0, dbPath.length - 1),
+      [filename],
+      jsonDB,
+      undefined,
+      req.comments,
+      tags,
+      req.filename == undefined,
+      req.url
+    );
+
+    if (idEntryOrError._tag === "right") {
+      const t: [string, DBEntry] = idEntryOrError.right;
+
+      if (t[0] in jsonDB) {
+        fs.rmSync(fullpathOfDownloadFile);
+        const r: ApiResponse = {
+          isSucceeded: false,
+          message:
+            "addPdfFromUrl failed. You have registered the same document already.",
+        };
+        response.status(500).json(r);
+      } else {
+        jsonDB[t[0]] = t[1];
+        saveDB(jsonDB, dbPath);
+
+        const r: ApiResponse = {
+          isSucceeded: true,
+          message: "addPdfFromUrl succeeded",
+        };
+        response.status(200).json(r);
+      }
+    } else {
+      fs.rmSync(fullpathOfDownloadFile);
+      const err: string = idEntryOrError.left;
+      const r: ApiResponse = {
+        isSucceeded: false,
+        message: err,
+      };
+      response.status(500).json(r);
+    }
   }
 
   logger.info("Sent a response from add_pdf_from_url");
