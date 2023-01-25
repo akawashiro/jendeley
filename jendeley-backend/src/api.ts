@@ -528,43 +528,18 @@ async function addPdfFromUrl(
     response.status(500).json(r);
   }
 
-  const download = (uri: string, filename: string) => {
-    const options = {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
-      },
-    };
-
-    if (uri.startsWith("https")) {
-      return new Promise<void>((resolve, reject) =>
-        https
-          .request(uri, options, (res) => {
-            res
-              .pipe(fs.createWriteStream(filename))
-              .on("close", resolve)
-              .on("error", reject);
-          })
-          .end()
-      );
-    } else if (uri.startsWith("http")) {
-      return new Promise<void>((resolve, reject) =>
-        http
-          .request(uri, options, (res) => {
-            res
-              .pipe(fs.createWriteStream(filename))
-              .on("close", resolve)
-              .on("error", reject);
-          })
-          .end()
-      );
-    }
-  };
-
   const fullpathOfDownloadFile = concatDirs(
     dbPath.slice(0, dbPath.length - 1).concat([filename])
   );
-  await download(req.url, fullpathOfDownloadFile);
+  let { got } = await import("got");
+  const options = {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+    },
+  };
+  const download_pdf = await got(req.url, options).buffer();
+  fs.writeFileSync(fullpathOfDownloadFile, download_pdf);
 
   const binaryContents = fs.readFileSync(fullpathOfDownloadFile);
   // PDF magic number. See https://en.wikipedia.org/wiki/List_of_file_signatures.
