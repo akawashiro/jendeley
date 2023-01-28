@@ -109,7 +109,7 @@ function stringArrayFilterFn(
 function purifyTitle(title: string): string {
   const t1 = title.replace(/\.[^/.]pdf$/, "");
   const t2 = t1.replace("[jendeley no id]", "");
-  const t3 = t2.replace("\[jendeley download [0-9]+\]", "");
+  const t3 = t2.replace("[jendeley download [0-9]+]", "");
   return t3;
 }
 
