@@ -106,14 +106,23 @@ function stringArrayFilterFn(
   return false;
 }
 
+function purifyTitle(title: string): string {
+  const t1 = title.replace(/\.[^/.]pdf$/, "");
+  const t2 = t1.replace("[jendeley no id]", "");
+  const t3 = t2.replace("\[jendeley download [0-9]+\]", "");
+  return t3;
+}
+
 function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
+  const title = purifyTitle(cell.getValue<string>());
+
   if (row.original.idType === "url") {
     return (
       <a
         href={`${row.original.url}`}
         target="_blank"
         rel="noopener noreferrer"
-      >{`${cell.getValue()}`}</a>
+      >{`${title}`}</a>
     );
   } else {
     if (row.original.path === undefined) {
@@ -128,7 +137,7 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
         }`}
         target="_blank"
         rel="noopener noreferrer"
-      >{`${cell.getValue()}`}</a>
+      >{`${title}`}</a>
     );
   }
 }
