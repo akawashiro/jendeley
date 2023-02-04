@@ -59,6 +59,7 @@ jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 You can use `--port` option to change the default port.
 
 ### Launch `jendeley` automatically
+#### Linux
 When you are using Linux, you can launch `jendeley` automatically using `systemd`. Please make `~/.config/systemd/user/jendeley.service` with the following contents, run `systemctl --user enable jendeley && systemctl --user start jendeley` and access [http://localhost:5000](http://localhost:5000). You can check the log with `journalctl --user -f -u jendeley.service`.
 ```
 [Unit]
@@ -70,6 +71,15 @@ ExecStart=jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_b
 [Install]
 WantedBy=default.target
 ```
+#### Windows
+When you are using Windonws, you can launch `jendeley` automatically using startup. First, open startup directory by `Windows+R` and type `shell:startup` and `Enter`.
+![Windows startup](win-startup.png)
+
+And then make `autorun-jendeley.bat` with following contents using `notepad.exe`.
+```
+jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser >> <FILL PATH TO THE LOG FILE>
+```
+![Startup directory](startup-directory.png)
 
 ## Use web interface
 ![howtouse](https://user-images.githubusercontent.com/3770618/212287575-b553971c-e59f-40f7-8fb4-fd6ac68d1665.png)
