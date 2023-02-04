@@ -1,8 +1,30 @@
 #! /bin/bash -eux
 
+if [[ $# != 1 ]]
+then
+    echo You must pass one argument.
+    exit 1
+fi
+
+if [[ $1 != "major" ]] && [[ $1 != "minor" ]] && [[ $1 != "patch" ]]
+then
+    echo You must pass one of major, minor or patch.
+    exit 1
+fi
+
+VERSION_UP_KIND=$1
+
 git checkout main
 git pull
 
+# npm version up
+pushd ./jendeley-backend
+npm version ${VERSION_UP_KIND}
+VERSION_DEFINITION_LINE="const JENDELEY_VERSION = $(cat package.json | jq .version);"
+sed -i "s/const JENDELEY_VERSION.*/${VERSION_DEFINITION_LINE}/g" src/constants.ts
+popd
+
+# Build and copy frontend
 pushd ./jendeley-frontend
 npm run build
 popd
@@ -10,6 +32,7 @@ popd
 rm -rf ./jendeley-backend/built-frontend
 cp -r ./jendeley-frontend/build ./jendeley-backend/built-frontend
 
+# Build and publish package
 pushd ./jendeley-backend
 npm run build
 npm publish --dry-run
