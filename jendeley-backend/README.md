@@ -11,6 +11,6 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
 Then you can see a screen like this!
-![Web UI](./webui.png "Web UI")
+![Web UI](https://raw.githubusercontent.com/akawashiro/jendeley/c4aa45db6da5ff567b819bd3dfa1c40ed97dfe8d/jendeley-backend/webui.png "Web UI")
 
 Please check [user document](https://akawashiro.github.io/jendeley/) for more details.
