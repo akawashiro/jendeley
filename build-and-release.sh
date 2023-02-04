@@ -30,6 +30,7 @@ git add ./package.json src/constants.ts
 git commit -m "Release ${VERSION_TAG}"
 git push origin main
 git tag "${VERSION_TAG}"
+git push origin "${VERSION_TAG}"
 popd
 
 # Build and copy frontend
