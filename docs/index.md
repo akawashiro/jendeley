@@ -12,6 +12,8 @@
   - [When `jendeley` fails to scan your PDFs](#when-jendeley-fails-to-scan-your-pdfs)
 - [Launch `jendeley` UI](#launch-jendeley-ui)
   - [Launch `jendeley` automatically](#launch-jendeley-automatically)
+    - [Linux](#linux)
+    - [Windows](#windows)
 - [Use web interface](#use-web-interface)
 - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
 
