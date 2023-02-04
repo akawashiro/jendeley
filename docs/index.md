@@ -16,6 +16,7 @@
     - [Windows](#windows)
 - [Use web interface](#use-web-interface)
 - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
+- [Check source code (advanced)](#check-source-code-advanced)
 
 ## Quickstart
 ```
@@ -30,6 +31,7 @@ Then you can see a screen like this!
 ```
 npm install @a_kawashiro/jendeley -g
 ```
+You can find the lastest package at [npm page](https://www.npmjs.com/package/@a_kawashiro/jendeley).
 
 ## Generate JSON database file
 This command outputs the database to `<YOUR PDFs DIR>/jendeley_db.json`. When `jendeley` fails to scan some PDFs, it generates a shellscript named `edit_and_run.sh`. Please read the next subsection and use it to rename files appropriately so that jendeley can recognize them.
@@ -105,3 +107,6 @@ Because `jendeley` is fully JSON-based, you can check the contents of the databa
 ```
 
 You can edit you database using your favorite editor. But after editing, you should check if your database is valid as a `jendeley` database by `jendeley validate --db <PATH TO THE DATABASE>`.
+
+## Check source code (advanced)
+You can check source code [akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We are welcome your pull request.
