@@ -22,7 +22,7 @@ pushd ./jendeley-backend
 
 npm version "${VERSION_UP_KIND}"
 VERSION_NUMBER=$(jq .version < package.json)
-VERSION_TAG=v${VERSION_NUMBER}
+VERSION_TAG=v$(echo ${VERSION_NUMBER} | tr -d \")
 VERSION_DEFINITION_LINE="const JENDELEY_VERSION = ${VERSION_NUMBER};"
 sed -i "s/const JENDELEY_VERSION.*/${VERSION_DEFINITION_LINE}/g" src/constants.ts
 
