@@ -21,3 +21,12 @@ jobs:
       with:
         context: .
         file: ./Releasable.Dockerfile
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: docker build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./shellcheck.Dockerfile
