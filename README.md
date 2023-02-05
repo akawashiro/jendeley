@@ -1,5 +1,5 @@
 # jendeley <!-- omit in toc -->
-`jendeley` is a JSON-based PDF paper organizing software.
+`jendeley` is a JSON-based document organizing software.
 - `jendeley` is JSON-based. You can see and edit your database easily.
 - `jendeley` is working locally. Your important database is owned only by you. No cloud.
 - `jendeley` is browser based. You can run it anywhere node.js runs.
