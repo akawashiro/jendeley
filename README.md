@@ -78,14 +78,14 @@ WantedBy=default.target
 #### Windows
 When you are using Windonws, you can launch `jendeley` automatically using startup. First, open startup directory by `Windows+R` and type `shell:startup` and `Enter`.
 
-![Windows startup](win-startup.png)
+<img src="https://raw.githubusercontent.com/akawashiro/jendeley/main/win-startup.png" width="50%">
 
 And then make `autorun-jendeley.bat` with following contents using `notepad.exe`.
 ```
 jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser >> <FILL PATH TO THE LOG FILE>
 ```
 
-![Startup directory](startup-directory.png)
+<img src="https://raw.githubusercontent.com/akawashiro/jendeley/main/startup-directory.png" width="70%">
 
 ## Use web interface
 ![howtouse](https://user-images.githubusercontent.com/3770618/212287575-b553971c-e59f-40f7-8fb4-fd6ac68d1665.png)
