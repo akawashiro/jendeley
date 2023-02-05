@@ -5,6 +5,7 @@
 - `jendeley` is browser based. You can run it anywhere node.js runs.
 
 ## Table of Contents <!-- omit in toc -->
+- [Why jendeley?](#why-jendeley)
 - [Quickstart](#quickstart)
 - [Install](#install)
 - [Generate JSON database file](#generate-json-database-file)
@@ -15,8 +16,14 @@
     - [Linux](#linux)
     - [Windows](#windows)
 - [Use web interface](#use-web-interface)
-- [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
-- [Check source code (advanced)](#check-source-code-advanced)
+- [Advanced topics](#advanced-topics)
+  - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
+  - [Check source code (advanced)](#check-source-code-advanced)
+
+## Why jendeley?
+Programmers need various documents. In addition to it, they are in various formats. For example, they are papers on the newest machine learning, classic compiler books, specification documents of our CPU or accelerators, document of programming languages, or useful blog articles. Programmers must organize these documents classified into categories. Furthermore, we must save them in long term such as 10 years because we cannot know when we need them.
+
+To satisfy such difficult requirements, I developed `jendeley`. You can register PDFs or webpages into the same database. You can easily categorize documents using tags. Furthermore, most importantly, the database is just a plain text JSON file. You can edit it using your favorite editor and develop an alternative application even if I failed to continue `jendeley` development.
 
 ## Quickstart
 ```
@@ -92,7 +99,8 @@ You can edit tags and comments by double clicking them. Tags are just comma sepa
 
 ![image](./blog100/top.png)
 
-## Check and edit your database (advanced)
+## Advanced topics
+### Check and edit your database (advanced)
 Because `jendeley` is fully JSON-based, you can check the contents of the database easily.
 ```
 > cat jendeley_db.json | jq '.' | head
@@ -110,5 +118,5 @@ Because `jendeley` is fully JSON-based, you can check the contents of the databa
 
 You can edit you database using your favorite editor. But after editing, you should check if your database is valid as a `jendeley` database by `jendeley validate --db <PATH TO THE DATABASE>`.
 
-## Check source code (advanced)
+### Check source code (advanced)
 You can check source code [akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We are welcome your pull request.
