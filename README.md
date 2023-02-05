@@ -25,7 +25,7 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
 Then you can see a screen like this!
-![image](https://user-images.githubusercontent.com/3770618/209427855-374e6523-8910-4c98-a9ec-05bd62ae9b8e.png)
+![image](./blog100/top.png)
 
 ## Install
 ```
@@ -88,7 +88,9 @@ jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser >> 
 <img src="https://raw.githubusercontent.com/akawashiro/jendeley/main/startup-directory.png" width="70%">
 
 ## Use web interface
-![howtouse](https://user-images.githubusercontent.com/3770618/212287575-b553971c-e59f-40f7-8fb4-fd6ac68d1665.png)
+You can edit tags and comments by double clicking them. Tags are just comma separated string and comments are just plain text. You can write anything. Clincking an author chip or a tag chip copies the string to the clip board. Please use this feature when you filter entries.
+
+![image](./blog100/top.png)
 
 ## Check and edit your database (advanced)
 Because `jendeley` is fully JSON-based, you can check the contents of the database easily.
