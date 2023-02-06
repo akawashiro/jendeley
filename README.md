@@ -16,9 +16,14 @@
     - [Linux](#linux)
     - [Windows](#windows)
 - [Use web interface](#use-web-interface)
+  - [Add a webpages](#add-a-webpages)
+  - [Add a PDF file on the Web](#add-a-pdf-file-on-the-web)
+  - [Upload a PDF file in your computer](#upload-a-pdf-file-in-your-computer)
+  - [Use tags and comments](#use-tags-and-comments)
 - [Advanced topics](#advanced-topics)
   - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
   - [Check source code (advanced)](#check-source-code-advanced)
+- [Support us](#support-us)
 
 ## Why jendeley?
 Programmers need various documents. In addition to it, they are in various formats. For example, they are papers on the newest machine learning, classic compiler books, specification documents of our CPU or accelerators, document of programming languages, or useful blog articles. Programmers must organize these documents classified into categories. Furthermore, we must save them in long term such as 10 years because we cannot know when we need them.
@@ -95,9 +100,29 @@ jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser >> 
 <img src="https://raw.githubusercontent.com/akawashiro/jendeley/main/startup-directory.png" width="70%">
 
 ## Use web interface
-You can edit tags and comments by double clicking them. Tags are just comma separated string and comments are just plain text. You can write anything. Clincking an author chip or a tag chip copies the string to the clip board. Please use this feature when you filter entries.
+When `jendeley` launches, `jendeley` opens Web UI automatically. If not, please acess `http://localhost:5000/`. 
 
 ![image](./blog100/top.png)
+
+### Add a webpages
+You can add an webpage to the database using `REGISTER WEBPAGE` button. When you register, you can write tags or comments. Tags are just a comma(`,`) separated text. By the way, tags of the date is automatically added to the database.
+
+![Register webpage](./blog100/register_webpage.png "Register webpage")
+
+### Add a PDF file on the Web
+You can add a PDF file on the Web using `REGISTER PDF FROM URL` button. When you add, `jendeley` try to find [Digital object identifier(DOI)](https://www.doi.org/) or [International Standard Book Number(ISBN)](https://en.wikipedia.org/wiki/ISBN) of the PDF file and register meta information such as authors and publication date to the database. However, sometimes, `jendeley` cannot find DOI or ISBN of the PDF or there is no correspoding DOI or ISBN to it. In such a case, you can specify DOI or ISBN using its filename. Please check [Recommended filename style](#recommended-filename-style) section for more details.
+
+![Register PDF from URL](./blog100/register_pdf_from_url.png "Register PDF from URL")
+### Upload a PDF file in your computer
+You can upload a PDF file in your computer using `UPLOAD PDF` button.
+
+### Use tags and comments
+You can edit tags or comments after you register. You can edit tags or comments by double clicking them.
+
+![Edit comments](./blog100/edit_comments.png "Edit comments")
+
+Furthermore, you can filter the databse using tags or comments.
+![Filter by tag](./blog100/filter_by_tag.png "Filter by tag")
 
 ## Advanced topics
 ### Check and edit your database (advanced)
@@ -120,3 +145,6 @@ You can edit you database using your favorite editor. But after editing, you sho
 
 ### Check source code (advanced)
 You can check source code [akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We are welcome your pull request.
+
+## Support us
+Please star [akawashiro/jendeley](https://github.com/akawashiro/jendeley). It encourage me a lot.
