@@ -16,13 +16,14 @@
     - [Linux](#linux)
     - [Windows](#windows)
 - [Use web interface](#use-web-interface)
-  - [Add webpages](#add-webpages)
-  - [ウェブ上のPDFファイルの追加](#ウェブ上のpdfファイルの追加)
-  - [ローカルのPDFファイルの追加](#ローカルのpdfファイルの追加)
-  - [タグ、コメントの使い方](#タグコメントの使い方)
+  - [Add a webpages](#add-a-webpages)
+  - [Add a PDF file on the Web](#add-a-pdf-file-on-the-web)
+  - [Upload a PDF file in your computer](#upload-a-pdf-file-in-your-computer)
+  - [Use tags and comments](#use-tags-and-comments)
 - [Advanced topics](#advanced-topics)
   - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
   - [Check source code (advanced)](#check-source-code-advanced)
+- [Support us](#support-us)
 
 ## Why jendeley?
 Programmers need various documents. In addition to it, they are in various formats. For example, they are papers on the newest machine learning, classic compiler books, specification documents of our CPU or accelerators, document of programming languages, or useful blog articles. Programmers must organize these documents classified into categories. Furthermore, we must save them in long term such as 10 years because we cannot know when we need them.
@@ -103,20 +104,24 @@ When `jendeley` launches, `jendeley` opens Web UI automatically. If not, please 
 
 ![image](./blog100/top.png)
 
-### Add webpages
-データベースへのウェブページの追加は`REGISTER WEBPAGE` ボタンから行えます。このとき、タグやコメントを書くことができます。タグはコンマ(`,`)区切りの文字列です。なお、追加した日のタグは自動で追加されます。
+### Add a webpages
+You can add an webpage to the database using `REGISTER WEBPAGE` button. When you register, you can write tags or comments. Tags are just a comma(`,`) separated text. By the way, tags of the date is automatically added to the database.
+
 ![Register webpage](./blog100/register_webpage.png "Register webpage")
-### ウェブ上のPDFファイルの追加
-`REGISTER PDF FROM URL`ボタンでウェブ上のPDFファイルをURLから直接追加できます。データベースにPDFファイルを追加する際、`jendeley` はPDFファイルの[Digital object identifier(DOI)](https://www.doi.org/)または[International Standard Book Number(ISBN)](https://en.wikipedia.org/wiki/ISBN)を特定し、PDFファイルの著者、出版日時などの情報をデータベースに追加します。PDFファイルによってはDOIまたはISBNが特定できない、もしくは対応するDOIまたはISBNが存在しないことがあります。この場合は、ファイル名を指定することで `jendeley` に追加の情報を伝えることができます。詳しくは[ファイル名を使ったDOIまたはISBNの指定](#ファイル名を使ったDOIまたはISBNの指定)で説明します。
+
+### Add a PDF file on the Web
+You can add a PDF file on the Web using `REGISTER PDF FROM URL` button. When you add, `jendeley` try to find [Digital object identifier(DOI)](https://www.doi.org/) or [International Standard Book Number(ISBN)](https://en.wikipedia.org/wiki/ISBN) of the PDF file and register meta information such as authors and publication date to the database. However, sometimes, `jendeley` cannot find DOI or ISBN of the PDF or there is no correspoding DOI or ISBN to it. In such a case, you can specify DOI or ISBN using its filename. Please check [Recommended filename style](#recommended-filename-style) section for more details.
 
 ![Register PDF from URL](./blog100/register_pdf_from_url.png "Register PDF from URL")
-### ローカルのPDFファイルの追加
-`UPLOAD PDF` ボタンでローカルのPDFファイルを追加することも可能です。
-### タグ、コメントの使い方
-タグやコメントは追加したあとで編集することもできます。編集したいエントリのタグ、コメント部分をダブルクリックすると編集できるようになります。
+### Upload a PDF file in your computer
+You can upload a PDF file in your computer using `UPLOAD PDF` button.
+
+### Use tags and comments
+You can edit tags or comments after you register. You can edit tags or comments by double clicking them.
+
 ![Edit comments](./blog100/edit_comments.png "Edit comments")
 
-また、タグやコメントを使ってデータベースをフィルタすることも可能です。
+Furthermore, you can filter the databse using tags or comments.
 ![Filter by tag](./blog100/filter_by_tag.png "Filter by tag")
 
 ## Advanced topics
@@ -140,3 +145,6 @@ You can edit you database using your favorite editor. But after editing, you sho
 
 ### Check source code (advanced)
 You can check source code [akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We are welcome your pull request.
+
+## Support us
+Please star [akawashiro/jendeley](https://github.com/akawashiro/jendeley). It encourage me a lot.
