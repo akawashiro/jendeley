@@ -16,6 +16,10 @@
     - [Linux](#linux)
     - [Windows](#windows)
 - [Use web interface](#use-web-interface)
+  - [Add webpages](#add-webpages)
+  - [ウェブ上のPDFファイルの追加](#ウェブ上のpdfファイルの追加)
+  - [ローカルのPDFファイルの追加](#ローカルのpdfファイルの追加)
+  - [タグ、コメントの使い方](#タグコメントの使い方)
 - [Advanced topics](#advanced-topics)
   - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
   - [Check source code (advanced)](#check-source-code-advanced)
@@ -95,9 +99,25 @@ jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser >> 
 <img src="https://raw.githubusercontent.com/akawashiro/jendeley/main/startup-directory.png" width="70%">
 
 ## Use web interface
-You can edit tags and comments by double clicking them. Tags are just comma separated string and comments are just plain text. You can write anything. Clincking an author chip or a tag chip copies the string to the clip board. Please use this feature when you filter entries.
+When `jendeley` launches, `jendeley` opens Web UI automatically. If not, please acess `http://localhost:5000/`. 
 
 ![image](./blog100/top.png)
+
+### Add webpages
+データベースへのウェブページの追加は`REGISTER WEBPAGE` ボタンから行えます。このとき、タグやコメントを書くことができます。タグはコンマ(`,`)区切りの文字列です。なお、追加した日のタグは自動で追加されます。
+![Register webpage](./blog100/register_webpage.png "Register webpage")
+### ウェブ上のPDFファイルの追加
+`REGISTER PDF FROM URL`ボタンでウェブ上のPDFファイルをURLから直接追加できます。データベースにPDFファイルを追加する際、`jendeley` はPDFファイルの[Digital object identifier(DOI)](https://www.doi.org/)または[International Standard Book Number(ISBN)](https://en.wikipedia.org/wiki/ISBN)を特定し、PDFファイルの著者、出版日時などの情報をデータベースに追加します。PDFファイルによってはDOIまたはISBNが特定できない、もしくは対応するDOIまたはISBNが存在しないことがあります。この場合は、ファイル名を指定することで `jendeley` に追加の情報を伝えることができます。詳しくは[ファイル名を使ったDOIまたはISBNの指定](#ファイル名を使ったDOIまたはISBNの指定)で説明します。
+
+![Register PDF from URL](./blog100/register_pdf_from_url.png "Register PDF from URL")
+### ローカルのPDFファイルの追加
+`UPLOAD PDF` ボタンでローカルのPDFファイルを追加することも可能です。
+### タグ、コメントの使い方
+タグやコメントは追加したあとで編集することもできます。編集したいエントリのタグ、コメント部分をダブルクリックすると編集できるようになります。
+![Edit comments](./blog100/edit_comments.png "Edit comments")
+
+また、タグやコメントを使ってデータベースをフィルタすることも可能です。
+![Filter by tag](./blog100/filter_by_tag.png "Filter by tag")
 
 ## Advanced topics
 ### Check and edit your database (advanced)
