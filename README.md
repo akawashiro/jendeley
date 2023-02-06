@@ -23,7 +23,8 @@
 - [Advanced topics](#advanced-topics)
   - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
   - [Check source code (advanced)](#check-source-code-advanced)
-- [Support us](#support-us)
+- [Contact me](#contact-me)
+- [Support me](#support-me)
 
 ## Why jendeley?
 Programmers need various documents. In addition to it, they are in various formats. For example, they are papers on the newest machine learning, classic compiler books, specification documents of our CPU or accelerators, document of programming languages, or useful blog articles. Programmers must organize these documents classified into categories. Furthermore, we must save them in long term such as 10 years because we cannot know when we need them.
@@ -146,5 +147,8 @@ You can edit you database using your favorite editor. But after editing, you sho
 ### Check source code (advanced)
 You can check source code [akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We are welcome your pull request.
 
-## Support us
+## Contact me
+I'm on [twitter.com/a_kawashiro](https://twitter.com/a_kawashiro) and [mstdn.jp/@a_kawashiro](https://mstdn.jp/@a_kawashiro). And of course, feel free to make an issue or an PR to the repository.
+
+## Support me
 Please star [akawashiro/jendeley](https://github.com/akawashiro/jendeley). It encourage me a lot.
