@@ -27,8 +27,6 @@ import {
   ApiResponse,
   RequestGetPdfFromFile,
 } from "./api_schema";
-import https from "https";
-import http from "http";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import {
   ArxivEntry,
@@ -38,7 +36,7 @@ import {
   PathEntry,
   UrlEntry,
 } from "./db_schema";
-import { Either, genLeft, genRight, isRight } from "./either";
+import { Either, genLeft, genRight } from "./either";
 import { loadDB, saveDB } from "./load_db";
 import { concatDirs } from "./path_util";
 
@@ -622,10 +620,10 @@ function deleteEntry(request: Request, response: Response, dbPath: string[]) {
       jsonDB[entry.id] != undefined &&
       jsonDB[entry.id][ENTRY_PATH] != undefined
     ) {
-      logger.info("Delete " + jsonDB[entry.id]["path"]);
       const oldFilename = concatDirs(
         dbPath.slice(0, dbPath.length - 1).concat(jsonDB[entry.id]["path"])
       );
+      logger.info("Delete " + oldFilename);
       const dir = path.dirname(oldFilename);
       const newFilename = path.join(
         dir,

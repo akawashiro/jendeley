@@ -371,7 +371,7 @@ async function registerNonBookPDF(
 ): Promise<Either<string, [string, DBEntry]>> {
   logger.info(
     "papersDir = " +
-      papersDir +
+      concatDirs(papersDir) +
       " pdf = " +
       pdf +
       " tags = " +
