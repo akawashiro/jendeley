@@ -73,6 +73,8 @@ function RegisterWebWithDialog(props: any) {
 
   const handleClose = () => {
     setWebUrl("");
+    setWebUrlError(false);
+    setWebUrlHelperText("");
     setTitle("");
     setTags("");
     setComments("");
@@ -275,6 +277,8 @@ function RegisterPDFFromFile(props: any) {
   const handleClose = () => {
     setIsRegisterable(false);
     setFilename("");
+    setFilenameError(false);
+    setFilenameErrorText("");
     setTags("");
     setComments("");
     setIsRegisterable(false);
@@ -484,6 +488,8 @@ function RegisterPDFFromWeb(props: any) {
   const handleClose = () => {
     setIsRegisterable(false);
     setPdfUrl("");
+    setPdfUrlError(false);
+    setPdfUrlHelperText("");
     setFilename("");
     setTags("");
     setComments("");
