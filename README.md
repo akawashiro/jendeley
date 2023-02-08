@@ -27,9 +27,9 @@
 - [Support me](#support-me)
 
 ## Why jendeley?
-Programmers need various documents. In addition to it, they are in various formats. For example, they are papers on the newest machine learning, classic compiler books, specification documents of our CPU or accelerators, document of programming languages, or useful blog articles. Programmers must organize these documents classified. Furthermore, we must save them in the long term, such as ten years, because we cannot know when we need them.
+As programmers, we require various documents in different formats, such as recent machine learning papers, classic compiler books, CPU and accelerator specification documents, programming language documents, and informative blog articles. To efficiently manage these documents, it's important to categorize and classify them. Additionally, we need to ensure that they are saved and accessible in the long term, as we never know when we need them.
 
-To satisfy such challenging requirements, I developed `jendeley`. You can register PDFs or webpages into the same database. You can easily categorize documents using tags. Furthermore, most importantly, the database is just a plain text JSON file. You can edit it using your favorite editor and develop an alternative application even if I failed to continue `jendeley` development.
+To address these challenges, I developed `jendeley`. It allows you to register both PDFs and webpages in the same database, making categorization easy through the use of tags. Moreover, the database is stored as a plain text JSON file, making it easily editable using your preferred editor. This means that even if I discontinue development of `jendeley`, you can still access your information and even create alternative applications to manage it.
 
 ## Quickstart
 ```
