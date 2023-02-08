@@ -1,7 +1,7 @@
 # jendeley <!-- omit in toc -->
 `jendeley` is a JSON-based document organizing software.
 - `jendeley` is JSON-based. You can see and edit your database quickly.
-- `jendeley` is working locally. Your important database is owned only by you. No cloud.
+- `jendeley` works locally. Your important database is owned only by you. No cloud.
 - `jendeley` is browser-based. You can run it anywhere node.js runs.
 
 ## Table of Contents <!-- omit in toc -->
