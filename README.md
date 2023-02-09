@@ -152,7 +152,7 @@ You can edit your database using your favorite editor. But after editing, you sh
 You can check the source code [https://github.com/akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We welcome your pull request.
 
 ## Contact me
-I'm on [https://twitter.com/a_kawashiro](https://twitter.com/a_kawashiro) and [https://mstdn.jp/@a_kawashiro](https://mstdn.jp/@a_kawashiro). And, of course, feel free to make an issue or a PR to [the repository](https://github.com/akawashiro/jendeley).
+I'm on [https://twitter.com/a_kawashiro](https://twitter.com/a_kawashiro) and [https://mstdn.jp/@a_kawashiro](https://mstdn.jp/@a_kawashiro). Other contacts are in [https://akawashiro.github.io/#links](https://akawashiro.github.io/#links). And, of course, feel free to make an issue or a PR to [the repository](https://github.com/akawashiro/jendeley).
 
 ## Support me
 Please star [akawashiro/jendeley](https://github.com/akawashiro/jendeley). It encourages me a lot.
