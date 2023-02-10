@@ -52,7 +52,7 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 ```
 This command outputs the database to `<YOUR PDFs DIR>/jendeley_db.json`. If you have no PDF file, please specify an empty directory as `<YOUR PDFs DIR>`.
 
-When `jendeley` fails to scan some PDFs, it generates a shell script named `edit_and_run.sh`. Please read the following subsection and use it to rename files appropriately so that jendeley can recognize them.
+If `jendeley` encounters an issue scanning some PDFs, it generates a shell script named `edit_and_run.sh.` Please refer to the following subsection to learn how to rename the files accordingly, so that jendeley can properly recognize them.
 
 ### Recommended filename style
 `jendeley` uses a filename to find the document ID (e.g., [DOI](https://www.doi.org/) or [ISBN](https://en.wikipedia.org/wiki/ISBN))). `jendeley` recognizes parts of a filename that are not enclosed by `[` and `]` as the title of the file. So I recommend you to name the file accordingly, for example,
@@ -75,11 +75,11 @@ When `jendeley` fails to scan some PDFs, it generates a shell script named `edit
 ```
 jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
-This command starts `jendeley` daemon and open the web user interface in your browser. You can use `--port` option to change the default port.
+This command launches the jendeley daemon and opens the web user interface in your web browser at [http://localhost:5000](http://localhost:5000). You have the option to change the default port by using the --port option.
 
 ### Launch `jendeley` automatically
 #### Linux
-When using Linux, you can launch `jendeley` automatically using `systemd`. Please make `~/.config/systemd/user/jendeley.service` with the following contents, run `systemctl --user enable jendeley && systemctl --user start jendeley` and access [http://localhost:5000](http://localhost:5000). You can check the log with `journalctl --user -f -u jendeley.service`.
+When using Linux, you can set up `jendeley` to start automatically by using `systemd`. To do this, please create a file named `~/.config/systemd/user/jendeley.service` with the following contents, and then run `systemctl --user enable jendeley && systemctl --user start jendeley`. You can then access `jendeley` at [http://localhost:5000](http://localhost:5000). You can monitor the logs using the command `journalctl --user -f -u jendeley.service`.
 ```
 # jendeley.service
 [Unit]
@@ -92,7 +92,7 @@ ExecStart=jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_b
 WantedBy=default.target
 ```
 #### Windows
-When using Windows, you can launch `jendeley` automatically using startup. First, open the startup directory by `Windows+R` and type `shell:startup` and `Enter`.
+When using Windows, you can set up `jendeley` to launch automatically at startup. To do this, first open the startup directory by pressing `Windows+R` and typing `shell:startup` and then pressing `Enter`.
 
 <img src="https://raw.githubusercontent.com/akawashiro/jendeley/main/win-startup.png" width="50%">
 
@@ -115,7 +115,7 @@ You can add a webpage to the database using `REGISTER WEBPAGE` button. When you 
 ![Register webpage](./blog100/register_webpage.png "Register webpage")
 
 ### Add a PDF file on the Web
-You can add a PDF file on the Web using `REGISTER PDF FROM URL` button. When you add, `jendeley` try to find [Digital object identifier(DOI)](https://www.doi.org/) or [International Standard Book Number(ISBN)](https://en.wikipedia.org/wiki/ISBN) of the PDF file and register meta information such as authors or publication date to the database. However, sometimes, `jendeley` cannot find DOI or ISBN of the PDF or there is no corresponding DOI or ISBN to it. You can specify DOI or ISBN using its filename in such a case. Please check [Recommended filename style](#recommended-filename-style) section for more details.
+You can add a PDF file to the web by using the `REGISTER PDF FROM URL` button. When you add the file, `jendeley` will attempt to locate its [Digital object identifier (DOI)](https://www.doi.org/) or [International Standard Book Number (ISBN)](https://en.wikipedia.org/wiki/ISBN) and register the meta information, such as the author's name or publication date, to the database. In some cases, `jendeley` may not be able to find the DOI or ISBN for the PDF, or there may not be a corresponding DOI or ISBN for it. In such situations, you can specify the DOI or ISBN by using the filename. For more information, please refer to the [Recommended filename style](#recommended-filename-style) section.
 
 ![Register PDF from URL](./blog100/register_pdf_from_url.png "Register PDF from URL")
 ### Upload a PDF file
@@ -146,13 +146,13 @@ Because `jendeley` is fully JSON-based, you can quickly check the database's con
     "comments": "",
 ```
 
-You can edit your database using your favorite editor. But after editing, you should check if your database is valid as a `jendeley` database by `jendeley validate --db <PATH TO THE DATABASE>`.
+You can edit your database using your preferred editor. However, after making the changes, it is important to verify that your database is still valid as a `jendeley` database using the command `jendeley validate --db <PATH TO THE DATABASE>`.
 
 ### Check source code (advanced)
 You can check the source code [https://github.com/akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We welcome your pull request.
 
 ## Contact me
-I'm on [https://twitter.com/a_kawashiro](https://twitter.com/a_kawashiro) and [https://mstdn.jp/@a_kawashiro](https://mstdn.jp/@a_kawashiro). Other contacts are in [https://akawashiro.github.io/#links](https://akawashiro.github.io/#links). And, of course, feel free to make an issue or a PR to [the repository](https://github.com/akawashiro/jendeley).
+You can find me on Twitter at [https://twitter.com/a_kawashiro](https://twitter.com/a_kawashiro) and on Mastodon at [https://mstdn.jp/@a_kawashiro](https://mstdn.jp/@a_kawashiro). Additional contact information can be found on my website at [https://akawashiro.github.io/#links](https://akawashiro.github.io/#links). Also, feel free to create an issue or submit a pull request on [the repository](https://github.com/akawashiro/jendeley).
 
 ## Support me
 Please star [akawashiro/jendeley](https://github.com/akawashiro/jendeley). It encourages me a lot.
