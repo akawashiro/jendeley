@@ -197,7 +197,7 @@ function isValidFilename(filename: string) {
       return false;
     }
   }
-  if (filename.split('.').pop() !== "pdf") {
+  if (filename.split(".").pop() !== "pdf") {
     return false;
   }
   return true;
