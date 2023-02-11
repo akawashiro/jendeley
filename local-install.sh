@@ -11,4 +11,4 @@ cp -r ./jendeley-frontend/build ./jendeley-backend/built-frontend
 pushd ./jendeley-backend
 npm install
 npm run build
-npm install . -g
+sudo npm install . -g
