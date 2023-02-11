@@ -18,7 +18,6 @@ import {
 } from "./api_schema";
 import { splitTagsStr } from "./stringUtils";
 import { useSnackbar } from "notistack";
-import path from "path";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -198,7 +197,7 @@ function isValidFilename(filename: string) {
       return false;
     }
   }
-  if (path.extname(filename) !== ".pdf") {
+  if (filename.split('.').pop() !== "pdf") {
     return false;
   }
   return true;

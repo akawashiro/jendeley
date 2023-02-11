@@ -44,7 +44,15 @@
     ]
   },
   "devDependencies": {
-    "@tanstack/react-table": "^8.7.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@types/node": "^16.18.3",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^2.1.4",
     "@types/base-64": "^1.0.0",
     "@types/react-table": "^7.7.12",
     "@types/sanitize-html": "^2.6.2",
