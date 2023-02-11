@@ -1,4 +1,4 @@
-const JENDELEY_VERSION = "1.0.8";
+const JENDELEY_VERSION = "1.0.9";
 const JENDELEY_NO_TRACK = "[jendeley no track]";
 const JENDELEY_NO_ID = "[jendeley no id]";
 const ENTRY_ID_TYPE = "idType";
