@@ -1,22 +1,9 @@
 {
   "name": "jendeley-frontend",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.3",
-    "@types/react": "^18.0.25",
-    "@types/react-dom": "^18.0.9",
-    "depcheck": "^1.4.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "^4.0.3",
-    "typescript": "^4.9.3",
-    "web-vitals": "^2.1.4"
-  },
+ },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts --openssl-legacy-provider build",
@@ -44,15 +31,21 @@
     ]
   },
   "devDependencies": {
-    "@tanstack/react-table": "^8.7.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@types/node": "^18.13.0",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^4.0.3",
+    "web-vitals": "^3.1.1",
     "@types/base-64": "^1.0.0",
-    "@types/react-table": "^7.7.12",
     "@types/sanitize-html": "^2.6.2",
     "base-64": "^1.0.0",
-    "material-react-table": "^1.3.16",
+    "material-react-table": "^1.7.3",
     "notistack": "^2.0.8",
-    "path": "^0.12.7",
-    "prettier": "2.8.0",
-    "sanitize-html": "^2.7.3"
+    "prettier": "2.8.4",
+    "sanitize-html": "^2.9.0"
   }
 }
