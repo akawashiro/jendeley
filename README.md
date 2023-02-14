@@ -27,9 +27,9 @@
 - [Support me](#support-me)
 
 ## Why jendeley?
-As programmers, we require various documents in different formats, such as recent machine learning papers, classic compiler books, CPU and accelerator specification documents, programming language documents, and informative blog articles. To efficiently manage these documents, it's important to categorize and classify them. Additionally, we need to ensure that they are saved and accessible in the long term, as we never know when we need them.
+As programmers, we need various documents in different formats, such as recent machine learning papers, classic compiler books, CPU and accelerator specification documents, programming language documents, and informative blog articles. To efficiently manage these documents, it's essential to categorize and classify them. Additionally, we need to ensure that they are saved and accessible long-term, as we never know when we need them.
 
-To address these challenges, I developed `jendeley`. It allows you to register both PDFs and webpages in the same database, making categorization easy through the use of tags. Moreover, the database is stored as a plain text JSON file, making it easily editable using your preferred editor. This means that even if I discontinue development of `jendeley`, you can still access your information and even create alternative applications to manage it.
+To address these challenges, I developed `jendeley`. It allows you to register both PDFs and webpages in the same database, making categorization easy through the use of tags. Moreover, the database is stored as a plain text JSON file, making it easily editable using your preferred editor. This means that even if `jendeley`'s development process ends, you can still access your information and create alternative applications to manage it.
 
 ## Quickstart
 ```
@@ -62,7 +62,7 @@ If `jendeley` encounters an issue scanning some PDFs, it generates a shell scrip
   - If you want to write additional information in a filename, please enclose it by `[` and `]`.
 
 ### When `jendeley` fails to scan your PDFs
-`jendeley` heavily relies on [DOI](https://www.doi.org/) or [ISBN](https://en.wikipedia.org/wiki/ISBN) to find the title, authors and published the year of PDFs. So `jendeley` tries to find the DOI of a given PDF in multiple ways. But sometimes, it fails to find DOI. In such cases, you can manually specify DOI of the PDF using the filename.
+`jendeley` heavily relies on [DOI](https://www.doi.org/) or [ISBN](https://en.wikipedia.org/wiki/ISBN) to find the title, authors and the year of publication of PDFs. When DOI or ISBN can not be automatically found by `jendeley`, you can manually specify DOI of the PDF using the filename.
 
 - To specify DOI, change the filename to include `[jendeley doi <DOI with all delimiters replaced with underscore>]`.
   - For example, `cyclone [jendeley doi 10_1145_512529_512563].pdf`.
@@ -79,7 +79,7 @@ This command launches the jendeley daemon and opens the web user interface in yo
 
 ### Launch `jendeley` automatically
 #### Linux
-When using Linux, you can set up `jendeley` to start automatically by using `systemd`. To do this, please create a file named `~/.config/systemd/user/jendeley.service` with the following contents, and then run `systemctl --user enable jendeley && systemctl --user start jendeley`. You can then access `jendeley` at [http://localhost:5000](http://localhost:5000). You can monitor the logs using the command `journalctl --user -f -u jendeley.service`.
+When using Linux, you can set up `jendeley` to start automatically by using `systemd`. To do this, create a file named `~/.config/systemd/user/jendeley.service` with the following contents, and then run `systemctl --user enable jendeley && systemctl --user start jendeley`. Then, you can access `jendeley` at [http://localhost:5000](http://localhost:5000). Logs are accessible with the command `journalctl --user -f -u jendeley.service`.
 ```
 # jendeley.service
 [Unit]
