@@ -90,6 +90,13 @@ function RegisterWebWithDialog(props: any) {
       comments: comments,
     };
     setWebUrl("");
+    setWebUrlError(false);
+    setWebUrlHelperText("");
+    setTitle("");
+    setTags("");
+    setComments("");
+    setIsRegisterable(false);
+
     console.log("Add an web article from URL");
     setOpen(false);
     await fetch(REACT_APP_API_URL + "/api/add_web_from_url", {
@@ -280,7 +287,6 @@ function RegisterPDFFromFile(props: any) {
     setFilenameErrorText("");
     setTags("");
     setComments("");
-    setIsRegisterable(false);
     setOpen(false);
   };
 
@@ -490,6 +496,7 @@ function RegisterPDFFromWeb(props: any) {
     setPdfUrlError(false);
     setPdfUrlHelperText("");
     setFilename("");
+    setFilenameError(false);
     setTags("");
     setComments("");
     setIsRegisterable(false);
