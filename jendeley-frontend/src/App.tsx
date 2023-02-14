@@ -113,12 +113,12 @@ function conferenceAcronymsFilterFn(
   filterValue: string | number
 ) {
   let conference = row.getValue(id);
-  if (typeof conference !== "string"){
-      conference = "";
+  if (typeof conference !== "string") {
+    conference = "";
   }
   const fv =
     typeof filterValue === "number" ? filterValue.toString() : filterValue;
-  return (getAcronyms(conference).includes(fv) || conference.includes(fv));
+  return getAcronyms(conference).includes(fv) || conference.includes(fv);
 }
 
 function purifyTitle(title: string): string {
