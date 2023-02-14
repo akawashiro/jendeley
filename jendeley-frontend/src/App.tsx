@@ -21,6 +21,7 @@ import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
+import { ConferenceAcronyms } from "./conferenceAcronyms";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -223,6 +224,7 @@ function App() {
       {
         accessorKey: "publisher",
         header: "publisher",
+        Cell: ({ cell }) => ConferenceAcronyms(cell.getValue<string>()),
         filterFn: "includesString",
         enableEditing: false,
       },
@@ -312,7 +314,7 @@ function App() {
               columnVisibility: {
                 id: true,
                 path: false,
-                publisher: false,
+                publisher: true,
                 abstract: false,
               },
               density: "comfortable",
