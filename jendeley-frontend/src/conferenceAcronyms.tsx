@@ -253,7 +253,7 @@ function getAcronyms(conference: string): string {
 }
 
 function ConferenceAcronyms(conference: string | undefined) {
-  if (conference == "" || conference == undefined) {
+  if (conference === "" || conference === undefined) {
     return conference;
   }
 

@@ -21,7 +21,7 @@ import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
-import { ConferenceAcronyms } from "./conferenceAcronyms";
+import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -105,6 +105,20 @@ function stringArrayFilterFn(
     if (a.includes(fv)) return true;
   }
   return false;
+}
+
+function conferenceAcronymsFilterFn(
+  row: any,
+  id: string,
+  filterValue: string | number
+) {
+  let conference = row.getValue(id);
+  if (typeof conference !== "string"){
+      conference = "";
+  }
+  const fv =
+    typeof filterValue === "number" ? filterValue.toString() : filterValue;
+  return (getAcronyms(conference).includes(fv) || conference.includes(fv));
 }
 
 function purifyTitle(title: string): string {
@@ -225,7 +239,7 @@ function App() {
         accessorKey: "publisher",
         header: "publisher",
         Cell: ({ cell }) => ConferenceAcronyms(cell.getValue<string>()),
-        filterFn: "includesString",
+        filterFn: conferenceAcronymsFilterFn,
         enableEditing: false,
       },
       {
