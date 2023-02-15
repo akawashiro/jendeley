@@ -262,6 +262,7 @@ function ConferenceAcronyms(conference: string | undefined) {
     <Box>
       <Chip
         label={`${c}`}
+        title={`${conference}`}
         size="small"
         onClick={() => {
           navigator.clipboard.writeText(c);
