@@ -25,6 +25,26 @@ import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
+function TypeChip(type: string) {
+  // TODO padding or margine
+  return (
+    <Box>
+      <Chip
+        label={`${type}`}
+        size="small"
+        onClick={() => {
+          navigator.clipboard.writeText(type);
+        }}
+        sx={{
+          color: getColorFromString(type).color,
+          bgcolor: getColorFromString(type).bgcolor,
+          m: 0.1,
+        }}
+      />
+    </Box>
+  );
+}
+
 function AuthorChips(authors: string[]) {
   // TODO padding or margine
   return (
@@ -185,12 +205,22 @@ function App() {
             tableData={tableData}
           />
         ),
-        header: "",
+        header: "action",
         enableColumnFilter: false,
         enableSorting: false,
         enableEditing: false,
         enableColumnActions: false,
-        size: 3,
+        size: 2,
+      },
+      {
+        accessorKey: "idType",
+        Cell: ({ cell, row }) => TypeChip(cell.getValue<string>()),
+        header: "type",
+        enableColumnFilter: false,
+        enableSorting: false,
+        enableEditing: false,
+        enableColumnActions: false,
+        size: 2,
       },
       {
         accessorKey: "title",
@@ -327,6 +357,7 @@ function App() {
               sorting: [{ id: "year", desc: true }],
               columnVisibility: {
                 id: true,
+                idType: true,
                 path: false,
                 publisher: true,
                 abstract: false,
