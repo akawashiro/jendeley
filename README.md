@@ -122,9 +122,9 @@ You can add a PDF file to the web by using the `REGISTER PDF FROM URL` button. W
 You can upload a PDF file in your computer using `UPLOAD PDF` button.
 
 ### Use tags and comments
-You can edit tags or comments after you register. You can edit tags or comments by double-clicking them.
+You can edit tags or comments after you register. You can edit tags or comments by double-clicking them. Comments are interpreted as Markdown.
 
-![Edit comments](./blog100/edit_comments.png "Edit comments")
+![Edit comments](./blog100/comments-markdown.png "Edit comments")
 
 Furthermore, you can filter the database using tags or comments.
 ![Filter by tag](./blog100/filter_by_tag.png "Filter by tag")

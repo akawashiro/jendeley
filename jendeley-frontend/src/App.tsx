@@ -10,6 +10,7 @@ import MaterialReactTable, {
   MRT_ColumnDef,
   MRT_Row,
 } from "material-react-table";
+import ReactMarkdown from "react-markdown";
 import sanitizeHTML from "sanitize-html";
 import {
   RegisterWebWithDialog,
@@ -98,7 +99,7 @@ function CommentsDiv(comments: string) {
   } else {
     return (
       <Box>
-        <p>{comments}</p>
+        <ReactMarkdown>{comments}</ReactMarkdown>
       </Box>
     );
   }
