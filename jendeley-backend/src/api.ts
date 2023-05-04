@@ -32,12 +32,13 @@ import {
   ArxivEntry,
   DBEntry,
   DoiEntry,
+  FulltextDB,
   JsonDB,
   PathEntry,
   UrlEntry,
 } from "./db_schema";
 import { Either, genLeft, genRight } from "./either";
-import { loadDB, saveDB } from "./load_db";
+import { loadDB, loadFulltextDB, saveDB } from "./load_db";
 import { concatDirs } from "./path_util";
 
 function checkEntry(entry: ApiEntry) {
@@ -64,7 +65,11 @@ function checkEntry(entry: ApiEntry) {
   }
 }
 
-function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
+function getEntry(
+  id: string,
+  jsonDB: JsonDB,
+  fulltextDB: FulltextDB
+): ApiEntry {
   if (jsonDB[id] == undefined) {
     logger.fatal("json[" + id + "] != undefined");
     process.exit(1);
@@ -87,6 +92,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       idType: urlEntry.idType,
       url: urlEntry.url,
       title: urlEntry.title,
+      text: fulltextDB[id],
       authors: authors,
       tags: urlEntry.tags,
       comments: urlEntry.comments,
@@ -127,6 +133,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: entryInDB.idType,
       title: title,
+      text: fulltextDB[id],
       url: undefined,
       authors: authors,
       tags: entryInDB.tags,
@@ -172,6 +179,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: entryInDB.idType,
       title: title,
+      text: fulltextDB[id],
       authors: authors,
       url: undefined,
       tags: tags,
@@ -214,6 +222,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: arxivEntry.idType,
       title: title,
+      text: fulltextDB[id],
       url: undefined,
       authors: authors,
       tags: arxivEntry.tags,
@@ -245,6 +254,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: pathEntry.idType,
       title: pathEntry.title,
+      text: fulltextDB[id],
       url: undefined,
       authors: authors,
       tags: pathEntry.tags,
@@ -316,15 +326,24 @@ function getPdf(request: Request, response: Response, dbPath: string[]) {
   logger.info("Sent a response from get_pdf");
 }
 
-function getDB(request: Request, response: Response, dbPath: string[]) {
+function getDB(
+  request: Request,
+  response: Response,
+  dbPath: string[],
+  fulltextDBPath: string[] | undefined
+) {
   logger.info("Get a get_db request" + request.url);
   const jsonDB = loadDB(dbPath, false);
+
+  const fulltextDB =
+    fulltextDBPath != undefined ? loadFulltextDB(fulltextDBPath) : {};
+
   let dbResponse: ApiDB = [];
 
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
     if (id == DB_META_KEY) continue;
-    const e = getEntry(id, jsonDB);
+    const e = getEntry(id, jsonDB, fulltextDB);
     dbResponse.push(e);
   }
 

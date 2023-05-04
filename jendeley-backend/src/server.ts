@@ -19,6 +19,7 @@ import { concatDirs } from "./path_util";
 
 function startServer(
   dbPath: string[],
+  fulltextDBPath: string[] | undefined,
   noBrowser: boolean,
   allowCors: boolean,
   port: number
@@ -39,7 +40,7 @@ function startServer(
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
     app.get("/api/get_db", (request: Request, response: Response) => {
-      getDB(request, response, dbPath);
+      getDB(request, response, dbPath, fulltextDBPath);
     });
 
     app.get("/api/get_pdf", (request: Request, response: Response) => {

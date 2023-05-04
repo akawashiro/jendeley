@@ -4,6 +4,7 @@ import pdfparse from "pdf-parse";
 import { logger } from "./logger";
 import { loadDB } from "./load_db";
 import { Either, genLeft, genRight, isRight } from "./either";
+import { FulltextDB } from "./db_schema";
 
 async function getTextsFromPDF(
   pdfFullpath: string
@@ -33,7 +34,7 @@ async function compileDB(dbPath: string[], compiledDBPath: string[]) {
   );
   if (fs.existsSync(concatDirs(dbPath))) {
     const jsonDB = loadDB(dbPath, false);
-    let compiledDB: { [key: string]: string } = {};
+    let compiledDB: FulltextDB = {};
     for (const id in jsonDB) {
       const entry = jsonDB[id];
       if (

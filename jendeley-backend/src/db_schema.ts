@@ -75,6 +75,8 @@ type JsonDB = {
   [key: string]: DBEntry | DBMetaData;
 };
 
+type FulltextDB = { [key: string]: string };
+
 export type {
   ArxivEntry,
   DoiEntry,
@@ -84,5 +86,6 @@ export type {
   BookEntry,
   JsonDB,
   DBEntry,
+  FulltextDB,
 };
 export {};

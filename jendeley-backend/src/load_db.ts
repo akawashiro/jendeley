@@ -1,4 +1,4 @@
-import { JsonDB } from "./db_schema";
+import { FulltextDB, JsonDB } from "./db_schema";
 import fs from "fs";
 import { validateJsonDB } from "./validate_db";
 import { logger } from "./logger";
@@ -72,4 +72,11 @@ function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
   return jsonDB;
 }
 
-export { saveDB, loadDB };
+function loadFulltextDB(fulltextDBPath: string[]): FulltextDB {
+  const fulltextDB = JSON.parse(
+    fs.readFileSync(concatDirs(fulltextDBPath)).toString()
+  );
+  return fulltextDB;
+}
+
+export { saveDB, loadDB, loadFulltextDB };

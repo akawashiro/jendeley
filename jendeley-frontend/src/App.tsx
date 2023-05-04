@@ -303,6 +303,7 @@ function App() {
       idType: tableData[cell.row.index]["idType"],
       url: tableData[cell.row.index]["url"],
       title: tableData[cell.row.index]["title"],
+      text: tableData[cell.row.index]["text"],
       path: tableData[cell.row.index]["path"],
       tags: tags,
       comments: comments,
