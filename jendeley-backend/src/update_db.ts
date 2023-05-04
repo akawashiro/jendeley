@@ -4,7 +4,7 @@ import pdfparse from "pdf-parse";
 import { logger } from "./logger";
 import { loadDB } from "./load_db";
 import { Either, genLeft, genRight } from "./either";
-import assert from "assert";
+import { validateJsonDB } from "./validate_db";
 
 async function getTextsFromPDF(
   pdfFullpath: string
@@ -44,14 +44,17 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
       entry.idType == "arxiv" ||
       entry.idType == "doi" ||
       entry.idType == "isbn" ||
-      entry.idType == "book"
+      entry.idType == "book" ||
+      entry.idType == "path"
     ) {
       const path = concatDirs(dbPathVer1.slice(0, -1).concat(entry.path));
       logger.info("Reading id = " + id + " path = " + path);
       const text = await getTextsFromPDF(path);
       if (text._tag == "right") {
-        assert(jsonDB[id].idType != "meta");
         jsonDB[id]["text"] = text.right;
+      } else {
+        logger.warn(text.left);
+        jsonDB[id]["text"] = "";
       }
     } else if (entry.idType == "url") {
       logger.info("url = " + entry.url);
@@ -65,7 +68,11 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
   }
 
   if (fs.existsSync(concatDirs(dbPathVer2))) {
-    logger.error(dbPathVer2 + " already exists.");
+    logger.fatal(dbPathVer2 + " already exists.");
+    return;
+  }
+  if (validateJsonDB(jsonDB, undefined)) {
+    logger.fatal("validateJsonDB failed.");
     return;
   }
   fs.writeFileSync(concatDirs(dbPathVer2), JSON.stringify(jsonDB, null, 2));

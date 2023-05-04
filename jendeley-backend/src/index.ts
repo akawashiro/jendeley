@@ -8,7 +8,7 @@ import { JENDELEY_DIR, JENDELEY_VERSION } from "./constants";
 import { logger } from "./logger";
 import { pathStrToDirs } from "./path_util";
 import path from "path";
-import { update_db } from "./compile";
+import { update_db } from "./update_db";
 
 async function main() {
   const program = new Command();
