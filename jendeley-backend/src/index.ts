@@ -8,6 +8,7 @@ import { JENDELEY_DIR, JENDELEY_VERSION } from "./constants";
 import { logger } from "./logger";
 import { pathStrToDirs } from "./path_util";
 import path from "path";
+import { update_db } from "./update_db";
 
 async function main() {
   const program = new Command();
@@ -45,6 +46,18 @@ async function main() {
         book_dirs_str,
         db_name,
         options._optionValues.delete_unreachable_files
+      );
+    });
+
+  program
+    .command("update_db")
+    .usage("Generate a database with full texts to search.")
+    .requiredOption("--db1 <db>", "Input database file of version 1")
+    .requiredOption("--db2 <db>", "Output database file of version 2")
+    .action((cmd, options) => {
+      update_db(
+        pathStrToDirs(path.resolve(options._optionValues.db1)),
+        pathStrToDirs(path.resolve(options._optionValues.db2))
       );
     });
 

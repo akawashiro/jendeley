@@ -1,9 +1,11 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import App from "./App";
+import { fuzzySearch } from "./fuzzysearch";
 
-test("renders learn react link", () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test("fuzzy search", () => {
+  const text = "wantedwtd";
+  const query = "wtd";
+  const matches = fuzzySearch(text, query);
+  let match_strs = matches.map((m) => {
+    return text.slice(m.start, m.end + 1);
+  });
+  expect(match_strs).toStrictEqual(["wtd", "wanted"]);
 });

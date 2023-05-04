@@ -1,4 +1,4 @@
-import { JsonDB } from "./db_schema";
+import { FulltextDB, JsonDB } from "./db_schema";
 import fs from "fs";
 import { validateJsonDB } from "./validate_db";
 import { logger } from "./logger";
@@ -64,12 +64,23 @@ function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
   const jsonDB = JSON.parse(fs.readFileSync(concatDirs(dbPath)).toString());
 
   if (!validateJsonDB(jsonDB, dbPath)) {
-    logger.fatal("Failed to load DB because validateJsonDB");
-    if (!ignoreErrors) {
+    if (ignoreErrors) {
+      logger.warn(
+        "validateJsonDB failed but ignore because ignoreErrors is true"
+      );
+    } else {
+      logger.fatal("Failed to load DB because validateJsonDB");
       process.exit(1);
     }
   }
   return jsonDB;
 }
 
-export { saveDB, loadDB };
+function loadFulltextDB(fulltextDBPath: string[]): FulltextDB {
+  const fulltextDB = JSON.parse(
+    fs.readFileSync(concatDirs(fulltextDBPath)).toString()
+  );
+  return fulltextDB;
+}
+
+export { saveDB, loadDB, loadFulltextDB };

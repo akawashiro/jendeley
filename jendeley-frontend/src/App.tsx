@@ -23,6 +23,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
+import { HighlightedText } from "./fuzzysearch";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -112,6 +113,17 @@ function AbstractHTML(abstract: string) {
       : abstract.replaceAll("<jats:", "<");
   const __html = sanitizeHTML(shortendAbstract);
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
+}
+
+function ShowText(text: string | undefined, query_unknown: unknown) {
+  if (text === undefined) {
+    return <Box></Box>;
+  } else if (typeof query_unknown !== "string") {
+    return <Box>{text.slice(0, 140) + "..."}</Box>;
+  } else {
+    const query = query_unknown;
+    return HighlightedText(text, query);
+  }
 }
 
 function stringArrayFilterFn(
@@ -280,6 +292,14 @@ function App() {
         filterFn: "includesString",
         enableEditing: false,
       },
+      {
+        accessorKey: "text",
+        Cell: ({ cell }) =>
+          ShowText(cell.getValue<string>(), cell.column.getFilterValue()),
+        header: "text",
+        filterFn: "includesString",
+        enableEditing: false,
+      },
     ],
     [tableData]
   );
@@ -303,6 +323,7 @@ function App() {
       idType: tableData[cell.row.index]["idType"],
       url: tableData[cell.row.index]["url"],
       title: tableData[cell.row.index]["title"],
+      text: tableData[cell.row.index]["text"],
       path: tableData[cell.row.index]["path"],
       tags: tags,
       comments: comments,
@@ -338,7 +359,7 @@ function App() {
   } else {
     return (
       <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
-        <Box component="main" sx={{ m: 2 }}>
+        <Box component="main">
           <MaterialReactTable
             displayColumnDefOptions={{
               "mrt-row-actions": {

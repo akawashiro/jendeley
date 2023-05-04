@@ -7,6 +7,7 @@ type ApiEntry = {
   idType: IDType;
   url: string | undefined;
   title: string;
+  text: string | undefined;
   path: string | undefined;
   tags: string[];
   comments: string;

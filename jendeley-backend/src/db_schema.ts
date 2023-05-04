@@ -3,6 +3,7 @@ type ArxivEntry = {
   path: string[];
   tags: string[];
   comments: string;
+  text: string;
   userSpecifiedTitle: string | undefined;
   dataFromArxiv: any;
   reservedForUser: any | undefined;
@@ -13,6 +14,7 @@ type DoiEntry = {
   path: string[];
   tags: string[];
   comments: string;
+  text: string;
   userSpecifiedTitle: string | undefined;
   dataFromCrossref: any;
   reservedForUser: any | undefined;
@@ -23,6 +25,7 @@ type BookEntry = {
   path: string[];
   tags: string[];
   comments: string;
+  text: string;
   userSpecifiedTitle: string | undefined;
   dataFromNodeIsbn: any;
   reservedForUser: any | undefined;
@@ -33,6 +36,7 @@ type IsbnEntry = {
   path: string[];
   tags: string[];
   comments: string;
+  text: string;
   userSpecifiedTitle: string | undefined;
   dataFromNodeIsbn: any;
   reservedForUser: any | undefined;
@@ -43,6 +47,7 @@ type PathEntry = {
   path: string[];
   title: string;
   tags: string[];
+  text: string;
   userSpecifiedTitle: string | undefined;
   comments: string;
   reservedForUser: any | undefined;
@@ -53,6 +58,7 @@ type UrlEntry = {
   url: string;
   title: string;
   tags: string[];
+  text: string;
   userSpecifiedTitle: string | undefined;
   comments: string;
   reservedForUser: any | undefined;
@@ -75,6 +81,8 @@ type JsonDB = {
   [key: string]: DBEntry | DBMetaData;
 };
 
+type FulltextDB = { [key: string]: string };
+
 export type {
   ArxivEntry,
   DoiEntry,
@@ -84,5 +92,6 @@ export type {
   BookEntry,
   JsonDB,
   DBEntry,
+  FulltextDB,
 };
 export {};

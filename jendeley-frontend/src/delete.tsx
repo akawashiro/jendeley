@@ -40,6 +40,7 @@ function DeleteButton(props: any) {
       url: "",
       idType: idType,
       title: "",
+      text: undefined,
       path: "",
       tags: [],
       comments: "",

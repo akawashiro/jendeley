@@ -14,6 +14,7 @@ import {
   ENTRY_COMMENTS,
   ENTRY_URL,
   DB_META_KEY,
+  ENTRY_TEXT,
 } from "./constants";
 import { JsonDB } from "./db_schema";
 import { logger } from "./logger";
@@ -31,6 +32,11 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
   for (const id of Object.keys(jsonDB)) {
     const id_type = jsonDB[id][ENTRY_ID_TYPE];
     if (id_type == ID_TYPE_META) {
+      const version = parseFloat(jsonDB[id]["version"]);
+      // Enable this check after version 2.0
+      // if (version < 2.0) {
+      //   validDB = false;
+      // }
       continue;
     }
 
@@ -73,6 +79,14 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
           id +
           " comments: " +
           jsonDB[id][ENTRY_COMMENTS]
+      );
+      validDB = false;
+    }
+
+    // ENTRY_TEXT check
+    if (typeof jsonDB[id][ENTRY_TEXT] != "string") {
+      logger.warn(
+        "Invalid text in id:" + id + " text: " + jsonDB[id][ENTRY_TEXT]
       );
       validDB = false;
     }
