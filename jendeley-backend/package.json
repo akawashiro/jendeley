@@ -14,7 +14,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "scan_test_pdfs": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl",
     "profile_scan_test_pdfs": "npm run build && node --require source-map-support/register --prof dist/index.js scan --papers_dir test_pdfs",
-    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl && node --require source-map-support/register dist/index.js compile --db test_pdfs/jendeley_db.json --fulltext_db test_pdfs/fulltext_db.json && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json --fulltext_db test_pdfs/fulltext_db.json --port 5001 --no_browser --allow_cors",
+    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json --port 5001 --no_browser --allow_cors",
     "fix:prettier": "prettier --write src",
     "check:prettier": "prettier --check src"
   },
@@ -40,7 +40,9 @@
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
+    "@types/node-isbn": "^1.6.2",
     "@types/pdf-parse": "^1.1.1",
+    "@types/xml2js": "^0.4.11",
     "jest": "^29.5.0",
     "prettier": "2.8.7",
     "source-map-support": "^0.5.21",

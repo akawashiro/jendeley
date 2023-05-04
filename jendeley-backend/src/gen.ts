@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import node_isbn from "node-isbn";
+import pdfparse from "pdf-parse";
 import xml2js from "xml2js";
 import crypto from "crypto";
 import { logger } from "./logger";
@@ -170,9 +171,32 @@ async function getArxivJson(arxiv: string) {
   }
 }
 
+async function getTextsFromPDF(
+  pdfFullpath: string
+): Promise<Either<string, string>> {
+  let dataBuffer: Buffer;
+  try {
+    dataBuffer = fs.readFileSync(pdfFullpath);
+  } catch (err) {
+    const msg = "Cannot read " + pdfFullpath + ".";
+    logger.warn(msg);
+    return genLeft(msg);
+  }
+
+  try {
+    const data = await pdfparse(dataBuffer);
+    const texts = data.text;
+    return genRight(texts);
+  } catch (err: any) {
+    logger.warn(err.message);
+    return genLeft(err.message);
+  }
+}
+
 // Return [JSON, ID]
 async function getJson(
   docID: DocID,
+  paperDir: string[],
   pathPDF: string[]
 ): Promise<
   Either<
@@ -180,6 +204,11 @@ async function getJson(
     { dbID: string; dbEntry: ArxivEntry | DoiEntry | IsbnEntry | PathEntry }
   >
 > {
+  const text = await getTextsFromPDF(concatDirs(paperDir.concat(pathPDF)));
+  if (text._tag == "left") {
+    return genLeft(text.left);
+  }
+
   if (docID.docIDType == "arxiv") {
     const dataFromArxiv = await getArxivJson(docID.arxiv);
     if (dataFromArxiv != undefined) {
@@ -188,6 +217,7 @@ async function getJson(
         idType: ID_TYPE_ARXIV,
         tags: [],
         comments: "",
+        text: text.right,
         userSpecifiedTitle: undefined,
         dataFromArxiv: dataFromArxiv,
         reservedForUser: undefined,
@@ -211,6 +241,7 @@ async function getJson(
         idType: ID_TYPE_DOI,
         tags: [],
         comments: "",
+        text: text.right,
         userSpecifiedTitle: undefined,
         dataFromCrossref: dataFromCrossref.right,
         reservedForUser: undefined,
@@ -228,6 +259,7 @@ async function getJson(
         idType: ID_TYPE_ISBN,
         tags: [],
         comments: "",
+        text: text.right,
         userSpecifiedTitle: undefined,
         dataFromNodeIsbn: dataFromNodeIsbn,
         reservedForUser: undefined,
@@ -249,6 +281,7 @@ async function getJson(
       idType: ID_TYPE_PATH,
       tags: [],
       comments: "",
+      text: text.right,
       userSpecifiedTitle: undefined,
       reservedForUser: undefined,
     };
@@ -277,6 +310,7 @@ function genDummyDB(output: string) {
       path: [crypto.randomBytes(40).toString("hex")],
       title: crypto.randomBytes(40).toString("hex"),
       tags: [],
+      text: crypto.randomBytes(40).toString("hex"),
       userSpecifiedTitle: undefined,
       comments: crypto.randomBytes(40).toString("hex"),
       reservedForUser: undefined,
@@ -287,13 +321,13 @@ function genDummyDB(output: string) {
   saveDB(jsonDB, [output]);
 }
 
-function registerWeb(
+async function registerWeb(
   jsonDB: JsonDB,
   url: string,
   title: string,
   comments: string,
   tags: string[]
-): Either<string, JsonDB> {
+): Promise<Either<string, JsonDB>> {
   logger.info(
     "url = " +
       url +
@@ -307,10 +341,17 @@ function registerWeb(
   const docID: DocID = { docIDType: "url", url: url };
   logger.info("docID = " + JSON.stringify(docID));
 
+  let { got } = await import("got");
+  const options = { headers: { Accept: "text/html" } };
+  const html = await got(url, options).text();
+  const { convert } = require("html-to-text");
+  const text = convert(html, {});
+
   let json: UrlEntry = {
     title: title,
     url: url,
     comments: comments,
+    text: text,
     tags: tags,
     userSpecifiedTitle: undefined,
     idType: ID_TYPE_URL,
@@ -392,7 +433,11 @@ async function registerNonBookPDF(
   }
 
   logger.info("docID = " + JSON.stringify(docID));
-  const t = await getJson(docID.right, JSON.parse(JSON.stringify(pdf)));
+  const t = await getJson(
+    docID.right,
+    papersDir,
+    JSON.parse(JSON.stringify(pdf))
+  );
 
   if (t._tag === "left") {
     return t;
@@ -560,7 +605,10 @@ async function genDB(
         bookChapters[concatDirs(papersDir.concat(bd))].pdfs.push(p);
         if (docID._tag === "right") {
           const i: DocID = docID.right;
-          const t = await getJson(i, p);
+          logger.info(
+            "papersDir = " + showDirs(papersDir) + " p = " + showDirs(p)
+          );
+          const t = await getJson(i, papersDir, p);
           if (
             t._tag === "right" &&
             t.right.dbEntry.idType == ID_TYPE_ISBN &&
@@ -617,6 +665,17 @@ async function genDB(
         title = path.join(bookDir, path.basename(pdf[pdf.length - 1], ".pdf"));
       }
 
+      const text = await getTextsFromPDF(concatDirs(papersDir.concat(pdf)));
+      if (text._tag === "left") {
+        logger.fatal(
+          "Cannot get text from " +
+            concatDirs(papersDir.concat(pdf)) +
+            ": " +
+            text.left
+        );
+        process.exit(1);
+      }
+
       // TODO: Should we use userSpecifiedTitle here? Otherwise, we can rewrite
       // isbnEntry.dataFromNodeIsbn["title"].
       const bookEntry: BookEntry = {
@@ -624,6 +683,7 @@ async function genDB(
         path: pdf,
         tags: [],
         comments: "",
+        text: text.right,
         userSpecifiedTitle: title,
         dataFromNodeIsbn: isbnEntry.dataFromNodeIsbn,
         reservedForUser: undefined,
