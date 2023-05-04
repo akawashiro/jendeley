@@ -71,7 +71,7 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
     logger.fatal(dbPathVer2 + " already exists.");
     return;
   }
-  if (validateJsonDB(jsonDB, undefined)) {
+  if (!validateJsonDB(jsonDB, undefined)) {
     logger.fatal("validateJsonDB failed.");
     return;
   }
