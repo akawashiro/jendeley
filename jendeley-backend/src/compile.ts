@@ -47,8 +47,15 @@ async function compileDB(dbPath: string[], compiledDBPath: string[]) {
         const text = await getTextsFromPDF(path);
         if (text._tag == "right") {
           compiledDB[id] = text.right;
-          logger.info("text = " + text.right);
         }
+      } else if (entry.idType == "url") {
+        logger.info("url = " + entry.url);
+        let { got } = await import("got");
+        const options = { headers: { Accept: "text/html" } };
+        const html = await got(entry.url, options).text();
+        const { convert } = require("html-to-text");
+        const text = convert(html, {});
+        compiledDB[id] = text;
       }
     }
 
