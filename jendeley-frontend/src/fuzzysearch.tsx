@@ -7,11 +7,11 @@ const MAX_MATCHES = 5;
 const MARGINE_AROUND_HIGHLIGHT = 30;
 
 function compareChar(a: string, b: string) {
-    if(a.toLowerCase() === b.toLowerCase()) {
-        return true;
-    }else{
-        return false;
-    }
+  if (a.toLowerCase() === b.toLowerCase()) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 // https://en-jp.wantedly.com/companies/wantedly/post_articles/306103
@@ -65,7 +65,7 @@ function fuzzySearch(text: string, query: string) {
     let ti = ends[mi][1];
     let qi = query.length - 1;
     while (true) {
-      if (compareChar(text[ti],query[qi])) {
+      if (compareChar(text[ti], query[qi])) {
         ti--;
         qi--;
       } else {
