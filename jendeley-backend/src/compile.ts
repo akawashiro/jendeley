@@ -3,8 +3,8 @@ import fs from "fs";
 import pdfparse from "pdf-parse";
 import { logger } from "./logger";
 import { loadDB } from "./load_db";
-import { Either, genLeft, genRight, isRight } from "./either";
-import { FulltextDB } from "./db_schema";
+import { Either, genLeft, genRight } from "./either";
+import assert from "assert";
 
 async function getTextsFromPDF(
   pdfFullpath: string
@@ -28,45 +28,47 @@ async function getTextsFromPDF(
   }
 }
 
-async function compileDB(dbPath: string[], compiledDBPath: string[]) {
+async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
   logger.info(
-    "Compiling " + concatDirs(dbPath) + " to " + concatDirs(compiledDBPath)
+    "Updating " + concatDirs(dbPathVer1) + " to " + concatDirs(dbPathVer2)
   );
-  if (fs.existsSync(concatDirs(dbPath))) {
-    const jsonDB = loadDB(dbPath, false);
-    let compiledDB: FulltextDB = {};
-    for (const id in jsonDB) {
-      const entry = jsonDB[id];
-      if (
-        entry.idType == "arxiv" ||
-        entry.idType == "doi" ||
-        entry.idType == "isbn" ||
-        entry.idType == "book"
-      ) {
-        const path = concatDirs(dbPath.slice(0, -1).concat(entry.path));
-        logger.info("Reading id = " + id + " path = " + path);
-        const text = await getTextsFromPDF(path);
-        if (text._tag == "right") {
-          compiledDB[id] = text.right;
-        }
-      } else if (entry.idType == "url") {
-        logger.info("url = " + entry.url);
-        let { got } = await import("got");
-        const options = { headers: { Accept: "text/html" } };
-        const html = await got(entry.url, options).text();
-        const { convert } = require("html-to-text");
-        const text = convert(html, {});
-        compiledDB[id] = text;
-      }
-    }
-
-    fs.writeFileSync(
-      concatDirs(compiledDBPath),
-      JSON.stringify(compiledDB, null, 2)
-    );
-  } else {
-    logger.error(dbPath + " is not exist.");
+  if (!fs.existsSync(concatDirs(dbPathVer1))) {
+    logger.error(dbPathVer1 + " does not exist.");
+    return;
   }
+
+  const jsonDB = loadDB(dbPathVer1, true);
+  for (const id in jsonDB) {
+    const entry = jsonDB[id];
+    if (
+      entry.idType == "arxiv" ||
+      entry.idType == "doi" ||
+      entry.idType == "isbn" ||
+      entry.idType == "book"
+    ) {
+      const path = concatDirs(dbPathVer1.slice(0, -1).concat(entry.path));
+      logger.info("Reading id = " + id + " path = " + path);
+      const text = await getTextsFromPDF(path);
+      if (text._tag == "right") {
+        assert(jsonDB[id].idType != "meta");
+        jsonDB[id]["text"] = text.right;
+      }
+    } else if (entry.idType == "url") {
+      logger.info("url = " + entry.url);
+      let { got } = await import("got");
+      const options = { headers: { Accept: "text/html" } };
+      const html = await got(entry.url, options).text();
+      const { convert } = require("html-to-text");
+      const text = convert(html, {});
+      jsonDB[id]["text"] = text;
+    }
+  }
+
+  if (fs.existsSync(concatDirs(dbPathVer2))) {
+    logger.error(dbPathVer2 + " already exists.");
+    return;
+  }
+  fs.writeFileSync(concatDirs(dbPathVer2), JSON.stringify(jsonDB, null, 2));
 }
 
-export { compileDB };
+export { update_db };

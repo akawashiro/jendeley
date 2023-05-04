@@ -64,8 +64,12 @@ function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
   const jsonDB = JSON.parse(fs.readFileSync(concatDirs(dbPath)).toString());
 
   if (!validateJsonDB(jsonDB, dbPath)) {
-    logger.fatal("Failed to load DB because validateJsonDB");
-    if (!ignoreErrors) {
+    if (ignoreErrors) {
+      logger.warn(
+        "validateJsonDB failed but ignore because ignoreErrors is true"
+      );
+    } else {
+      logger.fatal("Failed to load DB because validateJsonDB");
       process.exit(1);
     }
   }

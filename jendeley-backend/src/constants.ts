@@ -6,6 +6,7 @@ const ENTRY_PATH = "path";
 const ENTRY_URL = "url";
 const ENTRY_TAGS = "tags";
 const ENTRY_COMMENTS = "comments";
+const ENTRY_TEXT = "text";
 const DB_META_KEY = "jendeley_meta";
 const ID_TYPE_ARXIV = "arxiv";
 const ID_TYPE_DOI = "doi";
@@ -27,6 +28,7 @@ export {
   ENTRY_URL,
   ENTRY_TAGS,
   ENTRY_COMMENTS,
+  ENTRY_TEXT,
   ENTRY_DATA_FROM_ARXIV,
   ID_TYPE_ARXIV,
   ID_TYPE_DOI,

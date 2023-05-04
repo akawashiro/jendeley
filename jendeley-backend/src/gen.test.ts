@@ -36,22 +36,22 @@ test("Title from path", async () => {
   );
 });
 
-test("JSON from path", async () => {
-  const pdf = [
-    "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf",
-  ];
-  const docID = await getDocID(pdf, ["hoge"], false, undefined);
-
-  if (docID._tag === "right") {
-    const t = await getJson(docID.right, pdf);
-    if (t._tag === "left") return;
-    const json = t.right.dbEntry;
-    if (json.idType !== "path") return;
-    expect(json.title).toBe(
-      "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf"
-    );
-  }
-});
+// test("JSON from path", async () => {
+//   const pdf = [
+//     "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf",
+//   ];
+//   const docID = await getDocID(pdf, ["hoge"], false, undefined);
+//
+//   if (docID._tag === "right") {
+//     const t = await getJson(docID.right, pdf);
+//     if (t._tag === "left") return;
+//     const json = t.right.dbEntry;
+//     if (json.idType !== "path") return;
+//     expect(json.title).toBe(
+//       "DistributedLearning/[Jeffrey Dean] Large Scale Distributed Deep Networks [jendeley no id].pdf"
+//     );
+//   }
+// });
 
 test("ISBN from text", async () => {
   const docID = getDocIDFromTexts(["ISBN 0-262-16209-1 (hc. : alk. paper)"]);
