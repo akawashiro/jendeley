@@ -359,7 +359,7 @@ function App() {
   } else {
     return (
       <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
-        <Box component="main" sx={{ m: 2 }}>
+        <Box component="main">
           <MaterialReactTable
             displayColumnDefOptions={{
               "mrt-row-actions": {
