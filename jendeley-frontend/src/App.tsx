@@ -26,6 +26,7 @@ import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
 import { fuzzySearch, HighlightedText } from "./fuzzysearch";
+import { genRequestGetDB } from "./requests";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -321,37 +322,7 @@ function App() {
       sorting
     );
 
-    let title: string | undefined = undefined;
-    for (const filter of columnFilters) {
-      if (filter.id === "title") {
-        if (typeof filter.value !== "string") {
-          throw Error("filter.value is not a string");
-        }
-        title = filter.value;
-        break;
-      }
-    }
-
-    let text: string | undefined = undefined;
-    for (const filter of columnFilters) {
-      if (filter.id === "text") {
-        if (typeof filter.value !== "string") {
-          throw Error("filter.value is not a string");
-        }
-        text = filter.value;
-        break;
-      }
-    }
-
-    const request: RequestGetDB = {
-      title: title,
-      authors: undefined,
-      tags: undefined,
-      comments: undefined,
-      year: undefined,
-      publisher: undefined,
-      text: text,
-    };
+    const request = genRequestGetDB(columnFilters);
 
     fetch(REACT_APP_API_URL + "/api/get_db", {
       method: "POST",

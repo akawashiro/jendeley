@@ -21,10 +21,10 @@ type ApiDB = ApiEntry[];
 
 type RequestGetDB = {
   title: string | undefined;
-  authors: string[] | undefined;
-  tags: string[] | undefined;
+  authors: string | undefined;
+  tags: string | undefined;
   comments: string | undefined;
-  year: number | undefined;
+  year: string | undefined;
   publisher: string | undefined;
   text: string | undefined;
 };
