@@ -310,15 +310,12 @@ function App() {
       },
       {
         accessorKey: "text",
-        // Cell: ({ renderedCellValue }) => <span>{renderedCellValue}</span>,
         Cell: ({ cell }) =>
           ShowText(cell.getValue<string>(), cell.column.getFilterValue()),
         header: "text",
-        // TODO: Make custom function to sort rows. Now I am using
-        // https://www.material-react-table.com/docs/guides/global-filtering#global-filtering-(search)-feature-guide.
-        // filterFn: "fuzzySearchFilterFn",
+        // TODO: Make custom function to sort rows.
+        filterFn: fuzzySearchFilterFn,
         enableEditing: false,
-        enableGlobalFilter: true,
       },
     ],
     [tableData]
@@ -381,8 +378,6 @@ function App() {
       <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
         <Box component="main">
           <MaterialReactTable
-            enableGlobalFilterModes //enable the user to choose between multiple search filter modes
-            globalFilterModeOptions={["fuzzy", "startsWith"]} //only allow the user to choose between fuzzy and startsWith filter modes
             displayColumnDefOptions={{
               "mrt-row-actions": {
                 muiTableHeadCellProps: {
