@@ -59,7 +59,12 @@ function fuzzySearch(text: string, query: string) {
   }
 
   const matches: Array<Match> = [];
-  ends = ends.sort(function(a, b){return a[0] - b[0]}).reverse().slice(0, MAX_MATCHES);
+  ends = ends
+    .sort(function (a, b) {
+      return a[0] - b[0];
+    })
+    .reverse()
+    .slice(0, MAX_MATCHES);
 
   for (let mi = 0; mi < ends.length; mi++) {
     let ti = ends[mi][1];
