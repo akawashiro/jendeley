@@ -205,11 +205,13 @@ function getScoreAndText(
   }
 }
 
+type Scores = { title: number; text: number };
+
 function getScoreAndEntry(
   id: string,
   jsonDB: JsonDB,
   requestGetDB: RequestGetDB
-): [number, ApiEntry] {
+): [Scores, ApiEntry] {
   if (jsonDB[id] == undefined) {
     logger.fatal("json[" + id + "] != undefined");
     process.exit(1);
@@ -222,12 +224,22 @@ function getScoreAndEntry(
     process.exit(1);
   }
 
+  const start = process.hrtime.bigint();
   const [textScore, text] = getScoreAndText(entryInDB.text, requestGetDB.text);
+  const end = process.hrtime.bigint();
+  logger.info(
+    "id = " + id + " in " + (end - start) / BigInt(1000 * 1000) + " ms"
+  );
 
   if (entryInDB.idType == "url") {
     const urlEntry: UrlEntry = entryInDB;
     let authors: string[] = [];
     const abstract = "";
+
+    const [titleScore, _] = getScoreAndText(
+      entryInDB.title,
+      requestGetDB.title
+    );
 
     const e = {
       id: id,
@@ -244,7 +256,7 @@ function getScoreAndEntry(
       publisher: "",
     };
     checkEntry(e);
-    return [textScore, e];
+    return [{ title: titleScore, text: textScore }, e];
   } else if (
     entryInDB.idType == ID_TYPE_ISBN ||
     entryInDB.idType == ID_TYPE_BOOK
@@ -271,6 +283,8 @@ function getScoreAndEntry(
     const abstract = "";
     const p = entryInDB.path.join(path.sep);
 
+    const [titleScore, _] = getScoreAndText(title, requestGetDB.title);
+
     const e = {
       id: id,
       idType: entryInDB.idType,
@@ -286,7 +300,7 @@ function getScoreAndEntry(
       publisher: publisher,
     };
     checkEntry(e);
-    return [textScore, e];
+    return [{ title: titleScore, text: textScore }, e];
   } else if (entryInDB.idType == ID_TYPE_DOI) {
     const doiEntry: DoiEntry = entryInDB;
     const title: string = doiEntry.dataFromCrossref["title"];
@@ -317,6 +331,8 @@ function getScoreAndEntry(
     const tags = doiEntry.tags;
     const comments = doiEntry.comments;
 
+    const [titleScore, _] = getScoreAndText(title, requestGetDB.title);
+
     const e = {
       id: id,
       idType: entryInDB.idType,
@@ -332,7 +348,7 @@ function getScoreAndEntry(
       publisher: publisher,
     };
     checkEntry(e);
-    return [textScore, e];
+    return [{ title: titleScore, text: textScore }, e];
   } else if (entryInDB.idType == ID_TYPE_ARXIV) {
     const arxivEntry: ArxivEntry = entryInDB;
     const title: string = arxivEntry.dataFromArxiv["title"];
@@ -360,6 +376,8 @@ function getScoreAndEntry(
         ? arxivEntry.dataFromArxiv["summary"]
         : "";
 
+    const [titleScore, _] = getScoreAndText(title, requestGetDB.title);
+
     const e = {
       id: id,
       idType: arxivEntry.idType,
@@ -375,7 +393,7 @@ function getScoreAndEntry(
       publisher: publisher,
     };
     checkEntry(e);
-    return [textScore, e];
+    return [{ title: titleScore, text: textScore }, e];
   } else {
     if (entryInDB.idType != ID_TYPE_PATH) {
       logger.fatal(
@@ -388,10 +406,16 @@ function getScoreAndEntry(
       );
       process.exit(1);
     }
+
     const pathEntry: PathEntry = entryInDB;
     const authors = [];
     const abstract =
       jsonDB[id]["abstract"] != undefined ? jsonDB[id]["abstract"] : "";
+    const [titleScore, _] = getScoreAndText(
+      pathEntry.title,
+      requestGetDB.title
+    );
+
     const e = {
       id: id,
       idType: pathEntry.idType,
@@ -407,7 +431,7 @@ function getScoreAndEntry(
       publisher: undefined,
     };
     checkEntry(e);
-    return [textScore, e];
+    return [{ title: titleScore, text: textScore }, e];
   }
 }
 
@@ -479,7 +503,7 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
   );
   const jsonDB = loadDB(dbPath, false);
 
-  let scoreAndEntry: [number, ApiEntry][] = [];
+  let scoreAndEntry: [Scores, ApiEntry][] = [];
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
     if (id == DB_META_KEY) continue;
@@ -488,8 +512,14 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
   }
 
   // Sort by score in descending order
-  scoreAndEntry.sort((a, b) => {
-    return b[0] - a[0];
+  scoreAndEntry.sort((a: [Scores, ApiEntry], b: [Scores, ApiEntry]) => {
+    const as = a[0];
+    const bs = b[0];
+    if (bs.title != as.title) {
+      return bs.title > as.title ? 1 : -1;
+    } else {
+      return bs.text > as.text ? 1 : -1;
+    }
   });
 
   let dbResponse: ApiDB = [];

@@ -117,22 +117,6 @@ function AbstractHTML(abstract: string) {
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
 }
 
-// eslint-disable-next-line
-function fuzzySearchFilterFn(
-  row: any,
-  id: string,
-  filterValue: string | number
-) {
-  let text = row.getValue(id);
-  if (typeof text !== "string") {
-    throw Error("row.getValue(id) is not string. id = " + id);
-  }
-  const query =
-    typeof filterValue === "number" ? filterValue.toString() : filterValue;
-  const matches = fuzzySearch(text, query);
-  return matches.length > 0;
-}
-
 function ShowText(text: string | undefined) {
   if (text === undefined) {
     return <Box></Box>;
@@ -337,6 +321,17 @@ function App() {
       sorting
     );
 
+    let title: string | undefined = undefined;
+    for (const filter of columnFilters) {
+      if (filter.id === "title") {
+        if (typeof filter.value !== "string") {
+          throw Error("filter.value is not a string");
+        }
+        title = filter.value;
+        break;
+      }
+    }
+
     let text: string | undefined = undefined;
     for (const filter of columnFilters) {
       if (filter.id === "text") {
@@ -349,7 +344,7 @@ function App() {
     }
 
     const request: RequestGetDB = {
-      title: undefined,
+      title: title,
       authors: undefined,
       tags: undefined,
       comments: undefined,
