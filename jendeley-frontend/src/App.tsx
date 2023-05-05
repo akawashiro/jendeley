@@ -23,7 +23,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
-import { HighlightedText } from "./fuzzysearch";
+import { fuzzySearch, HighlightedText } from "./fuzzysearch";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -113,6 +113,22 @@ function AbstractHTML(abstract: string) {
       : abstract.replaceAll("<jats:", "<");
   const __html = sanitizeHTML(shortendAbstract);
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
+}
+
+// eslint-disable-next-line
+function fuzzySearchFilterFn(
+  row: any,
+  id: string,
+  filterValue: string | number
+) {
+  let text = row.getValue(id);
+  if (typeof text !== "string") {
+    throw Error("row.getValue(id) is not string. id = " + id);
+  }
+  const query =
+    typeof filterValue === "number" ? filterValue.toString() : filterValue;
+  const matches = fuzzySearch(text, query);
+  return matches.length > 0;
 }
 
 function ShowText(text: string | undefined, query_unknown: unknown) {
@@ -294,11 +310,15 @@ function App() {
       },
       {
         accessorKey: "text",
+        // Cell: ({ renderedCellValue }) => <span>{renderedCellValue}</span>,
         Cell: ({ cell }) =>
           ShowText(cell.getValue<string>(), cell.column.getFilterValue()),
         header: "text",
-        filterFn: "includesString",
+        // TODO: Make custom function to sort rows. Now I am using
+        // https://www.material-react-table.com/docs/guides/global-filtering#global-filtering-(search)-feature-guide.
+        // filterFn: "fuzzySearchFilterFn",
         enableEditing: false,
+        enableGlobalFilter: true,
       },
     ],
     [tableData]
@@ -361,6 +381,8 @@ function App() {
       <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
         <Box component="main">
           <MaterialReactTable
+            enableGlobalFilterModes //enable the user to choose between multiple search filter modes
+            globalFilterModeOptions={["fuzzy", "startsWith"]} //only allow the user to choose between fuzzy and startsWith filter modes
             displayColumnDefOptions={{
               "mrt-row-actions": {
                 muiTableHeadCellProps: {
