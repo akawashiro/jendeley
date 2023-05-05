@@ -23,7 +23,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
-import { HighlightedText } from "./fuzzysearch";
+import { fuzzySearch, HighlightedText } from "./fuzzysearch";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
