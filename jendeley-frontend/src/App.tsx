@@ -415,7 +415,6 @@ function App() {
             enablePagination={false}
             initialState={{
               showColumnFilters: true,
-              sorting: [{ id: "year", desc: true }],
               columnVisibility: {
                 id: true,
                 idType: true,
