@@ -38,15 +38,20 @@ function startServer(
     }
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
 
-    app.get("/api/get_db", (request: Request, response: Response) => {
-      getDB(request, response, dbPath);
-    });
+    let jsonParser = bodyParser.json();
+
+    // To include search condition in the request body, we use POST method.
+    app.post(
+      "/api/get_db",
+      jsonParser,
+      (request: Request, response: Response) => {
+        getDB(request, response, dbPath);
+      }
+    );
 
     app.get("/api/get_pdf", (request: Request, response: Response) => {
       getPdf(request, response, dbPath);
     });
-
-    let jsonParser = bodyParser.json();
 
     app.put(
       "/api/add_pdf_from_file",

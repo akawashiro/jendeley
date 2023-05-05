@@ -120,7 +120,9 @@ function RegisterWebWithDialog(props: any) {
         props.setConnectionError(true);
       });
     console.log("Fetching from DB in registration");
-    fetch(REACT_APP_API_URL + "/api/get_db")
+
+    // TODO: Pass filter and sort
+    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
       .then((response) => response.json())
       .then((json) => props.setTableData(json))
       .catch((error) => {
@@ -339,7 +341,9 @@ function RegisterPDFFromFile(props: any) {
             props.setConnectionError(true);
           });
         console.log("Fetching from DB in registration");
-        fetch(REACT_APP_API_URL + "/api/get_db")
+
+        // TODO
+        fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
           .then((response) => response.json())
           .then((json) => props.setTableData(json))
           .catch((error) => {
@@ -537,7 +541,9 @@ function RegisterPDFFromWeb(props: any) {
         props.setConnectionError(true);
       });
     console.log("Fetching from DB in registration");
-    fetch(REACT_APP_API_URL + "/api/get_db")
+
+    // TODO: Pass filter and sort
+    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
       .then((response) => response.json())
       .then((json) => props.setTableData(json))
       .catch((error) => {

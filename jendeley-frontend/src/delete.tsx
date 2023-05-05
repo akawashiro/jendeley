@@ -59,7 +59,8 @@ function DeleteButton(props: any) {
     });
     console.log("response of update_entry:", response);
 
-    fetch(REACT_APP_API_URL + "/api/get_db")
+    // TODO: Pass filter and sort
+    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
       .then((response) => response.json())
       .then((json) => setTableData(json))
       .catch((error) => {

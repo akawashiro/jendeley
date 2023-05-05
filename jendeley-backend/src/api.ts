@@ -26,6 +26,7 @@ import {
   RequestGetWebFromUrl,
   ApiResponse,
   RequestGetPdfFromFile,
+  RequestGetDB,
 } from "./api_schema";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import {
@@ -65,7 +66,150 @@ function checkEntry(entry: ApiEntry) {
   }
 }
 
-function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
+type Match = { start: number; end: number; score: number };
+
+const MAX_MATCHES = 5;
+const MARGINE_AROUND_HIGHLIGHT = 30;
+
+function compareChar(a: string, b: string) {
+  if (a.toLowerCase() === b.toLowerCase()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// https://en-jp.wantedly.com/companies/wantedly/post_articles/306103
+function fuzzySearch(text: string, query: string) {
+  // Corresponds to H in the article
+  let dp_table: Array<Array<number>> = [];
+  let matched_index: Array<Array<number>> = [];
+  for (let i: number = 0; i < query.length; i++) {
+    dp_table[i] = [];
+    matched_index[i] = [];
+    for (let j: number = 0; j < text.length; j++) {
+      dp_table[i][j] = Number.NEGATIVE_INFINITY;
+      matched_index[i][j] = -1;
+    }
+  }
+
+  const Score = 8;
+  const Gap = -3;
+
+  for (let i: number = 0; i < query.length; i++) {
+    for (let j: number = 0; j < text.length; j++) {
+      if (compareChar(query[i], text[j])) {
+        dp_table[i][j] = Score;
+        if (0 < i && 0 < j) {
+          dp_table[i][j] += dp_table[i - 1][j - 1];
+          matched_index[i][j] = j;
+        }
+      } else {
+        if (0 < j) {
+          dp_table[i][j] = dp_table[i][j - 1] + Gap;
+        }
+      }
+    }
+  }
+
+  let ends: Array<[number, number]> = [];
+  for (let i = 0; i < text.length; i++) {
+    if (
+      dp_table[query.length - 1][i] > 0 &&
+      (i === 0 ||
+        dp_table[query.length - 1][i - 1] < dp_table[query.length - 1][i])
+    ) {
+      ends.push([dp_table[query.length - 1][i], i]);
+    }
+  }
+
+  const matches: Array<Match> = [];
+  ends = ends
+    .sort(function (a, b) {
+      return a[0] - b[0];
+    })
+    .reverse()
+    .slice(0, MAX_MATCHES);
+
+  for (let mi = 0; mi < ends.length; mi++) {
+    let ti = ends[mi][1];
+    let qi = query.length - 1;
+    let failed_to_reconstruct = false;
+    while (true) {
+      if (compareChar(text[ti], query[qi])) {
+        ti--;
+        qi--;
+      } else {
+        ti--;
+      }
+      if (qi === -1) {
+        break;
+      }
+      if (ti === -1) {
+        logger.warn(
+          "Skip an article because failed to reconstruct matched string. ti == -1 qi = " +
+            qi +
+            " query = " +
+            query
+        );
+        failed_to_reconstruct = true;
+        break;
+      }
+    }
+
+    if (!failed_to_reconstruct) {
+      matches.push({ start: ti + 1, end: ends[mi][1], score: ends[mi][0] });
+    }
+  }
+
+  return matches;
+}
+
+function highlightedText(text: string, matches: Array<Match>) {
+  const match_strs = matches.map((m) => {
+    const s = Math.max(0, m.start - MARGINE_AROUND_HIGHLIGHT);
+    const begin = text.slice(s, m.start);
+    const body = text.slice(m.start, m.end + 1);
+    const e = Math.min(text.length, m.end + MARGINE_AROUND_HIGHLIGHT);
+    const end = text.slice(m.end + 1, e);
+    return [begin, body, end];
+  });
+
+  let highlighted = "";
+
+  for (let i = 0; i < match_strs.length; i++) {
+    highlighted += "...";
+    highlighted += match_strs[i][0];
+    highlighted += "<strong>";
+    highlighted += match_strs[i][1];
+    highlighted += "</strong>";
+    highlighted += match_strs[i][2];
+    highlighted += "...";
+  }
+  return highlighted;
+}
+
+function getScoreAndText(
+  text: string,
+  query: string | undefined
+): [number, string] {
+  if (query == undefined) {
+    return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
+  } else {
+    const matches = fuzzySearch(text, query);
+    if (matches.length == 0) {
+      return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
+    } else {
+      return [matches[0].score, highlightedText(text, matches)];
+    }
+  }
+}
+
+function getScoreAndEntry(
+  id: string,
+  jsonDB: JsonDB,
+  requestGetDB: RequestGetDB
+): [number, ApiEntry] {
   if (jsonDB[id] == undefined) {
     logger.fatal("json[" + id + "] != undefined");
     process.exit(1);
@@ -78,6 +222,8 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
     process.exit(1);
   }
 
+  const [textScore, text] = getScoreAndText(entryInDB.text, requestGetDB.text);
+
   if (entryInDB.idType == "url") {
     const urlEntry: UrlEntry = entryInDB;
     let authors: string[] = [];
@@ -88,7 +234,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       idType: urlEntry.idType,
       url: urlEntry.url,
       title: urlEntry.title,
-      text: urlEntry.text,
+      text: text,
       authors: authors,
       tags: urlEntry.tags,
       comments: urlEntry.comments,
@@ -98,7 +244,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       publisher: "",
     };
     checkEntry(e);
-    return e;
+    return [textScore, e];
   } else if (
     entryInDB.idType == ID_TYPE_ISBN ||
     entryInDB.idType == ID_TYPE_BOOK
@@ -129,7 +275,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: entryInDB.idType,
       title: title,
-      text: entryInDB.text,
+      text: text,
       url: undefined,
       authors: authors,
       tags: entryInDB.tags,
@@ -140,7 +286,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       publisher: publisher,
     };
     checkEntry(e);
-    return e;
+    return [textScore, e];
   } else if (entryInDB.idType == ID_TYPE_DOI) {
     const doiEntry: DoiEntry = entryInDB;
     const title: string = doiEntry.dataFromCrossref["title"];
@@ -175,7 +321,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: entryInDB.idType,
       title: title,
-      text: entryInDB.text,
+      text: text,
       authors: authors,
       url: undefined,
       tags: tags,
@@ -186,7 +332,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       publisher: publisher,
     };
     checkEntry(e);
-    return e;
+    return [textScore, e];
   } else if (entryInDB.idType == ID_TYPE_ARXIV) {
     const arxivEntry: ArxivEntry = entryInDB;
     const title: string = arxivEntry.dataFromArxiv["title"];
@@ -218,7 +364,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: arxivEntry.idType,
       title: title,
-      text: arxivEntry.text,
+      text: text,
       url: undefined,
       authors: authors,
       tags: arxivEntry.tags,
@@ -229,7 +375,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       publisher: publisher,
     };
     checkEntry(e);
-    return e;
+    return [textScore, e];
   } else {
     if (entryInDB.idType != ID_TYPE_PATH) {
       logger.fatal(
@@ -250,7 +396,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       id: id,
       idType: pathEntry.idType,
       title: pathEntry.title,
-      text: pathEntry.text,
+      text: text,
       url: undefined,
       authors: authors,
       tags: pathEntry.tags,
@@ -261,7 +407,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       publisher: undefined,
     };
     checkEntry(e);
-    return e;
+    return [textScore, e];
   }
 }
 
@@ -323,20 +469,46 @@ function getPdf(request: Request, response: Response, dbPath: string[]) {
 }
 
 function getDB(request: Request, response: Response, dbPath: string[]) {
-  logger.info("Get a get_db request" + request.url);
+  const start = process.hrtime.bigint();
+  const requestGetDB = request.body as RequestGetDB;
+  logger.info(
+    "Get a get_db request" +
+      request.url +
+      " requestGetDB = " +
+      JSON.stringify(requestGetDB)
+  );
   const jsonDB = loadDB(dbPath, false);
 
-  let dbResponse: ApiDB = [];
-
+  let scoreAndEntry: [number, ApiEntry][] = [];
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
     if (id == DB_META_KEY) continue;
-    const e = getEntry(id, jsonDB);
-    dbResponse.push(e);
+    const e = getScoreAndEntry(id, jsonDB, requestGetDB);
+    scoreAndEntry.push(e);
+  }
+
+  // Sort by score in descending order
+  scoreAndEntry.sort((a, b) => {
+    return b[0] - a[0];
+  });
+
+  let dbResponse: ApiDB = [];
+  for (const e of scoreAndEntry) {
+    dbResponse.push(e[1]);
+    // TODO: Remove hard coded number
+    if (dbResponse.length >= 20) break;
   }
 
   response.status(200).json(dbResponse);
-  logger.info("Sent a response from get_db");
+
+  const end = process.hrtime.bigint();
+  logger.info(
+    "Sent a response from get_db requestGetDB = " +
+      JSON.stringify(requestGetDB) +
+      " in " +
+      (end - start) / BigInt(1000 * 1000) +
+      " ms"
+  );
 }
 
 // Rewrite using Either

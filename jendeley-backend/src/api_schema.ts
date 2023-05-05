@@ -19,6 +19,16 @@ type ApiEntry = {
 
 type ApiDB = ApiEntry[];
 
+type RequestGetDB = {
+  title: string | undefined;
+  authors: string[] | undefined;
+  tags: string[] | undefined;
+  comments: string | undefined;
+  year: number | undefined;
+  publisher: string | undefined;
+  text: string | undefined;
+};
+
 type RequestGetPdfFromFile = {
   filename: string;
   fileBase64: string;
@@ -56,6 +66,7 @@ export type {
   RequestGetPdfFromFile,
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
+  RequestGetDB,
   ApiResponse,
 };
 export {};

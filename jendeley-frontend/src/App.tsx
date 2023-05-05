@@ -1,14 +1,16 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Alert from "@mui/material/Alert";
 import base_64 from "base-64";
 import { Box } from "@mui/material";
 import "./App.css";
-import { ApiEntry, ApiDB } from "./api_schema";
+import { ApiEntry, ApiDB, RequestGetDB } from "./api_schema";
 import MaterialReactTable, {
   MRT_Cell,
   MRT_ColumnDef,
+  MRT_ColumnFiltersState,
   MRT_Row,
+  MRT_SortingState,
 } from "material-react-table";
 import ReactMarkdown from "react-markdown";
 import sanitizeHTML from "sanitize-html";
@@ -131,14 +133,12 @@ function fuzzySearchFilterFn(
   return matches.length > 0;
 }
 
-function ShowText(text: string | undefined, query_unknown: unknown) {
+function ShowText(text: string | undefined) {
   if (text === undefined) {
     return <Box></Box>;
-  } else if (typeof query_unknown !== "string") {
-    return <Box>{text.slice(0, 140) + "..."}</Box>;
   } else {
-    const query = query_unknown;
-    return HighlightedText(text, query);
+    const __html = sanitizeHTML(text);
+    return <div dangerouslySetInnerHTML={{ __html }}></div>;
   }
 }
 
@@ -206,22 +206,11 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
   }
 }
 
-function App() {
-  const [tableData, setTableData] = React.useState<ApiDB>([]);
-  const [connectionError, setConnectionError] = React.useState(false);
-
-  React.useEffect(() => {
-    console.log("Fetching from DB in loading");
-    fetch(REACT_APP_API_URL + "/api/get_db")
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        setConnectionError(true);
-      });
-  }, []);
-
-  const columns = useMemo<MRT_ColumnDef<ApiEntry>[]>(
+function useColumnDefs(
+  tableData: ApiDB,
+  setTableData: React.Dispatch<React.SetStateAction<ApiDB>>
+): MRT_ColumnDef<ApiEntry>[] {
+  return useMemo<MRT_ColumnDef<ApiEntry>[]>(
     () => [
       {
         accessorKey: "id",
@@ -310,16 +299,81 @@ function App() {
       },
       {
         accessorKey: "text",
-        Cell: ({ cell }) =>
-          ShowText(cell.getValue<string>(), cell.column.getFilterValue()),
+        Cell: ({ cell }) => ShowText(cell.getValue<string>()),
         header: "text",
-        // TODO: Make custom function to sort rows.
-        filterFn: fuzzySearchFilterFn,
         enableEditing: false,
       },
     ],
-    [tableData]
+    [tableData, setTableData]
   );
+}
+
+function App() {
+  const [tableData, setTableData] = React.useState<ApiDB>([]);
+  const [connectionError, setConnectionError] = React.useState(false);
+
+  // Table state
+  const [columnFilters, setColumnFilters] =
+    React.useState<MRT_ColumnFiltersState>([]);
+  const [sorting, setSorting] = React.useState<MRT_SortingState>([]);
+
+  // Fetch the table data from the server for the first time.
+  React.useEffect(() => {
+    console.log("Fetching from DB in loading");
+    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
+      .then((response) => response.json())
+      .then((json) => setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        setConnectionError(true);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    console.log(
+      "Fetching from DB because of changes in columnFilters or sorting. columnFilters = ",
+      columnFilters,
+      "sorting = ",
+      sorting
+    );
+
+    let text: string | undefined = undefined;
+    for (const filter of columnFilters) {
+      if (filter.id === "text") {
+        if (typeof filter.value !== "string") {
+          throw Error("filter.value is not a string");
+        }
+        text = filter.value;
+        break;
+      }
+    }
+
+    const request: RequestGetDB = {
+      title: undefined,
+      authors: undefined,
+      tags: undefined,
+      comments: undefined,
+      year: undefined,
+      publisher: undefined,
+      text: text,
+    };
+
+    fetch(REACT_APP_API_URL + "/api/get_db", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    })
+      .then((response) => response.json())
+      .then((json) => setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        setConnectionError(true);
+      });
+  }, [columnFilters, sorting]);
+
+  const columns = useColumnDefs(tableData, setTableData);
 
   const handleSaveCell = async (cell: MRT_Cell<ApiEntry>, value: any) => {
     let tags = tableData[cell.row.index]["tags"];
@@ -378,6 +432,8 @@ function App() {
       <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
         <Box component="main">
           <MaterialReactTable
+            onColumnFiltersChange={setColumnFilters}
+            onSortingChange={setSorting}
             displayColumnDefOptions={{
               "mrt-row-actions": {
                 muiTableHeadCellProps: {
