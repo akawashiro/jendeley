@@ -3,6 +3,7 @@ const JENDELEY_NO_TRACK = "[jendeley no track]";
 const JENDELEY_NO_ID = "[jendeley no id]";
 const ENTRY_ID_TYPE = "idType";
 const ENTRY_PATH = "path";
+const ENTRY_AUTHORS = "authors";
 const ENTRY_URL = "url";
 const ENTRY_TAGS = "tags";
 const ENTRY_COMMENTS = "comments";
@@ -19,11 +20,15 @@ const ARXIV_API_URL = "http://export.arxiv.org/api/query?id_list=";
 const ENTRY_DATA_FROM_ARXIV = "data_from_" + ARXIV_API_URL;
 const JENDELEY_DIR = ".jendeley";
 
+const AUTHORES_EDITABLE_ID_TYPES = ["url", "path"];
+
 export {
+  AUTHORES_EDITABLE_ID_TYPES,
   JENDELEY_NO_TRACK,
   JENDELEY_NO_ID,
   DB_META_KEY,
   ENTRY_ID_TYPE,
+  ENTRY_AUTHORS,
   ENTRY_PATH,
   ENTRY_URL,
   ENTRY_TAGS,

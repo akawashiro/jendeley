@@ -16,7 +16,7 @@ import {
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
 } from "./api_schema";
-import { splitTagsStr } from "./stringUtils";
+import { splitTagsOrAuthorsStr} from "./stringUtils";
 import { useSnackbar } from "notistack";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -86,7 +86,7 @@ function RegisterWebWithDialog(props: any) {
     const r: RequestGetWebFromUrl = {
       url: webUrl,
       title: title,
-      tags: splitTagsStr(tags),
+      tags: splitTagsOrAuthorsStr(tags),
       comments: comments,
     };
     setWebUrl("");
@@ -315,7 +315,7 @@ function RegisterPDFFromFile(props: any) {
           fileBase64: fileBase64,
           isbn: isbn === "" ? undefined : isbn,
           doi: doi === "" ? undefined : doi,
-          tags: splitTagsStr(tags),
+          tags: splitTagsOrAuthorsStr(tags),
           comments: comments,
         };
         console.log("Add PDF from URL");
@@ -514,7 +514,7 @@ function RegisterPDFFromWeb(props: any) {
       filename: filename === "" ? undefined : filename,
       isbn: isbn === "" ? undefined : isbn,
       doi: doi === "" ? undefined : doi,
-      tags: splitTagsStr(tags),
+      tags: splitTagsOrAuthorsStr(tags),
       comments: comments,
     };
     setPdfUrl("");

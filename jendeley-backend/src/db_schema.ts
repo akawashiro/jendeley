@@ -46,6 +46,7 @@ type PathEntry = {
   idType: "path";
   path: string[];
   title: string;
+  authors: string[];
   tags: string[];
   text: string;
   userSpecifiedTitle: string | undefined;
@@ -57,6 +58,7 @@ type UrlEntry = {
   idType: "url";
   url: string;
   title: string;
+  authors: string[];
   tags: string[];
   text: string;
   userSpecifiedTitle: string | undefined;

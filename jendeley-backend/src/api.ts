@@ -18,6 +18,8 @@ import {
   ID_TYPE_PATH,
   ENTRY_PATH,
   DB_META_KEY,
+  ENTRY_AUTHORS,
+  AUTHORES_EDITABLE_ID_TYPES,
 } from "./constants";
 import {
   ApiEntry,
@@ -82,7 +84,6 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
 
   if (entryInDB.idType == "url") {
     const urlEntry: UrlEntry = entryInDB;
-    let authors: string[] = [];
     const abstract = "";
 
     const e = {
@@ -91,7 +92,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       url: urlEntry.url,
       title: urlEntry.title,
       text: urlEntry.text,
-      authors: authors,
+      authors: urlEntry.authors,
       tags: urlEntry.tags,
       comments: urlEntry.comments,
       abstract: abstract,
@@ -246,7 +247,6 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
     }
 
     const pathEntry: PathEntry = entryInDB;
-    const authors = [];
     const abstract =
       jsonDB[id]["abstract"] != undefined ? jsonDB[id]["abstract"] : "";
 
@@ -256,7 +256,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       title: pathEntry.title,
       text: pathEntry.text,
       url: undefined,
-      authors: authors,
+      authors: pathEntry.authors,
       tags: pathEntry.tags,
       abstract: abstract,
       comments: pathEntry.comments,
@@ -293,6 +293,13 @@ function updateEntry(request: Request, response: Response, dbPath: string[]) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
       jsonDB[entry.id][ENTRY_TAGS] = entry.tags;
       jsonDB[entry.id][ENTRY_COMMENTS] = entry.comments;
+      logger.info(
+        "AUTHORES_EDITABLE_ID_TYPES.includes(entry.idType) = " +
+          AUTHORES_EDITABLE_ID_TYPES.includes(entry.idType)
+      );
+      if (AUTHORES_EDITABLE_ID_TYPES.includes(entry.idType)) {
+        jsonDB[entry.id][ENTRY_AUTHORS] = entry.authors;
+      }
     }
 
     saveDB(jsonDB, dbPath);

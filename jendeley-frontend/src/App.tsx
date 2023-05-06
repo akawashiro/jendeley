@@ -19,13 +19,14 @@ import {
   RegisterPDFFromWeb,
   RegisterPDFFromFile,
 } from "./register";
-import { splitTagsStr, getColorFromString } from "./stringUtils";
+import { splitTagsOrAuthorsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceChip } from "./conference";
 import { genRequestGetDB } from "./requests";
+import {AUTHORES_EDITABLE_ID_TYPES} from "./constants";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -49,26 +50,33 @@ function TypeChip(type: string) {
   );
 }
 
-function AuthorChips(authors: string[]) {
-  // TODO padding or margine
-  return (
-    <Box>
-      {authors.map((a) => (
-        <Chip
-          label={`${a}`}
-          size="small"
-          onClick={() => {
-            navigator.clipboard.writeText(a);
-          }}
-          sx={{
-            color: getColorFromString(a).color,
-            bgcolor: getColorFromString(a).bgcolor,
-            m: 0.1,
-          }}
-        />
-      ))}
-    </Box>
-  );
+function AuthorChips(idType: string, authors: string[]) {
+  if (authors.length === 0) {
+    if (AUTHORES_EDITABLE_ID_TYPES.includes(idType)) {
+      return <EditIcon sx={{ color: grey[300] }} />;
+    } else {
+      return <Box></Box>;
+    }
+  } else {
+    return (
+      <Box>
+        {authors.map((a) => (
+          <Chip
+            label={`${a}`}
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(a);
+            }}
+            sx={{
+              color: getColorFromString(a).color,
+              bgcolor: getColorFromString(a).bgcolor,
+              m: 0.1,
+            }}
+          />
+        ))}
+      </Box>
+    );
+  }
 }
 
 function TagChips(tags: string[]) {
@@ -227,10 +235,11 @@ function useColumnDefs(
       },
       {
         accessorKey: "authors",
-        Cell: ({ cell }) => AuthorChips(cell.getValue<string[]>()),
+        Cell: ({ cell, row }) =>
+          AuthorChips(row.original.idType, cell.getValue<string[]>()),
         header: "authors",
         enableSorting: false,
-        enableEditing: false,
+        enableEditing: true,
         filterFn: stringArrayFilterFn,
       },
       {
@@ -336,14 +345,27 @@ function App() {
 
   const handleSaveCell = async (cell: MRT_Cell<ApiEntry>, value: any) => {
     let tags = tableData[cell.row.index]["tags"];
+    let authors = tableData[cell.row.index]["authors"];
     let comments = tableData[cell.row.index]["comments"];
 
     if (cell.column.id === "comments") {
       comments = value;
       tableData[cell.row.index]["comments"] = comments;
     } else if (cell.column.id === "tags") {
-      tags = splitTagsStr(value);
+      tags = splitTagsOrAuthorsStr(value);
       tableData[cell.row.index]["tags"] = tags;
+    } else if (cell.column.id === "authors") {
+      if (!AUTHORES_EDITABLE_ID_TYPES.includes(cell.row.original.idType)) {
+        const message =
+          "Cannot edit authors for idType = " + cell.row.original.idType;
+        // TODO: show error message using Snackbar
+        // enqueueSnackbar(message, { variant: "error" });
+        console.warn(message);
+        return;
+      } else {
+        authors = splitTagsOrAuthorsStr(value);
+        tableData[cell.row.index]["authors"] = authors;
+      }
     }
 
     const e: ApiEntry = {

@@ -15,6 +15,7 @@ import {
   ENTRY_URL,
   DB_META_KEY,
   ENTRY_TEXT,
+  ENTRY_AUTHORS,
 } from "./constants";
 import { JsonDB } from "./db_schema";
 import { logger } from "./logger";
@@ -59,6 +60,19 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
     ) {
       logger.warn("Invalid id: " + id + " id_type: " + id_type);
       validDB = false;
+    }
+
+    // ENTRY_AUTHORS check
+    if (id_type == ID_TYPE_URL || id_type == ID_TYPE_PATH) {
+      if (!Array.isArray(jsonDB[id][ENTRY_AUTHORS])) {
+        logger.warn(
+          "Invalid authors in id:" +
+            id +
+            " authors: " +
+            JSON.stringify(jsonDB[id][ENTRY_AUTHORS])
+        );
+        validDB = false;
+      }
     }
 
     // ENTRY_TAGS check
