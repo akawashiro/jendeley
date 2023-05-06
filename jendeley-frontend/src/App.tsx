@@ -25,16 +25,15 @@ import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceChip } from "./conference";
-import { genRequestGetDB } from "./requests";
 import {
   AUTHORES_EDITABLE_ID_TYPES,
   TITLE_EDITABLE_ID_TYPES,
 } from "./constants";
+import { fetchDB } from "./api_call";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 function TypeChip(type: string) {
-  // TODO padding or margine
   return (
     <Box>
       <Chip
@@ -54,57 +53,49 @@ function TypeChip(type: string) {
 }
 
 function AuthorChips(idType: string, authors: string[]) {
-  if (authors.length === 0) {
-    if (AUTHORES_EDITABLE_ID_TYPES.includes(idType)) {
-      return <EditIcon sx={{ color: grey[300] }} />;
-    } else {
-      return <Box></Box>;
-    }
-  } else {
-    return (
-      <Box>
-        {authors.map((a) => (
-          <Chip
-            label={`${a}`}
-            size="small"
-            onClick={() => {
-              navigator.clipboard.writeText(a);
-            }}
-            sx={{
-              color: getColorFromString(a).color,
-              bgcolor: getColorFromString(a).bgcolor,
-              m: 0.1,
-            }}
-          />
-        ))}
-      </Box>
-    );
-  }
+  return (
+    <Box>
+      {AUTHORES_EDITABLE_ID_TYPES.includes(idType) && (
+        <EditIcon sx={{ color: grey[300] }} />
+      )}
+      {authors.map((a) => (
+        <Chip
+          label={`${a}`}
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(a);
+          }}
+          sx={{
+            color: getColorFromString(a).color,
+            bgcolor: getColorFromString(a).bgcolor,
+            m: 0.1,
+          }}
+        />
+      ))}
+    </Box>
+  );
 }
 
 function TagChips(tags: string[]) {
-  if (tags.length === 0) {
-    return <EditIcon sx={{ color: grey[300] }} />;
-  } else {
-    return (
-      <Box>
-        {tags.map((t) => (
-          <Chip
-            label={`${t}`}
-            size="small"
-            onClick={() => {
-              navigator.clipboard.writeText(t);
-            }}
-            sx={{
-              color: getColorFromString(t).color,
-              bgcolor: getColorFromString(t).bgcolor,
-              m: 0.1,
-            }}
-          />
-        ))}
-      </Box>
-    );
-  }
+  return (
+    <Box>
+      <EditIcon sx={{ color: grey[300] }} />
+      {tags.map((t) => (
+        <Chip
+          label={`${t}`}
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(t);
+          }}
+          sx={{
+            color: getColorFromString(t).color,
+            bgcolor: getColorFromString(t).bgcolor,
+            m: 0.1,
+          }}
+        />
+      ))}
+    </Box>
+  );
 }
 
 function CommentsDiv(comments: string) {
@@ -174,24 +165,11 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
       throw Error("row.original.path is undefined for " + row.original.id);
     }
 
-    // TODO: Refactor this
-    if (row.original.idType == "path") {
-      return (
-        <Box>
+    return (
+      <Box>
+        {row.original.idType === "path" && (
           <EditIcon sx={{ color: grey[300] }} />
-          <a
-            href={`${
-              REACT_APP_API_URL +
-              "/api/get_pdf/?file=" +
-              base_64.encode(escape(row.original.path))
-            }`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >{`${title}`}</a>
-        </Box>
-      );
-    } else {
-      return (
+        )}
         <a
           href={`${
             REACT_APP_API_URL +
@@ -201,14 +179,15 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
           target="_blank"
           rel="noopener noreferrer"
         >{`${title}`}</a>
-      );
-    }
+      </Box>
+    );
   }
 }
 
 function useColumnDefs(
   tableData: ApiDB,
-  setTableData: React.Dispatch<React.SetStateAction<ApiDB>>
+  setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
+  columnFilters: MRT_ColumnFiltersState
 ): MRT_ColumnDef<ApiEntry>[] {
   return useMemo<MRT_ColumnDef<ApiEntry>[]>(
     () => [
@@ -219,6 +198,7 @@ function useColumnDefs(
             id={`${cell.getValue<string>()}`}
             idType={`${row.original.idType}`}
             title={`${row.original.title}`}
+            columnFilters={columnFilters}
             setTableData={setTableData}
             tableData={tableData}
           />
@@ -329,13 +309,7 @@ function App() {
   // Fetch the table data from the server for the first time.
   React.useEffect(() => {
     console.log("Fetching from DB in loading");
-    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        setConnectionError(true);
-      });
+    fetchDB(columnFilters, setTableData, setConnectionError);
   }, []);
 
   React.useEffect(() => {
@@ -346,24 +320,10 @@ function App() {
       sorting
     );
 
-    const request = genRequestGetDB(columnFilters);
-
-    fetch(REACT_APP_API_URL + "/api/get_db", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    })
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        setConnectionError(true);
-      });
+    fetchDB(columnFilters, setTableData, setConnectionError);
   }, [columnFilters, sorting]);
 
-  const columns = useColumnDefs(tableData, setTableData);
+  const columns = useColumnDefs(tableData, setTableData, columnFilters);
 
   const handleSaveCell = async (cell: MRT_Cell<ApiEntry>, value: any) => {
     let tags = tableData[cell.row.index]["tags"];
@@ -494,14 +454,17 @@ function App() {
                   <RegisterWebWithDialog
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
+                    columnFilters={columnFilters}
                   />
                   <RegisterPDFFromWeb
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
+                    columnFilters={columnFilters}
                   />
                   <RegisterPDFFromFile
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
+                    columnFilters={columnFilters}
                   />
                 </div>
               );

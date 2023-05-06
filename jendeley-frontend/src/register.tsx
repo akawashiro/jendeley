@@ -18,6 +18,7 @@ import {
 } from "./api_schema";
 import { splitTagsOrAuthorsStr } from "./stringUtils";
 import { useSnackbar } from "notistack";
+import { fetchDB } from "./api_call";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -121,14 +122,7 @@ function RegisterWebWithDialog(props: any) {
       });
     console.log("Fetching from DB in registration");
 
-    // TODO: Pass filter and sort
-    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
-      .then((response) => response.json())
-      .then((json) => props.setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        props.setConnectionError(true);
-      });
+    fetchDB(props.columnFilters, props.setTableData, props.setConnectionError);
   }
 
   return (
@@ -342,14 +336,11 @@ function RegisterPDFFromFile(props: any) {
           });
         console.log("Fetching from DB in registration");
 
-        // TODO
-        fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
-          .then((response) => response.json())
-          .then((json) => props.setTableData(json))
-          .catch((error) => {
-            console.log(error);
-            props.setConnectionError(true);
-          });
+        fetchDB(
+          props.columnFilters,
+          props.setTableData,
+          props.setConnectionError
+        );
       }
     }
   }
@@ -542,14 +533,7 @@ function RegisterPDFFromWeb(props: any) {
       });
     console.log("Fetching from DB in registration");
 
-    // TODO: Pass filter and sort
-    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
-      .then((response) => response.json())
-      .then((json) => props.setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        props.setConnectionError(true);
-      });
+    fetchDB(props.columnFilters, props.setTableData, props.setConnectionError);
   }
 
   return (
