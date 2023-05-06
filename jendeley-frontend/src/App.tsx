@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Alert from "@mui/material/Alert";
 import base_64 from "base-64";
 import { Box } from "@mui/material";
 import "./App.css";
-import { ApiEntry, ApiDB, RequestGetDB } from "./api_schema";
+import { ApiEntry, ApiDB } from "./api_schema";
 import MaterialReactTable, {
   MRT_Cell,
   MRT_ColumnDef,
@@ -24,7 +24,7 @@ import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
-import { ConferenceChip } from "./conferenceAcronyms";
+import { ConferenceChip } from "./conference";
 import { genRequestGetDB } from "./requests";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
