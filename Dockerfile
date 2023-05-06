@@ -4,6 +4,7 @@ COPY . /jendeley
 
 WORKDIR /jendeley
 RUN diff /jendeley/jendeley-backend/src/api_schema.ts /jendeley/jendeley-frontend/src/api_schema.ts
+RUN diff /jendeley/jendeley-backend/src/constants.ts /jendeley/jendeley-frontend/src/constants.ts
 
 WORKDIR /jendeley/jendeley-backend
 RUN ./check-version.sh
