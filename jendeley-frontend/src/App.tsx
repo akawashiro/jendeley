@@ -25,16 +25,15 @@ import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceChip } from "./conference";
-import { genRequestGetDB } from "./requests";
 import {
   AUTHORES_EDITABLE_ID_TYPES,
   TITLE_EDITABLE_ID_TYPES,
 } from "./constants";
+import { fetchDB } from "./api_call";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 function TypeChip(type: string) {
-  // TODO padding or margine
   return (
     <Box>
       <Chip
@@ -187,7 +186,8 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
 
 function useColumnDefs(
   tableData: ApiDB,
-  setTableData: React.Dispatch<React.SetStateAction<ApiDB>>
+  setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
+  columnFilters: MRT_ColumnFiltersState
 ): MRT_ColumnDef<ApiEntry>[] {
   return useMemo<MRT_ColumnDef<ApiEntry>[]>(
     () => [
@@ -198,6 +198,7 @@ function useColumnDefs(
             id={`${cell.getValue<string>()}`}
             idType={`${row.original.idType}`}
             title={`${row.original.title}`}
+            columnFilters={columnFilters}
             setTableData={setTableData}
             tableData={tableData}
           />
@@ -308,13 +309,7 @@ function App() {
   // Fetch the table data from the server for the first time.
   React.useEffect(() => {
     console.log("Fetching from DB in loading");
-    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        setConnectionError(true);
-      });
+    fetchDB(columnFilters, setTableData, setConnectionError);
   }, []);
 
   React.useEffect(() => {
@@ -325,24 +320,10 @@ function App() {
       sorting
     );
 
-    const request = genRequestGetDB(columnFilters);
-
-    fetch(REACT_APP_API_URL + "/api/get_db", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    })
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        setConnectionError(true);
-      });
+    fetchDB(columnFilters, setTableData, setConnectionError);
   }, [columnFilters, sorting]);
 
-  const columns = useColumnDefs(tableData, setTableData);
+  const columns = useColumnDefs(tableData, setTableData, columnFilters);
 
   const handleSaveCell = async (cell: MRT_Cell<ApiEntry>, value: any) => {
     let tags = tableData[cell.row.index]["tags"];
@@ -473,14 +454,17 @@ function App() {
                   <RegisterWebWithDialog
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
+                    columnFilters={columnFilters}
                   />
                   <RegisterPDFFromWeb
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
+                    columnFilters={columnFilters}
                   />
                   <RegisterPDFFromFile
                     setTableData={setTableData}
                     setConnectionError={setConnectionError}
+                    columnFilters={columnFilters}
                   />
                 </div>
               );

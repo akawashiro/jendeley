@@ -10,6 +10,8 @@ import {
 import "./App.css";
 import { IDType, ApiEntry, ApiDB } from "./api_schema";
 import { Delete } from "@mui/icons-material";
+import { MRT_ColumnFiltersState } from "material-react-table";
+import { fetchDB } from "./api_call";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -28,6 +30,7 @@ function DeleteButton(props: any) {
     id: string,
     idType: IDType,
     tableData: ApiDB,
+    columnFilters: MRT_ColumnFiltersState,
     setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
     setConnectionError: React.Dispatch<React.SetStateAction<boolean>>
   ) {
@@ -59,14 +62,7 @@ function DeleteButton(props: any) {
     });
     console.log("response of update_entry:", response);
 
-    // TODO: Pass filter and sort
-    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        setConnectionError(true);
-      });
+    fetchDB(columnFilters, setTableData, setConnectionError);
 
     setOpen(false);
   }
@@ -88,6 +84,7 @@ function DeleteButton(props: any) {
                 props.id,
                 props.idType,
                 props.tableData,
+                props.columnFilters,
                 props.setTableData,
                 props.setConnectionError
               )
