@@ -16,6 +16,7 @@ import {
   DB_META_KEY,
   ENTRY_TEXT,
   ENTRY_AUTHORS,
+  ENTRY_TITLE,
 } from "./constants";
 import { JsonDB } from "./db_schema";
 import { logger } from "./logger";
@@ -70,6 +71,19 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             id +
             " authors: " +
             JSON.stringify(jsonDB[id][ENTRY_AUTHORS])
+        );
+        validDB = false;
+      }
+    }
+
+    // ENTRY_TITLE check
+    if (id_type == ID_TYPE_URL || id_type == ID_TYPE_PATH) {
+      if (typeof jsonDB[id][ENTRY_TITLE] != "string") {
+        logger.warn(
+          "Invalid title in id:" +
+            id +
+            " tile: " +
+            JSON.stringify(jsonDB[id][ENTRY_TITLE])
         );
         validDB = false;
       }
