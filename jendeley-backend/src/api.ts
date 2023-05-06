@@ -728,5 +728,8 @@ export {
   addPdfFromUrl,
   addPdfFromFile,
   getPdf,
+  getEntry,
+  abbribatePublisherInEntry,
+  getScoreAndEntry,
   getTitleFromUrl,
 };

@@ -204,29 +204,17 @@ function getScoreAndEntry(
     yearScore = entry.year.toString().includes(requestGetDB.year) ? 1 : 0;
   }
 
-  const score = {
+  const score: Scores = {
     title: titleScore,
     text: textScore,
     authors: authorsScore,
     tags: tagsScore,
     comments: commentsScore,
     year: yearScore,
+    publisher: publisherScore,
   };
 
-  logger.info("id = " + entry.id + " score = " + JSON.stringify(score));
-
-  return [
-    {
-      title: titleScore,
-      text: textScore,
-      authors: authorsScore,
-      tags: tagsScore,
-      comments: commentsScore,
-      year: yearScore,
-      publisher: publisherScore,
-    },
-    entry,
-  ];
+  return [score, entry];
 }
 
 function compareScore(a: Scores, b: Scores) {
