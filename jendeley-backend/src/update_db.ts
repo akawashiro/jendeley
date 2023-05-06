@@ -5,6 +5,7 @@ import { logger } from "./logger";
 import { loadDB } from "./load_db";
 import { Either, genLeft, genRight } from "./either";
 import { validateJsonDB } from "./validate_db";
+import { ENTRY_AUTHORS, ENTRY_TEXT, ENTRY_TITLE } from "./constants";
 
 async function getTextsFromPDF(
   pdfFullpath: string
@@ -28,6 +29,9 @@ async function getTextsFromPDF(
   }
 }
 
+// Run
+// git diff v1.3.0 jendeley-backend/src/db_schema.ts
+// to see what has changed.
 async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
   logger.info(
     "Updating " + concatDirs(dbPathVer1) + " to " + concatDirs(dbPathVer2)
@@ -40,6 +44,7 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
   const jsonDB = loadDB(dbPathVer1, true);
   for (const id in jsonDB) {
     const entry = jsonDB[id];
+    // ENTRY_TEXT
     if (
       entry.idType == "arxiv" ||
       entry.idType == "doi" ||
@@ -51,10 +56,10 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
       logger.info("Reading id = " + id + " path = " + path);
       const text = await getTextsFromPDF(path);
       if (text._tag == "right") {
-        jsonDB[id]["text"] = text.right;
+        jsonDB[id][ENTRY_TEXT] = text.right;
       } else {
         logger.warn(text.left);
-        jsonDB[id]["text"] = "";
+        jsonDB[id][ENTRY_TEXT] = "";
       }
     } else if (entry.idType == "url") {
       logger.info("url = " + entry.url);
@@ -63,7 +68,12 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
       const html = await got(entry.url, options).text();
       const { convert } = require("html-to-text");
       const text = convert(html, {});
-      jsonDB[id]["text"] = text;
+      jsonDB[id][ENTRY_TEXT] = text;
+    }
+
+    // ENTRY_AUTHORS
+    if (entry.idType === "path" || entry.idType === "url") {
+      jsonDB[id][ENTRY_AUTHORS] = [];
     }
   }
 
