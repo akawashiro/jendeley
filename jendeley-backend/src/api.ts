@@ -18,6 +18,10 @@ import {
   ID_TYPE_PATH,
   ENTRY_PATH,
   DB_META_KEY,
+  ENTRY_AUTHORS,
+  AUTHORES_EDITABLE_ID_TYPES,
+  TITLE_EDITABLE_ID_TYPES,
+  ENTRY_TITLE,
 } from "./constants";
 import {
   ApiEntry,
@@ -26,20 +30,22 @@ import {
   RequestGetWebFromUrl,
   ApiResponse,
   RequestGetPdfFromFile,
+  RequestGetDB,
 } from "./api_schema";
 import { registerWeb, registerNonBookPDF } from "./gen";
 import {
   ArxivEntry,
   DBEntry,
   DoiEntry,
-  FulltextDB,
   JsonDB,
   PathEntry,
   UrlEntry,
 } from "./db_schema";
 import { Either, genLeft, genRight } from "./either";
-import { loadDB, loadFulltextDB, saveDB } from "./load_db";
+import { loadDB, saveDB } from "./load_db";
 import { concatDirs } from "./path_util";
+import { getScoreAndEntry, Scores, compareScore } from "./score";
+import { getAcronyms } from "./conferenceAcronyms";
 
 function checkEntry(entry: ApiEntry) {
   if (entry.idType == "url") {
@@ -80,7 +86,6 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
 
   if (entryInDB.idType == "url") {
     const urlEntry: UrlEntry = entryInDB;
-    let authors: string[] = [];
     const abstract = "";
 
     const e = {
@@ -89,7 +94,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       url: urlEntry.url,
       title: urlEntry.title,
       text: urlEntry.text,
-      authors: authors,
+      authors: urlEntry.authors,
       tags: urlEntry.tags,
       comments: urlEntry.comments,
       abstract: abstract,
@@ -242,17 +247,18 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
       );
       process.exit(1);
     }
+
     const pathEntry: PathEntry = entryInDB;
-    const authors = [];
     const abstract =
       jsonDB[id]["abstract"] != undefined ? jsonDB[id]["abstract"] : "";
+
     const e = {
       id: id,
       idType: pathEntry.idType,
       title: pathEntry.title,
       text: pathEntry.text,
       url: undefined,
-      authors: authors,
+      authors: pathEntry.authors,
       tags: pathEntry.tags,
       abstract: abstract,
       comments: pathEntry.comments,
@@ -263,6 +269,14 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
     checkEntry(e);
     return e;
   }
+}
+
+function abbribatePublisherInEntry(entry: ApiEntry): ApiEntry {
+  let r = entry;
+  if (r.publisher != undefined) {
+    r.publisher = getAcronyms(r.publisher);
+  }
+  return r;
 }
 
 function updateEntry(request: Request, response: Response, dbPath: string[]) {
@@ -281,6 +295,12 @@ function updateEntry(request: Request, response: Response, dbPath: string[]) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
       jsonDB[entry.id][ENTRY_TAGS] = entry.tags;
       jsonDB[entry.id][ENTRY_COMMENTS] = entry.comments;
+      if (AUTHORES_EDITABLE_ID_TYPES.includes(entry.idType)) {
+        jsonDB[entry.id][ENTRY_AUTHORS] = entry.authors;
+      }
+      if (TITLE_EDITABLE_ID_TYPES.includes(entry.idType)) {
+        jsonDB[entry.id][ENTRY_TITLE] = entry.title;
+      }
     }
 
     saveDB(jsonDB, dbPath);
@@ -323,20 +343,48 @@ function getPdf(request: Request, response: Response, dbPath: string[]) {
 }
 
 function getDB(request: Request, response: Response, dbPath: string[]) {
-  logger.info("Get a get_db request" + request.url);
+  const start = process.hrtime.bigint();
+  const requestGetDB = request.body as RequestGetDB;
+  logger.info(
+    "Get a get_db request" +
+      request.url +
+      " requestGetDB = " +
+      JSON.stringify(requestGetDB)
+  );
   const jsonDB = loadDB(dbPath, false);
 
-  let dbResponse: ApiDB = [];
-
+  let scoreAndEntry: [Scores, ApiEntry][] = [];
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
     if (id == DB_META_KEY) continue;
-    const e = getEntry(id, jsonDB);
-    dbResponse.push(e);
+    const e_raw = getEntry(id, jsonDB);
+    const e = abbribatePublisherInEntry(e_raw);
+    const sande = getScoreAndEntry(e, requestGetDB);
+    scoreAndEntry.push(sande);
+  }
+
+  // Sort by score in descending order
+  scoreAndEntry.sort((a: [Scores, ApiEntry], b: [Scores, ApiEntry]) => {
+    return compareScore(a[0], b[0]);
+  });
+
+  let dbResponse: ApiDB = [];
+  for (const e of scoreAndEntry) {
+    dbResponse.push(e[1]);
+    // TODO: Remove hard coded number
+    if (dbResponse.length >= 20) break;
   }
 
   response.status(200).json(dbResponse);
-  logger.info("Sent a response from get_db");
+
+  const end = process.hrtime.bigint();
+  logger.info(
+    "Sent a response from get_db requestGetDB = " +
+      JSON.stringify(requestGetDB) +
+      " in " +
+      (end - start) / BigInt(1000 * 1000) +
+      " ms"
+  );
 }
 
 // Rewrite using Either
@@ -688,5 +736,8 @@ export {
   addPdfFromUrl,
   addPdfFromFile,
   getPdf,
+  getEntry,
+  abbribatePublisherInEntry,
+  getScoreAndEntry,
   getTitleFromUrl,
 };

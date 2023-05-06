@@ -52,7 +52,8 @@ function fuzzySearch(text: string, query: string) {
     if (
       dp_table[query.length - 1][i] > 0 &&
       (i === 0 ||
-        dp_table[query.length - 1][i - 1] < dp_table[query.length - 1][i])
+        dp_table[query.length - 1][i - 1] < dp_table[query.length - 1][i]) &&
+      dp_table[query.length - 1][i] / query.length > 0.5
     ) {
       ends.push([dp_table[query.length - 1][i], i]);
     }

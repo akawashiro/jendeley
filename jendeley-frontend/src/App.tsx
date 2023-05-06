@@ -8,7 +8,9 @@ import { ApiEntry, ApiDB } from "./api_schema";
 import MaterialReactTable, {
   MRT_Cell,
   MRT_ColumnDef,
+  MRT_ColumnFiltersState,
   MRT_Row,
+  MRT_SortingState,
 } from "material-react-table";
 import ReactMarkdown from "react-markdown";
 import sanitizeHTML from "sanitize-html";
@@ -17,13 +19,17 @@ import {
   RegisterPDFFromWeb,
   RegisterPDFFromFile,
 } from "./register";
-import { splitTagsStr, getColorFromString } from "./stringUtils";
+import { splitTagsOrAuthorsStr, getColorFromString } from "./stringUtils";
 import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
-import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
-import { fuzzySearch, HighlightedText } from "./fuzzysearch";
+import { ConferenceChip } from "./conference";
+import { genRequestGetDB } from "./requests";
+import {
+  AUTHORES_EDITABLE_ID_TYPES,
+  TITLE_EDITABLE_ID_TYPES,
+} from "./constants";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -47,26 +53,33 @@ function TypeChip(type: string) {
   );
 }
 
-function AuthorChips(authors: string[]) {
-  // TODO padding or margine
-  return (
-    <Box>
-      {authors.map((a) => (
-        <Chip
-          label={`${a}`}
-          size="small"
-          onClick={() => {
-            navigator.clipboard.writeText(a);
-          }}
-          sx={{
-            color: getColorFromString(a).color,
-            bgcolor: getColorFromString(a).bgcolor,
-            m: 0.1,
-          }}
-        />
-      ))}
-    </Box>
-  );
+function AuthorChips(idType: string, authors: string[]) {
+  if (authors.length === 0) {
+    if (AUTHORES_EDITABLE_ID_TYPES.includes(idType)) {
+      return <EditIcon sx={{ color: grey[300] }} />;
+    } else {
+      return <Box></Box>;
+    }
+  } else {
+    return (
+      <Box>
+        {authors.map((a) => (
+          <Chip
+            label={`${a}`}
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(a);
+            }}
+            sx={{
+              color: getColorFromString(a).color,
+              bgcolor: getColorFromString(a).bgcolor,
+              m: 0.1,
+            }}
+          />
+        ))}
+      </Box>
+    );
+  }
 }
 
 function TagChips(tags: string[]) {
@@ -115,30 +128,12 @@ function AbstractHTML(abstract: string) {
   return <div dangerouslySetInnerHTML={{ __html }}></div>;
 }
 
-// eslint-disable-next-line
-function fuzzySearchFilterFn(
-  row: any,
-  id: string,
-  filterValue: string | number
-) {
-  let text = row.getValue(id);
-  if (typeof text !== "string") {
-    throw Error("row.getValue(id) is not string. id = " + id);
-  }
-  const query =
-    typeof filterValue === "number" ? filterValue.toString() : filterValue;
-  const matches = fuzzySearch(text, query);
-  return matches.length > 0;
-}
-
-function ShowText(text: string | undefined, query_unknown: unknown) {
+function ShowText(text: string | undefined) {
   if (text === undefined) {
     return <Box></Box>;
-  } else if (typeof query_unknown !== "string") {
-    return <Box>{text.slice(0, 140) + "..."}</Box>;
   } else {
-    const query = query_unknown;
-    return HighlightedText(text, query);
+    const __html = sanitizeHTML(text);
+    return <div dangerouslySetInnerHTML={{ __html }}></div>;
   }
 }
 
@@ -154,20 +149,6 @@ function stringArrayFilterFn(
     if (a.includes(fv)) return true;
   }
   return false;
-}
-
-function conferenceAcronymsFilterFn(
-  row: any,
-  id: string,
-  filterValue: string | number
-) {
-  let conference = row.getValue(id);
-  if (typeof conference !== "string") {
-    conference = "";
-  }
-  const fv =
-    typeof filterValue === "number" ? filterValue.toString() : filterValue;
-  return getAcronyms(conference).includes(fv) || conference.includes(fv);
 }
 
 function purifyTitle(title: string): string {
@@ -192,36 +173,44 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
     if (row.original.path === undefined) {
       throw Error("row.original.path is undefined for " + row.original.id);
     }
-    return (
-      <a
-        href={`${
-          REACT_APP_API_URL +
-          "/api/get_pdf/?file=" +
-          base_64.encode(escape(row.original.path))
-        }`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >{`${title}`}</a>
-    );
+
+    // TODO: Refactor this
+    if (row.original.idType == "path") {
+      return (
+        <Box>
+          <EditIcon sx={{ color: grey[300] }} />
+          <a
+            href={`${
+              REACT_APP_API_URL +
+              "/api/get_pdf/?file=" +
+              base_64.encode(escape(row.original.path))
+            }`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >{`${title}`}</a>
+        </Box>
+      );
+    } else {
+      return (
+        <a
+          href={`${
+            REACT_APP_API_URL +
+            "/api/get_pdf/?file=" +
+            base_64.encode(escape(row.original.path))
+          }`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >{`${title}`}</a>
+      );
+    }
   }
 }
 
-function App() {
-  const [tableData, setTableData] = React.useState<ApiDB>([]);
-  const [connectionError, setConnectionError] = React.useState(false);
-
-  React.useEffect(() => {
-    console.log("Fetching from DB in loading");
-    fetch(REACT_APP_API_URL + "/api/get_db")
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => {
-        console.log(error);
-        setConnectionError(true);
-      });
-  }, []);
-
-  const columns = useMemo<MRT_ColumnDef<ApiEntry>[]>(
+function useColumnDefs(
+  tableData: ApiDB,
+  setTableData: React.Dispatch<React.SetStateAction<ApiDB>>
+): MRT_ColumnDef<ApiEntry>[] {
+  return useMemo<MRT_ColumnDef<ApiEntry>[]>(
     () => [
       {
         accessorKey: "id",
@@ -255,20 +244,24 @@ function App() {
         accessorKey: "title",
         Cell: ({ cell, row }) => CellHref(cell, row),
         header: "title",
-        enableEditing: false,
+        enableSorting: false,
+        enableEditing: true,
         filterFn: "includesString",
       },
       {
         accessorKey: "path",
         header: "path",
+        enableSorting: false,
         enableEditing: false,
         filterFn: "includesString",
       },
       {
         accessorKey: "authors",
-        Cell: ({ cell }) => AuthorChips(cell.getValue<string[]>()),
+        Cell: ({ cell, row }) =>
+          AuthorChips(row.original.idType, cell.getValue<string[]>()),
         header: "authors",
-        enableEditing: false,
+        enableSorting: false,
+        enableEditing: true,
         filterFn: stringArrayFilterFn,
       },
       {
@@ -276,6 +269,7 @@ function App() {
         Cell: ({ cell }) => TagChips(cell.getValue<string[]>()),
         header: "tags",
         filterFn: stringArrayFilterFn,
+        enableSorting: false,
         enableEditing: true,
         size: 100,
       },
@@ -284,12 +278,14 @@ function App() {
         header: "comments",
         Cell: ({ cell }) => CommentsDiv(cell.getValue<string>()),
         filterFn: "includesString",
+        enableSorting: false,
         enableEditing: true,
         size: 200,
       },
       {
         accessorKey: "year",
         header: "year",
+        enableSorting: false,
         enableEditing: false,
         size: 50,
         muiTableHeadCellFilterTextFieldProps: { placeholder: "year" },
@@ -297,43 +293,114 @@ function App() {
       {
         accessorKey: "publisher",
         header: "publisher",
-        Cell: ({ cell }) => ConferenceAcronyms(cell.getValue<string>()),
-        filterFn: conferenceAcronymsFilterFn,
+        enableSorting: false,
+        Cell: ({ cell }) => ConferenceChip(cell.getValue<string>()),
         enableEditing: false,
       },
       {
         accessorKey: "abstract",
         Cell: ({ cell }) => AbstractHTML(cell.getValue<string>()),
         header: "abstract",
+        enableSorting: false,
         filterFn: "includesString",
         enableEditing: false,
       },
       {
         accessorKey: "text",
-        // Cell: ({ renderedCellValue }) => <span>{renderedCellValue}</span>,
-        Cell: ({ cell }) =>
-          ShowText(cell.getValue<string>(), cell.column.getFilterValue()),
+        Cell: ({ cell }) => ShowText(cell.getValue<string>()),
+        enableSorting: false,
         header: "text",
-        // TODO: Make custom function to sort rows. Now I am using
-        // https://www.material-react-table.com/docs/guides/global-filtering#global-filtering-(search)-feature-guide.
-        // filterFn: "fuzzySearchFilterFn",
         enableEditing: false,
-        enableGlobalFilter: true,
       },
     ],
-    [tableData]
+    [tableData, setTableData]
   );
+}
+
+function App() {
+  const [tableData, setTableData] = React.useState<ApiDB>([]);
+  const [connectionError, setConnectionError] = React.useState(false);
+
+  // Table state
+  const [columnFilters, setColumnFilters] =
+    React.useState<MRT_ColumnFiltersState>([]);
+  const [sorting, setSorting] = React.useState<MRT_SortingState>([]);
+
+  // Fetch the table data from the server for the first time.
+  React.useEffect(() => {
+    console.log("Fetching from DB in loading");
+    fetch(REACT_APP_API_URL + "/api/get_db", { method: "POST" })
+      .then((response) => response.json())
+      .then((json) => setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        setConnectionError(true);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    console.log(
+      "Fetching from DB because of changes in columnFilters or sorting. columnFilters = ",
+      columnFilters,
+      "sorting = ",
+      sorting
+    );
+
+    const request = genRequestGetDB(columnFilters);
+
+    fetch(REACT_APP_API_URL + "/api/get_db", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    })
+      .then((response) => response.json())
+      .then((json) => setTableData(json))
+      .catch((error) => {
+        console.log(error);
+        setConnectionError(true);
+      });
+  }, [columnFilters, sorting]);
+
+  const columns = useColumnDefs(tableData, setTableData);
 
   const handleSaveCell = async (cell: MRT_Cell<ApiEntry>, value: any) => {
     let tags = tableData[cell.row.index]["tags"];
+    let authors = tableData[cell.row.index]["authors"];
     let comments = tableData[cell.row.index]["comments"];
+    let title = tableData[cell.row.index]["title"];
 
     if (cell.column.id === "comments") {
       comments = value;
       tableData[cell.row.index]["comments"] = comments;
     } else if (cell.column.id === "tags") {
-      tags = splitTagsStr(value);
+      tags = splitTagsOrAuthorsStr(value);
       tableData[cell.row.index]["tags"] = tags;
+    } else if (cell.column.id === "authors") {
+      if (!AUTHORES_EDITABLE_ID_TYPES.includes(cell.row.original.idType)) {
+        const message =
+          "Cannot edit authors for idType = " + cell.row.original.idType;
+        // TODO: show error message using Snackbar
+        // enqueueSnackbar(message, { variant: "error" });
+        console.warn(message);
+        return;
+      } else {
+        authors = splitTagsOrAuthorsStr(value);
+        tableData[cell.row.index]["authors"] = authors;
+      }
+    } else if (cell.column.id === "title") {
+      if (!TITLE_EDITABLE_ID_TYPES.includes(cell.row.original.idType)) {
+        const message =
+          "Cannot edit tile for idType = " + cell.row.original.idType;
+        // TODO: show error message using Snackbar
+        // enqueueSnackbar(message, { variant: "error" });
+        console.warn(message);
+        return;
+      } else {
+        title = value;
+        tableData[cell.row.index]["title"] = title;
+      }
     }
 
     const e: ApiEntry = {
@@ -381,8 +448,8 @@ function App() {
       <SnackbarProvider maxSnack={10} autoHideDuration={30000}>
         <Box component="main">
           <MaterialReactTable
-            enableGlobalFilterModes //enable the user to choose between multiple search filter modes
-            globalFilterModeOptions={["fuzzy", "startsWith"]} //only allow the user to choose between fuzzy and startsWith filter modes
+            onColumnFiltersChange={setColumnFilters}
+            onSortingChange={setSorting}
             displayColumnDefOptions={{
               "mrt-row-actions": {
                 muiTableHeadCellProps: {
@@ -398,7 +465,6 @@ function App() {
             enablePagination={false}
             initialState={{
               showColumnFilters: true,
-              sorting: [{ id: "year", desc: true }],
               columnVisibility: {
                 id: true,
                 idType: true,

@@ -18,20 +18,24 @@ git checkout main
 git pull
 
 # npm version up
-pushd ./jendeley-backend
 
+pushd ./jendeley-backend
 npm version "${VERSION_UP_KIND}"
 VERSION_NUMBER=$(jq .version < package.json)
 VERSION_TAG=v$(echo "${VERSION_NUMBER}" | tr -d \")
 VERSION_DEFINITION_LINE="const JENDELEY_VERSION = ${VERSION_NUMBER};"
 sed -i "s/const JENDELEY_VERSION.*/${VERSION_DEFINITION_LINE}/g" src/constants.ts
+popd
 
-git add ./package.json src/constants.ts
+pushd ./jendeley-frontend
+sed -i "s/const JENDELEY_VERSION.*/${VERSION_DEFINITION_LINE}/g" src/constants.ts
+popd
+
+git add ./jendeley-backend/package.json ./jendeley-backend/src/constants.ts ./jendeley-frontend/src/constants.ts
 git commit -m "Release ${VERSION_TAG}"
 git push origin main
 git tag "${VERSION_TAG}"
 git push origin "${VERSION_TAG}"
-popd
 
 # Build and copy frontend
 pushd ./jendeley-frontend

@@ -20,7 +20,7 @@ import {
   blueGrey,
 } from "@mui/material/colors";
 
-function splitTagsStr(s: string) {
+function splitTagsOrAuthorsStr(s: string) {
   return s.split(",").filter((w) => w.length > 0);
 }
 
@@ -58,4 +58,4 @@ function getColorFromString(author: string) {
   return colorList[hashString(author) % colorList.length];
 }
 
-export { splitTagsStr, hashString, getColorFromString };
+export { splitTagsOrAuthorsStr, hashString, getColorFromString };
