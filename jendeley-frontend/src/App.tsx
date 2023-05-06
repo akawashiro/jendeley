@@ -63,6 +63,9 @@ function AuthorChips(idType: string, authors: string[]) {
   } else {
     return (
       <Box>
+        {AUTHORES_EDITABLE_ID_TYPES.includes(idType) && (
+          <EditIcon sx={{ color: grey[300] }} />
+        )}
         {authors.map((a) => (
           <Chip
             label={`${a}`}
@@ -83,28 +86,25 @@ function AuthorChips(idType: string, authors: string[]) {
 }
 
 function TagChips(tags: string[]) {
-  if (tags.length === 0) {
-    return <EditIcon sx={{ color: grey[300] }} />;
-  } else {
-    return (
-      <Box>
-        {tags.map((t) => (
-          <Chip
-            label={`${t}`}
-            size="small"
-            onClick={() => {
-              navigator.clipboard.writeText(t);
-            }}
-            sx={{
-              color: getColorFromString(t).color,
-              bgcolor: getColorFromString(t).bgcolor,
-              m: 0.1,
-            }}
-          />
-        ))}
-      </Box>
-    );
-  }
+  return (
+    <Box>
+      <EditIcon sx={{ color: grey[300] }} />
+      {tags.map((t) => (
+        <Chip
+          label={`${t}`}
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(t);
+          }}
+          sx={{
+            color: getColorFromString(t).color,
+            bgcolor: getColorFromString(t).bgcolor,
+            m: 0.1,
+          }}
+        />
+      ))}
+    </Box>
+  );
 }
 
 function CommentsDiv(comments: string) {
@@ -175,7 +175,7 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
     }
 
     // TODO: Refactor this
-    if (row.original.idType == "path") {
+    if (row.original.idType === "path") {
       return (
         <Box>
           <EditIcon sx={{ color: grey[300] }} />
