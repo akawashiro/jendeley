@@ -21,9 +21,11 @@ const ENTRY_DATA_FROM_ARXIV = "data_from_" + ARXIV_API_URL;
 const JENDELEY_DIR = ".jendeley";
 
 const AUTHORES_EDITABLE_ID_TYPES = ["url", "path"];
+const TITLE_EDITABLE_ID_TYPES = ["path"];
 
 export {
   AUTHORES_EDITABLE_ID_TYPES,
+  TITLE_EDITABLE_ID_TYPES,
   JENDELEY_NO_TRACK,
   JENDELEY_NO_ID,
   DB_META_KEY,

@@ -16,7 +16,7 @@ import {
   RequestGetPdfFromUrl,
   RequestGetWebFromUrl,
 } from "./api_schema";
-import { splitTagsOrAuthorsStr} from "./stringUtils";
+import { splitTagsOrAuthorsStr } from "./stringUtils";
 import { useSnackbar } from "notistack";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;

@@ -26,7 +26,10 @@ import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
 import { ConferenceChip } from "./conference";
 import { genRequestGetDB } from "./requests";
-import {AUTHORES_EDITABLE_ID_TYPES} from "./constants";
+import {
+  AUTHORES_EDITABLE_ID_TYPES,
+  TITLE_EDITABLE_ID_TYPES,
+} from "./constants";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -170,17 +173,36 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
     if (row.original.path === undefined) {
       throw Error("row.original.path is undefined for " + row.original.id);
     }
-    return (
-      <a
-        href={`${
-          REACT_APP_API_URL +
-          "/api/get_pdf/?file=" +
-          base_64.encode(escape(row.original.path))
-        }`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >{`${title}`}</a>
-    );
+
+    // TODO: Refactor this
+    if (row.original.idType == "path") {
+      return (
+        <Box>
+          <EditIcon sx={{ color: grey[300] }} />
+          <a
+            href={`${
+              REACT_APP_API_URL +
+              "/api/get_pdf/?file=" +
+              base_64.encode(escape(row.original.path))
+            }`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >{`${title}`}</a>
+        </Box>
+      );
+    } else {
+      return (
+        <a
+          href={`${
+            REACT_APP_API_URL +
+            "/api/get_pdf/?file=" +
+            base_64.encode(escape(row.original.path))
+          }`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >{`${title}`}</a>
+      );
+    }
   }
 }
 
@@ -223,7 +245,7 @@ function useColumnDefs(
         Cell: ({ cell, row }) => CellHref(cell, row),
         header: "title",
         enableSorting: false,
-        enableEditing: false,
+        enableEditing: true,
         filterFn: "includesString",
       },
       {
@@ -347,6 +369,7 @@ function App() {
     let tags = tableData[cell.row.index]["tags"];
     let authors = tableData[cell.row.index]["authors"];
     let comments = tableData[cell.row.index]["comments"];
+    let title = tableData[cell.row.index]["title"];
 
     if (cell.column.id === "comments") {
       comments = value;
@@ -365,6 +388,18 @@ function App() {
       } else {
         authors = splitTagsOrAuthorsStr(value);
         tableData[cell.row.index]["authors"] = authors;
+      }
+    } else if (cell.column.id === "title") {
+      if (!TITLE_EDITABLE_ID_TYPES.includes(cell.row.original.idType)) {
+        const message =
+          "Cannot edit tile for idType = " + cell.row.original.idType;
+        // TODO: show error message using Snackbar
+        // enqueueSnackbar(message, { variant: "error" });
+        console.warn(message);
+        return;
+      } else {
+        title = value;
+        tableData[cell.row.index]["title"] = title;
       }
     }
 

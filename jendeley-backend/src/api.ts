@@ -20,6 +20,8 @@ import {
   DB_META_KEY,
   ENTRY_AUTHORS,
   AUTHORES_EDITABLE_ID_TYPES,
+  TITLE_EDITABLE_ID_TYPES,
+  ENTRY_TITLE,
 } from "./constants";
 import {
   ApiEntry,
@@ -293,12 +295,11 @@ function updateEntry(request: Request, response: Response, dbPath: string[]) {
       logger.info("Update DB with entry = " + JSON.stringify(entry));
       jsonDB[entry.id][ENTRY_TAGS] = entry.tags;
       jsonDB[entry.id][ENTRY_COMMENTS] = entry.comments;
-      logger.info(
-        "AUTHORES_EDITABLE_ID_TYPES.includes(entry.idType) = " +
-          AUTHORES_EDITABLE_ID_TYPES.includes(entry.idType)
-      );
       if (AUTHORES_EDITABLE_ID_TYPES.includes(entry.idType)) {
         jsonDB[entry.id][ENTRY_AUTHORS] = entry.authors;
+      }
+      if (TITLE_EDITABLE_ID_TYPES.includes(entry.idType)) {
+        jsonDB[entry.id][ENTRY_TITLE] = entry.title;
       }
     }
 
