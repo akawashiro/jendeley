@@ -35,10 +35,9 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
     const id_type = jsonDB[id][ENTRY_ID_TYPE];
     if (id_type == ID_TYPE_META) {
       const version = parseFloat(jsonDB[id]["version"]);
-      // Enable this check after version 2.0
-      // if (version < 2.0) {
-      //   validDB = false;
-      // }
+      if (version < 2.0) {
+        validDB = false;
+      }
       continue;
     }
 
