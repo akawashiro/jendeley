@@ -22,6 +22,7 @@ import {
   AUTHORES_EDITABLE_ID_TYPES,
   TITLE_EDITABLE_ID_TYPES,
   ENTRY_TITLE,
+  MAX_ENTRIES_IN_GET_API,
 } from "./constants";
 import {
   ApiEntry,
