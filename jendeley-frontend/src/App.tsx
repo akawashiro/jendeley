@@ -24,8 +24,7 @@ import { DeleteButton } from "./delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { grey } from "@mui/material/colors";
 import { SnackbarProvider } from "notistack";
-import { ConferenceAcronyms, getAcronyms } from "./conferenceAcronyms";
-import { fuzzySearch, HighlightedText } from "./fuzzysearch";
+import { ConferenceChip } from "./conferenceAcronyms";
 import { genRequestGetDB } from "./requests";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -141,20 +140,6 @@ function stringArrayFilterFn(
   return false;
 }
 
-function conferenceAcronymsFilterFn(
-  row: any,
-  id: string,
-  filterValue: string | number
-) {
-  let conference = row.getValue(id);
-  if (typeof conference !== "string") {
-    conference = "";
-  }
-  const fv =
-    typeof filterValue === "number" ? filterValue.toString() : filterValue;
-  return getAcronyms(conference).includes(fv) || conference.includes(fv);
-}
-
 function purifyTitle(title: string): string {
   const t1 = title.replace(/\.pdf$/, "");
   const t2 = t1.replace("[jendeley no id]", "");
@@ -229,12 +214,14 @@ function useColumnDefs(
         accessorKey: "title",
         Cell: ({ cell, row }) => CellHref(cell, row),
         header: "title",
+        enableSorting: false,
         enableEditing: false,
         filterFn: "includesString",
       },
       {
         accessorKey: "path",
         header: "path",
+        enableSorting: false,
         enableEditing: false,
         filterFn: "includesString",
       },
@@ -242,6 +229,7 @@ function useColumnDefs(
         accessorKey: "authors",
         Cell: ({ cell }) => AuthorChips(cell.getValue<string[]>()),
         header: "authors",
+        enableSorting: false,
         enableEditing: false,
         filterFn: stringArrayFilterFn,
       },
@@ -250,6 +238,7 @@ function useColumnDefs(
         Cell: ({ cell }) => TagChips(cell.getValue<string[]>()),
         header: "tags",
         filterFn: stringArrayFilterFn,
+        enableSorting: false,
         enableEditing: true,
         size: 100,
       },
@@ -258,12 +247,14 @@ function useColumnDefs(
         header: "comments",
         Cell: ({ cell }) => CommentsDiv(cell.getValue<string>()),
         filterFn: "includesString",
+        enableSorting: false,
         enableEditing: true,
         size: 200,
       },
       {
         accessorKey: "year",
         header: "year",
+        enableSorting: false,
         enableEditing: false,
         size: 50,
         muiTableHeadCellFilterTextFieldProps: { placeholder: "year" },
@@ -271,20 +262,22 @@ function useColumnDefs(
       {
         accessorKey: "publisher",
         header: "publisher",
-        Cell: ({ cell }) => ConferenceAcronyms(cell.getValue<string>()),
-        filterFn: conferenceAcronymsFilterFn,
+        enableSorting: false,
+        Cell: ({ cell }) => ConferenceChip(cell.getValue<string>()),
         enableEditing: false,
       },
       {
         accessorKey: "abstract",
         Cell: ({ cell }) => AbstractHTML(cell.getValue<string>()),
         header: "abstract",
+        enableSorting: false,
         filterFn: "includesString",
         enableEditing: false,
       },
       {
         accessorKey: "text",
         Cell: ({ cell }) => ShowText(cell.getValue<string>()),
+        enableSorting: false,
         header: "text",
         enableEditing: false,
       },

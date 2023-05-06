@@ -147,6 +147,7 @@ type Scores = {
   tags: number;
   comments: number;
   year: number;
+  publisher: number;
 };
 
 function getScoreAndEntry(
@@ -193,6 +194,11 @@ function getScoreAndEntry(
     commentsScore = entry.comments.includes(requestGetDB.comments) ? 1 : 0;
   }
 
+  let publisherScore = 0;
+  if (entry.publisher != undefined && requestGetDB.publisher != undefined) {
+    commentsScore = entry.publisher.includes(requestGetDB.publisher) ? 1 : 0;
+  }
+
   let yearScore = 0;
   if (requestGetDB.year != undefined && entry.year != undefined) {
     yearScore = entry.year.toString().includes(requestGetDB.year) ? 1 : 0;
@@ -217,6 +223,7 @@ function getScoreAndEntry(
       tags: tagsScore,
       comments: commentsScore,
       year: yearScore,
+      publisher: publisherScore,
     },
     entry,
   ];
@@ -235,6 +242,8 @@ function compareScore(a: Scores, b: Scores) {
     return b.comments > a.comments ? 1 : -1;
   } else if (b.year != a.year) {
     return b.year > a.year ? 1 : -1;
+  } else if (b.publisher != a.publisher) {
+    return b.publisher > a.publisher ? 1 : -1;
   } else {
     return 1;
   }

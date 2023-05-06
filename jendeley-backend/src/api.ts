@@ -41,6 +41,7 @@ import { Either, genLeft, genRight } from "./either";
 import { loadDB, saveDB } from "./load_db";
 import { concatDirs } from "./path_util";
 import { getScoreAndEntry, Scores, compareScore } from "./score";
+import { getAcronyms } from "./conferenceAcronyms";
 
 function checkEntry(entry: ApiEntry) {
   if (entry.idType == "url") {
@@ -268,6 +269,14 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
   }
 }
 
+function abbribatePublisherInEntry(entry: ApiEntry): ApiEntry {
+  let r = entry;
+  if (r.publisher != undefined) {
+    r.publisher = getAcronyms(r.publisher);
+  }
+  return r;
+}
+
 function updateEntry(request: Request, response: Response, dbPath: string[]) {
   logger.info("Get a update_entry request url = " + request.url);
   const entry_o = request.body;
@@ -340,7 +349,8 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
   for (const id of Object.keys(jsonDB)) {
     if (jsonDB[id] == undefined) continue;
     if (id == DB_META_KEY) continue;
-    const e = getEntry(id, jsonDB);
+    const e_raw = getEntry(id, jsonDB);
+    const e = abbribatePublisherInEntry(e_raw);
     const sande = getScoreAndEntry(e, requestGetDB);
     scoreAndEntry.push(sande);
   }
