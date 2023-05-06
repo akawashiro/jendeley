@@ -23,6 +23,7 @@ const JENDELEY_DIR = ".jendeley";
 
 const AUTHORES_EDITABLE_ID_TYPES = ["url", "path"];
 const TITLE_EDITABLE_ID_TYPES = ["path"];
+const MAX_ENTRIES_IN_GET_API = 20;
 
 export {
   AUTHORES_EDITABLE_ID_TYPES,
@@ -49,4 +50,5 @@ export {
   ARXIV_API_URL,
   JENDELEY_VERSION,
   JENDELEY_DIR,
+  MAX_ENTRIES_IN_GET_API,
 };
