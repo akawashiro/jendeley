@@ -54,35 +54,27 @@ function TypeChip(type: string) {
 }
 
 function AuthorChips(idType: string, authors: string[]) {
-  if (authors.length === 0) {
-    if (AUTHORES_EDITABLE_ID_TYPES.includes(idType)) {
-      return <EditIcon sx={{ color: grey[300] }} />;
-    } else {
-      return <Box></Box>;
-    }
-  } else {
-    return (
-      <Box>
-        {AUTHORES_EDITABLE_ID_TYPES.includes(idType) && (
-          <EditIcon sx={{ color: grey[300] }} />
-        )}
-        {authors.map((a) => (
-          <Chip
-            label={`${a}`}
-            size="small"
-            onClick={() => {
-              navigator.clipboard.writeText(a);
-            }}
-            sx={{
-              color: getColorFromString(a).color,
-              bgcolor: getColorFromString(a).bgcolor,
-              m: 0.1,
-            }}
-          />
-        ))}
-      </Box>
-    );
-  }
+  return (
+    <Box>
+      {AUTHORES_EDITABLE_ID_TYPES.includes(idType) && (
+        <EditIcon sx={{ color: grey[300] }} />
+      )}
+      {authors.map((a) => (
+        <Chip
+          label={`${a}`}
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(a);
+          }}
+          sx={{
+            color: getColorFromString(a).color,
+            bgcolor: getColorFromString(a).bgcolor,
+            m: 0.1,
+          }}
+        />
+      ))}
+    </Box>
+  );
 }
 
 function TagChips(tags: string[]) {
@@ -174,24 +166,11 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
       throw Error("row.original.path is undefined for " + row.original.id);
     }
 
-    // TODO: Refactor this
-    if (row.original.idType === "path") {
-      return (
-        <Box>
+    return (
+      <Box>
+        {row.original.idType === "path" && (
           <EditIcon sx={{ color: grey[300] }} />
-          <a
-            href={`${
-              REACT_APP_API_URL +
-              "/api/get_pdf/?file=" +
-              base_64.encode(escape(row.original.path))
-            }`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >{`${title}`}</a>
-        </Box>
-      );
-    } else {
-      return (
+        )}
         <a
           href={`${
             REACT_APP_API_URL +
@@ -201,8 +180,8 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
           target="_blank"
           rel="noopener noreferrer"
         >{`${title}`}</a>
-      );
-    }
+      </Box>
+    );
   }
 }
 
