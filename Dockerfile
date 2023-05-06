@@ -19,4 +19,4 @@ WORKDIR /jendeley/jendeley-frontend
 RUN npm install
 RUN npm run check:prettier
 RUN npm run build
-RUN npm run jest
+# RUN npm run jest

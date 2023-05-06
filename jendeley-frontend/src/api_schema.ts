@@ -59,8 +59,6 @@ type ApiResponse = {
   message: string;
 };
 
-const AUTHORES_EDITABLE_ID_TYPES = ["url", "path"];
-
 export type {
   IDType,
   ApiEntry,

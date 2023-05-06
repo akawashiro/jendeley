@@ -69,4 +69,3 @@ export type {
   RequestGetDB,
   ApiResponse,
 };
-export {};

@@ -5,6 +5,7 @@ const ENTRY_ID_TYPE = "idType";
 const ENTRY_PATH = "path";
 const ENTRY_AUTHORS = "authors";
 const ENTRY_URL = "url";
+const ENTRY_TITLE = "title";
 const ENTRY_TAGS = "tags";
 const ENTRY_COMMENTS = "comments";
 const ENTRY_TEXT = "text";
@@ -36,6 +37,7 @@ export {
   ENTRY_TAGS,
   ENTRY_COMMENTS,
   ENTRY_TEXT,
+  ENTRY_TITLE,
   ENTRY_DATA_FROM_ARXIV,
   ID_TYPE_ARXIV,
   ID_TYPE_DOI,
