@@ -43,27 +43,47 @@ function listUpAllSuffixes(str: string): string[] {
 
 test("Construct suffix trie of abcabxabcd", () => {
   const suffixTrie = ukkonenAlgorithm("abcabxabcd");
-  const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
-  console.log(graphStr);
+  // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
+  // console.log(graphStr);
   const suffixes_trie = new Set(
     listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [""])
   );
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
-  console.log(suffixes_trie);
-  console.log(suffixes_naive);
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
 });
 
 test("Construct suffix trie of ezezeq", () => {
-  const shakespear = "ezezeq";
-  const suffixTrie = ukkonenAlgorithm(shakespear);
-  const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
-  console.log(graphStr);
+  const str = "ezezeq";
+  const suffixTrie = ukkonenAlgorithm(str);
+  // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
+  // console.log(graphStr);
   const suffixes_trie = new Set(
     listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [])
   );
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
-  console.log(suffixes_trie);
-  console.log(suffixes_naive);
+  expect(suffixes_trie).toStrictEqual(suffixes_naive);
+});
+
+test("Construct suffix trie of Hamlet", () => {
+  const str = `To be, or not to be, that is the question:
+Whether 'tis nobler in the mind to suffer
+The slings and arrows of outrageous fortune,
+Or to take Arms against a Sea of troubles,
+And by opposing end them: to die, to sleep
+No more; and by a sleep, to say we end
+The heart-ache, and the thousand natural shocks
+That Flesh is heir to? 'Tis a consummation
+Devoutly to be wished. To die, to sleep,
+To sleep, perchance to Dream; aye, there's the rub,
+For in that sleep of death, what dreams may come,
+When we have shuffled off this mortal coil,
+Must give us pause.`;
+  const suffixTrie = ukkonenAlgorithm(str);
+  // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
+  // console.log(graphStr);
+  const suffixes_trie = new Set(
+    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [])
+  );
+  const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
 });
