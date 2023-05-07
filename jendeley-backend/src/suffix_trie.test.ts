@@ -87,3 +87,15 @@ Must give us pause.`;
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
 });
+
+test("Construct suffix trie of ぼっちゃん", () => {
+  const str = `親譲りの無鉄砲で小供の時から損ばかりしている。小学校に居る時分学校の二階から飛び降りて一週間ほど腰を抜かした事がある。なぜそんな無闇をしたと聞く人があるかも知れぬ。別段深い理由でもない。新築の二階から首を出していたら、同級生の一人が冗談に、いくら威張っても、そこから飛び降りる事は出来まい。弱虫やーい。と囃したからである。小使に負ぶさって帰って来た時、おやじが大きな眼をして二階ぐらいから飛び降りて腰を抜かす奴があるかと云ったから、この次は抜かさずに飛んで見せますと答えた。親類のものから西洋製のナイフを貰って奇麗な刃を日に翳して、友達に見せていたら、一人が光る事は光るが切れそうもないと云った。切れぬ事があるか、何でも切ってみせると受け合った。そんなら君の指を切ってみろと注文したから、何だ指ぐらいこの通りだと右の手の親指の甲をはすに切り込んだ。幸ナイフが小さいのと、親指の骨が堅かったので、今だに親指は手に付いている。しかし創痕は死ぬまで消えぬ。`;
+  const suffixTrie = ukkonenAlgorithm(str);
+  // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
+  // console.log(graphStr);
+  const suffixes_trie = new Set(
+    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [])
+  );
+  const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
+  expect(suffixes_trie).toStrictEqual(suffixes_naive);
+});
