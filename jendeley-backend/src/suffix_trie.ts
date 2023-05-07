@@ -85,14 +85,19 @@ function ukkonenAlgorithm(str: string): SuffixTrie {
         "currentIndex:",
         currentIndex,
         "remainder:",
-        str.substring(currentIndex - remainder + 1, currentIndex + 1)
+        str.substring(currentIndex - remainder + 1, currentIndex + 1),
+        "lastNewNode:",
+        lastNewNode
+      );
+      console.log(
+        showGraph(suffixTrie.root, 0, "", str.substring(0, currentIndex))
       );
 
       if (activeLength == 0) {
         activeEdge = str[currentIndex];
       }
-      if (activeNode.edges[str[currentIndex]] === undefined) {
-        activeNode.edges[str[currentIndex]] = {
+      if (activeNode.edges[activeEdge] === undefined) {
+        activeNode.edges[activeEdge] = {
           id: getID(),
           start: currentIndex,
           end: "#",
@@ -115,22 +120,33 @@ function ukkonenAlgorithm(str: string): SuffixTrie {
 
         // Proceed activeNode.
         if (activeLength >= activeEdgeStr.length) {
-          activeNode = activeNode[activeEdge].to;
+          activeNode = activeNode.edges[activeEdge].to;
           activeLength -= activeEdgeStr.length;
           activeEdge = str[activeEdgeStart + activeEdgeStr.length];
           continue;
         }
 
         // Current character is already in the tree.
+        console.log(
+          "activeEdgeStr[activeLength] = " +
+            activeEdgeStr[activeLength] +
+            " str[currentIndex] = " +
+            str[currentIndex]
+        );
         if (activeEdgeStr[activeLength] == str[currentIndex]) {
           activeLength++;
           break;
         }
 
         // Split edge
-        activeNode.edges[activeEdge].end = activeLength;
-        activeNode = activeNode.edges[activeEdge].to;
-        activeNode.edges[activeEdgeStr[activeLength]] = {
+        console.log(
+          "Split edge at activeLength:",
+          activeLength,
+          " activeEdgeStr:",
+          activeEdgeStr
+        );
+        activeNode.edges[activeEdge].end = activeEdgeStart + activeLength;
+        activeNode.edges[activeEdge].to.edges[activeEdgeStr[activeLength]] = {
           id: getID(),
           start: activeEdgeStart + activeLength,
           end: activeEdgeEnd,
@@ -140,10 +156,21 @@ function ukkonenAlgorithm(str: string): SuffixTrie {
             suffixLink: undefined,
           },
         };
+        activeNode.edges[activeEdge].to.edges[str[currentIndex]] = {
+          id: getID(),
+          start: currentIndex,
+          end: "#",
+          to: {
+            id: getID(),
+            edges: {},
+            suffixLink: undefined,
+          },
+        };
+        console.log(lastNewNode);
         if (lastNewNode !== undefined) {
-          activeNode.suffixLink = lastNewNode;
+          lastNewNode.suffixLink = activeNode.edges[activeEdge].to;
         }
-        lastNewNode = activeNode;
+        lastNewNode = activeNode.edges[activeEdge].to;
       }
 
       remainder--;
