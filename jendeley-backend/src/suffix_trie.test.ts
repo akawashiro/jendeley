@@ -10,14 +10,14 @@ test("Show edge", () => {
     to: {
       id: 2,
       edges: {},
-      suffixLinks: [],
+      suffixLink: undefined,
     },
   };
   console.log(edge);
 });
 
-test("Construct suffix trie of abc", () => {
-  const suffixTrie = ukkonenAlgorithm("abc");
+test("Construct suffix trie of abcabx", () => {
+  const suffixTrie = ukkonenAlgorithm("abcabx");
   const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
   console.log(graphStr);
 });
