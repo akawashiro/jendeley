@@ -177,11 +177,12 @@ function ukkonenAlgorithm(str: string): SuffixTrie {
       if (activeNode.id == ROOT_NODE_ID && activeLength > 0) {
         activeLength--;
         activeEdge = str[currentIndex - remainder + 1];
-      } else if (
-        activeNode.id != ROOT_NODE_ID &&
-        activeNode.suffixLink != undefined
-      ) {
-        activeNode = activeNode.suffixLink;
+      } else if (activeNode.id != ROOT_NODE_ID) {
+        if (activeNode.suffixLink != undefined) {
+          activeNode = activeNode.suffixLink;
+        } else {
+          activeNode = suffixTrie.root;
+        }
       }
     }
   }
