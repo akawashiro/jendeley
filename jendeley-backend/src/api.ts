@@ -22,6 +22,7 @@ import {
   AUTHORES_EDITABLE_ID_TYPES,
   TITLE_EDITABLE_ID_TYPES,
   ENTRY_TITLE,
+  MAX_ENTRIES_IN_GET_API,
 } from "./constants";
 import {
   ApiEntry,
@@ -372,7 +373,7 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
   for (const e of scoreAndEntry) {
     dbResponse.push(e[1]);
     // TODO: Remove hard coded number
-    if (dbResponse.length >= 20) break;
+    if (dbResponse.length >= MAX_ENTRIES_IN_GET_API) break;
   }
 
   response.status(200).json(dbResponse);
