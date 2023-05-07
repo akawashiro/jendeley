@@ -1,5 +1,3 @@
-import assert from "assert";
-
 type Edge = {
   id: number;
   start: number;
