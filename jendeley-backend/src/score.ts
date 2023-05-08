@@ -1,5 +1,10 @@
 import { ApiEntry, RequestGetDB } from "./api_schema";
 import { logger } from "./logger";
+import {
+  fuzzySearchSuffixPatriciaTree,
+  ukkonenAlgorithm,
+  Match,
+} from "./suffix_patricia_tree";
 
 const MARGINE_AROUND_HIGHLIGHT = 30;
 
@@ -34,7 +39,12 @@ function getScoreAndText(
   if (query == undefined) {
     return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
   } else {
-    const matches = fuzzySearchFast(text, query);
+    const suffixPatriciaTree = ukkonenAlgorithm(text);
+    const matches = fuzzySearchSuffixPatriciaTree(
+      query,
+      query.length,
+      suffixPatriciaTree
+    );
     if (matches.length == 0) {
       return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
     } else {
