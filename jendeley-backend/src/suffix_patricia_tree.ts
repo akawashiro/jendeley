@@ -11,7 +11,7 @@ type Node = {
   suffixLink: Node | undefined;
 };
 
-type SuffixTrie = {
+type SuffixPatriciaTree = {
   str: string;
   root: Node;
 };
@@ -50,9 +50,9 @@ function showGraph(
   return buffer;
 }
 
-function ukkonenAlgorithm(str: string): SuffixTrie {
+function ukkonenAlgorithm(str: string): SuffixPatriciaTree {
   const ROOT_NODE_ID = getID();
-  let suffixTrie: SuffixTrie = {
+  let suffixTrie: SuffixPatriciaTree = {
     str: str,
     root: {
       id: ROOT_NODE_ID,
@@ -192,5 +192,166 @@ function ukkonenAlgorithm(str: string): SuffixTrie {
   return suffixTrie;
 }
 
-export type { Edge, Node, SuffixTrie };
-export { ukkonenAlgorithm, showGraph };
+type Match = { start: number; end: number; score: number };
+
+const MAX_MATCHES = 5;
+const SCORE_REWARD_MATCHED = 8;
+const SCORE_REWARD_UNMATCHED = -3;
+
+function getEdgeLength(
+  edge: Edge,
+  suffixPatriciaTree: SuffixPatriciaTree
+): number {
+  if (edge.end == "#") {
+    return suffixPatriciaTree.str.length - edge.start;
+  } else {
+    return edge.end - edge.start;
+  }
+}
+
+function fuzzySearchDFS(
+  pattern: string,
+  patternIndex: number,
+  suffixPatriciaTree: SuffixPatriciaTree,
+  edge: Edge,
+  edgeIndex: number,
+  score: number,
+  consumed: number,
+  maxConsumed: number,
+  matches: Set<string>
+): Set<string> {
+  const edgeStr =
+    edge.end == "#"
+      ? suffixPatriciaTree.str.substring(edge.start)
+      : suffixPatriciaTree.str.substring(edge.start, edge.end);
+  // console.log(
+  //   "pattern:",
+  //   pattern,
+  //   "patternIndex:",
+  //   patternIndex,
+  //   "edgeStr:",
+  //   edgeStr,
+  //   "edgeIndex:",
+  //   edgeIndex,
+  //   "score:",
+  //   score,
+  //   "consumed:",
+  //   consumed,
+  //   "maxConsumed:",
+  //   maxConsumed,
+  //   "matches:",
+  //   matches
+  // );
+  if (matches.size >= MAX_MATCHES) {
+    return matches;
+  } else if (getEdgeLength(edge, suffixPatriciaTree) === edgeIndex) {
+    for (const [_, e] of Object.entries(edge.to.edges)) {
+      const ms = fuzzySearchDFS(
+        pattern,
+        patternIndex,
+        suffixPatriciaTree,
+        e,
+        0,
+        score,
+        consumed,
+        maxConsumed,
+        new Set<string>()
+      );
+      for (const m of ms) {
+        matches.add(m);
+      }
+    }
+    return matches;
+  } else if (patternIndex === pattern.length) {
+    const end = edge.start + edgeIndex;
+    matches.add(
+      JSON.stringify({
+        start: end - consumed,
+        end: end,
+        score: score,
+      })
+    );
+    return matches;
+  } else if (consumed == maxConsumed) {
+    return matches;
+  } else if (
+    // Option to care about case
+    pattern[patternIndex].toLowerCase() ===
+    suffixPatriciaTree.str[edge.start + edgeIndex].toLowerCase()
+  ) {
+    const ms1 = fuzzySearchDFS(
+      pattern,
+      patternIndex,
+      suffixPatriciaTree,
+      edge,
+      edgeIndex + 1,
+      score + SCORE_REWARD_UNMATCHED,
+      consumed + 1,
+      maxConsumed,
+      new Set<string>()
+    );
+    for (const m of ms1) {
+      matches.add(m);
+    }
+    const ms2 = fuzzySearchDFS(
+      pattern,
+      patternIndex + 1,
+      suffixPatriciaTree,
+      edge,
+      edgeIndex + 1,
+      score + SCORE_REWARD_MATCHED,
+      consumed + 1,
+      maxConsumed,
+      new Set<string>()
+    );
+    for (const m of ms2) {
+      matches.add(m);
+    }
+    return matches;
+  } else {
+    return fuzzySearchDFS(
+      pattern,
+      patternIndex,
+      suffixPatriciaTree,
+      edge,
+      edgeIndex + 1,
+      score + SCORE_REWARD_UNMATCHED,
+      consumed + 1,
+      maxConsumed,
+      matches
+    );
+  }
+}
+
+function fuzzySearchSuffixPatriciaTree(
+  pattern: string,
+  maxExtraChars: number,
+  suffixPatriciaTree: SuffixPatriciaTree
+): Match[] {
+  if (suffixPatriciaTree.root.edges[pattern[0]] === undefined) {
+    return [];
+  } else {
+    const ms = fuzzySearchDFS(
+      pattern,
+      1,
+      suffixPatriciaTree,
+      suffixPatriciaTree.root.edges[pattern[0]],
+      1,
+      SCORE_REWARD_MATCHED,
+      1,
+      pattern.length + maxExtraChars,
+      new Set<string>()
+    );
+    let matches: Match[] = [];
+    for (const m of ms) {
+      matches.push(JSON.parse(m));
+    }
+    matches.sort((a, b) => {
+      return b.score - a.score;
+    });
+    return matches;
+  }
+}
+
+export type { Edge, Node, SuffixPatriciaTree, Match };
+export { ukkonenAlgorithm, showGraph, fuzzySearchSuffixPatriciaTree };
