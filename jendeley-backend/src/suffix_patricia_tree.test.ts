@@ -1,6 +1,11 @@
 // ./node_modules/jest-cli/bin/jest.js src/suffix_trie.test.ts
 
-import { Edge, Node, ukkonenAlgorithm, showGraph } from "./suffix_trie";
+import {
+  Node,
+  ukkonenAlgorithm,
+  fuzzySearch,
+  showGraph,
+} from "./suffix_patricia_tree";
 
 function listUpAllSuffixesFromSuffixTrie(
   node: Node,
@@ -41,7 +46,7 @@ function listUpAllSuffixes(str: string): string[] {
   return result.sort();
 }
 
-test("Construct suffix trie of abcabxabcd", () => {
+test("Suffixes of abcabxabcd", () => {
   const suffixTrie = ukkonenAlgorithm("abcabxabcd");
   // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
   // console.log(graphStr);
@@ -52,7 +57,7 @@ test("Construct suffix trie of abcabxabcd", () => {
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
 });
 
-test("Construct suffix trie of ezezeq", () => {
+test("suffix of ezezeq", () => {
   const str = "ezezeq";
   const suffixTrie = ukkonenAlgorithm(str);
   // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
@@ -64,7 +69,7 @@ test("Construct suffix trie of ezezeq", () => {
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
 });
 
-test("Construct suffix trie of Hamlet", () => {
+test("Suffixes of Hamlet", () => {
   const str = `To be, or not to be, that is the question:
 Whether 'tis nobler in the mind to suffer
 The slings and arrows of outrageous fortune,
@@ -88,7 +93,7 @@ Must give us pause.`;
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
 });
 
-test("Construct suffix trie of ぼっちゃん", () => {
+test("Suffixes of ぼっちゃん", () => {
   const str = `親譲りの無鉄砲で小供の時から損ばかりしている。小学校に居る時分学校の二階から飛び降りて一週間ほど腰を抜かした事がある。なぜそんな無闇をしたと聞く人があるかも知れぬ。別段深い理由でもない。新築の二階から首を出していたら、同級生の一人が冗談に、いくら威張っても、そこから飛び降りる事は出来まい。弱虫やーい。と囃したからである。小使に負ぶさって帰って来た時、おやじが大きな眼をして二階ぐらいから飛び降りて腰を抜かす奴があるかと云ったから、この次は抜かさずに飛んで見せますと答えた。親類のものから西洋製のナイフを貰って奇麗な刃を日に翳して、友達に見せていたら、一人が光る事は光るが切れそうもないと云った。切れぬ事があるか、何でも切ってみせると受け合った。そんなら君の指を切ってみろと注文したから、何だ指ぐらいこの通りだと右の手の親指の甲をはすに切り込んだ。幸ナイフが小さいのと、親指の骨が堅かったので、今だに親指は手に付いている。しかし創痕は死ぬまで消えぬ。`;
   const suffixTrie = ukkonenAlgorithm(str);
   // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
@@ -98,4 +103,17 @@ test("Construct suffix trie of ぼっちゃん", () => {
   );
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
+});
+
+test("Search abcabxabcd", () => {
+  const str = "abcabxabcd";
+  const suffixTrie = ukkonenAlgorithm(str);
+  // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
+  // console.log(graphStr);
+  const pattern = "abc";
+  const matches = fuzzySearch(pattern, 0, suffixTrie);
+  // console.log(matches);
+  for (const match of matches) {
+    expect(str.substring(match.start, match.end)).toBe(pattern);
+  }
 });
