@@ -275,7 +275,9 @@ function fuzzySearchDFS(
   } else if (consumed == maxConsumed) {
     return matches;
   } else if (
-    pattern[patternIndex] === suffixPatriciaTree.str[edge.start + edgeIndex]
+    // Option to care about case
+    pattern[patternIndex].toLowerCase() ===
+    suffixPatriciaTree.str[edge.start + edgeIndex].toLowerCase()
   ) {
     const ms1 = fuzzySearchDFS(
       pattern,
