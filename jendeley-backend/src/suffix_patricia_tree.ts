@@ -321,13 +321,13 @@ function fuzzySearchDFS(
   }
 }
 
-function fuzzySearch(
+function fuzzySearchSuffixPatriciaTree(
   pattern: string,
   maxExtraChars: number,
   suffixPatriciaTree: SuffixPatriciaTree
-): Set<Match> {
+): Match[] {
   if (suffixPatriciaTree.root.edges[pattern[0]] === undefined) {
-    return new Set<Match>();
+    return [];
   } else {
     const ms = fuzzySearchDFS(
       pattern,
@@ -340,13 +340,16 @@ function fuzzySearch(
       pattern.length + maxExtraChars,
       new Set<string>()
     );
-    let matches: Set<Match> = new Set<Match>();
+    let matches: Match[] = [];
     for (const m of ms) {
-      matches.add(JSON.parse(m));
+      matches.push(JSON.parse(m));
     }
+    matches.sort((a, b) => {
+      return b.score - a.score;
+    });
     return matches;
   }
 }
 
-export type { Edge, Node, SuffixPatriciaTree };
-export { ukkonenAlgorithm, showGraph, fuzzySearch };
+export type { Edge, Node, SuffixPatriciaTree, Match };
+export { ukkonenAlgorithm, showGraph, fuzzySearchSuffixPatriciaTree };

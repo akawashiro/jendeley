@@ -3,7 +3,7 @@
 import {
   Node,
   ukkonenAlgorithm,
-  fuzzySearch,
+  fuzzySearchSuffixPatriciaTree,
   showGraph,
 } from "./suffix_patricia_tree";
 
@@ -113,15 +113,15 @@ test("Search abcabxabcd", () => {
 
   const pattern = "abc";
 
-  const matches_0 = fuzzySearch(pattern, 0, suffixTrie);
+  const matches_0 = fuzzySearchSuffixPatriciaTree(pattern, 0, suffixTrie);
   for (const match of matches_0) {
     expect(str.substring(match.start, match.end)).toBe(pattern);
   }
 
-  const matches_1 = fuzzySearch(pattern, 6, suffixTrie);
+  const matches_1 = fuzzySearchSuffixPatriciaTree(pattern, 6, suffixTrie);
+  let machtedStrs_1: string[] = [];
   for (const match of matches_1) {
-    expect(["abc", "abxabc", "abcabxabc"]).toContain(
-      str.substring(match.start, match.end)
-    );
+    machtedStrs_1.push(str.substring(match.start, match.end));
   }
+  expect(machtedStrs_1).toStrictEqual(["abc", "abc", "abxabc", "abcabxabc"]);
 });
