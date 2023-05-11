@@ -69,7 +69,7 @@ function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
         "validateJsonDB failed but ignore because ignoreErrors is true"
       );
     } else {
-      logger.fatal("Failed to load DB because validateJsonDB");
+      logger.fatal("Failed to load DB. Check log.");
       process.exit(1);
     }
   }
