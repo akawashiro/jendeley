@@ -25,13 +25,14 @@ VERSION_NUMBER=$(jq .version < package.json)
 VERSION_TAG=v$(echo "${VERSION_NUMBER}" | tr -d \")
 VERSION_DEFINITION_LINE="const JENDELEY_VERSION = ${VERSION_NUMBER};"
 sed -i "s/const JENDELEY_VERSION.*/${VERSION_DEFINITION_LINE}/g" src/constants.ts
+npm run build
 popd
 
 pushd ./jendeley-frontend
 sed -i "s/const JENDELEY_VERSION.*/${VERSION_DEFINITION_LINE}/g" src/constants.ts
 popd
 
-git add ./jendeley-backend/package.json ./jendeley-backend/src/constants.ts ./jendeley-frontend/src/constants.ts
+git add ./jendeley-backend/package.json ./jendeley-backend/package-lock.json ./jendeley-backend/src/constants.ts ./jendeley-frontend/src/constants.ts
 git commit -m "Release ${VERSION_TAG}"
 git push origin main
 git tag "${VERSION_TAG}"
