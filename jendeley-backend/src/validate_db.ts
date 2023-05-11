@@ -37,8 +37,13 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
       const version = parseFloat(jsonDB[id]["version"]);
       if (version < 2.0) {
         validDB = false;
+        logger.fatal(
+          "DB version " +
+            jsonDB[id]["version"] +
+            " is too old. Please update DB using `jendeley update_db` subcommand."
+        );
       }
-      continue;
+      break;
     }
 
     // ENTRY_ID_TYPE check

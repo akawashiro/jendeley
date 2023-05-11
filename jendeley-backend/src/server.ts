@@ -16,6 +16,7 @@ import {
   updateEntry,
 } from "./api";
 import { concatDirs } from "./path_util";
+import { loadDB } from "./load_db";
 
 function startServer(
   dbPath: string[],
@@ -24,6 +25,10 @@ function startServer(
   port: number
 ) {
   if (fs.existsSync(concatDirs(dbPath))) {
+    {
+      loadDB(dbPath, false);
+    }
+
     const app = express();
     app.use(bodyParser.json({ limit: "1gb" }));
     if (allowCors) {
