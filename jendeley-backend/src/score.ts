@@ -12,9 +12,9 @@ function highlightedText(text: string, matches: Array<Match>) {
   const match_strs = matches.map((m) => {
     const s = Math.max(0, m.start - MARGINE_AROUND_HIGHLIGHT);
     const begin = text.slice(s, m.start);
-    const body = text.slice(m.start, m.end + 1);
+    const body = text.slice(m.start, m.end);
     const e = Math.min(text.length, m.end + MARGINE_AROUND_HIGHLIGHT);
-    const end = text.slice(m.end + 1, e);
+    const end = text.slice(m.end, e);
     return [begin, body, end];
   });
 
