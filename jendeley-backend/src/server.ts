@@ -26,6 +26,7 @@ function startServer(
 ) {
   if (fs.existsSync(concatDirs(dbPath))) {
     {
+      // Just check DB and ignore the result.
       loadDB(dbPath, false);
     }
 
