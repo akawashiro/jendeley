@@ -10,3 +10,9 @@ db*.json
 edit_and_run.sh
 built-frontend/*
 test_pdfs/.jendeley/*
+benchmark.folded
+benchmark.perf
+benchmark.svg
+perf.data*
+processed-isolate-*.txt
+processed-isolate-*.txt
