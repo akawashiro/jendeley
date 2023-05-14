@@ -4,7 +4,9 @@ import {
   fuzzySearchSuffixPatriciaTree,
   ukkonenAlgorithm,
   Match,
+  SuffixPatriciaTree,
 } from "./suffix_patricia_tree";
+import { createHash } from "crypto";
 
 const MARGINE_AROUND_HIGHLIGHT = 30;
 
@@ -44,6 +46,8 @@ function filterOutSameStart(matches: Match[]): Match[] {
   return filtered;
 }
 
+let suffixPatriciaTreeCache: { [key: string]: SuffixPatriciaTree } = {};
+
 function getScoreAndText(
   text: string,
   query: string | undefined
@@ -51,7 +55,12 @@ function getScoreAndText(
   if (query == undefined) {
     return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
   } else {
-    const suffixPatriciaTree = ukkonenAlgorithm(text);
+    const cache_key = createHash("md5").update(text).digest("hex");
+    if (suffixPatriciaTreeCache[cache_key] == undefined) {
+      suffixPatriciaTreeCache[cache_key] = ukkonenAlgorithm(text);
+    }
+    const suffixPatriciaTree = suffixPatriciaTreeCache[cache_key];
+
     const matches = fuzzySearchSuffixPatriciaTree(
       query,
       query.length,
@@ -59,8 +68,8 @@ function getScoreAndText(
     );
     const filtered = filterOutSameStart(matches);
 
-    if(filtered.length == 0 && matches.length > 0) {
-        logger.fatal("filtered.length == 0 && matches.length > 0");
+    if (filtered.length == 0 && matches.length > 0) {
+      logger.fatal("filtered.length == 0 && matches.length > 0");
     }
 
     if (filtered.length == 0) {
