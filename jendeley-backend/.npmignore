@@ -12,3 +12,9 @@ test_pdfs/*
 jest.config.js
 .eslintrc
 *.pdf
+benchmark.folded
+benchmark.perf
+benchmark.svg
+perf.data*
+processed-isolate-*.txt
+processed-isolate-*.txt
