@@ -6,9 +6,14 @@ import path from "path";
 import { JENDELEY_DIR } from "./constants";
 import { concatDirs } from "./path_util";
 
+// TODO: Naive cache. Check cache consistency.
+let loadedDB: { jsonDB: JsonDB; dbPath: string[] } | undefined = undefined;
+
 // saveDB and loadDB exit when fails because writing wrong data to
 // DB is worse than continuing to work.
 function saveDB(jsonDB: JsonDB, dbPath: string[]) {
+  loadedDB = undefined;
+
   logger.info("saveDB dbPath = " + dbPath);
 
   const jendeley_hidden_dir = path.join(
@@ -61,6 +66,12 @@ function saveDB(jsonDB: JsonDB, dbPath: string[]) {
 }
 
 function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
+  if (loadedDB != undefined && loadedDB.dbPath == dbPath) {
+    return loadedDB.jsonDB;
+  } else {
+    loadedDB = undefined;
+  }
+
   const jsonDB = JSON.parse(fs.readFileSync(concatDirs(dbPath)).toString());
 
   if (!validateJsonDB(jsonDB, dbPath)) {
@@ -73,6 +84,8 @@ function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
       process.exit(1);
     }
   }
+
+  loadedDB = { jsonDB: jsonDB, dbPath: dbPath };
   return jsonDB;
 }
 
