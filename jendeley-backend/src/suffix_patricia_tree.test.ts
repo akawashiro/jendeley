@@ -6,6 +6,7 @@ import {
   fuzzySearchSuffixPatriciaTree,
   showGraph,
 } from "./suffix_patricia_tree";
+import { filterOutSameStart } from "./score";
 
 function listUpAllSuffixesFromSuffixTrie(
   node: Node,
@@ -124,4 +125,23 @@ test("Search abcabxabcd", () => {
     machtedStrs_1.push(str.substring(match.start, match.end));
   }
   expect(machtedStrs_1).toStrictEqual(["abc", "abc", "abxabc", "abcabxabc"]);
+});
+
+test("Filter same start of abcabxabcd", () => {
+  const str = "abcabxabcd";
+  const suffixTrie = ukkonenAlgorithm(str);
+  // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
+  // console.log(graphStr);
+
+  const pattern = "abc";
+
+  const matches_0 = filterOutSameStart(
+    fuzzySearchSuffixPatriciaTree(pattern, 6, suffixTrie)
+  );
+
+  let starts: Set<number> = new Set();
+  for (const match of matches_0) {
+    expect(starts.has(match.start)).toBe(false);
+    starts.add(match.start);
+  }
 });
