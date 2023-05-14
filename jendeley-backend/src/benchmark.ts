@@ -26,25 +26,29 @@ function benchmarkFuzzySearch(dbPath: string[]) {
 
   const start = process.hrtime.bigint();
 
-  let scoreAndEntry: [Scores, ApiEntry][] = [];
-  for (const id of Object.keys(jsonDB)) {
-    if (jsonDB[id] == undefined) continue;
-    if (id == DB_META_KEY) continue;
-    const e_raw = getEntry(id, jsonDB);
-    const e = abbribatePublisherInEntry(e_raw);
-    const sande = getScoreAndEntry(e, requestGetDB);
-    scoreAndEntry.push(sande);
+  for (let i = 0; i < 100; i++) {
+    let scoreAndEntry: [Scores, ApiEntry][] = [];
+    for (const id of Object.keys(jsonDB)) {
+      if (jsonDB[id] == undefined) continue;
+      if (id == DB_META_KEY) continue;
+      const e_raw = getEntry(id, jsonDB);
+      const e = abbribatePublisherInEntry(e_raw);
+      const sande = getScoreAndEntry(e, requestGetDB);
+      scoreAndEntry.push(sande);
+    }
+
+    // Sort by score in descending order
+    scoreAndEntry.sort((a: [Scores, ApiEntry], b: [Scores, ApiEntry]) => {
+      return compareScore(a[0], b[0]);
+    });
+
+    const end = process.hrtime.bigint();
+    logger.info(
+      "benchmarkFuzzySearch takes " +
+        (end - start) / BigInt(1000 * 1000) +
+        " ms"
+    );
   }
-
-  // Sort by score in descending order
-  scoreAndEntry.sort((a: [Scores, ApiEntry], b: [Scores, ApiEntry]) => {
-    return compareScore(a[0], b[0]);
-  });
-
-  const end = process.hrtime.bigint();
-  logger.info(
-    "benchmarkFuzzySearch takes " + (end - start) / BigInt(1000 * 1000) + " ms"
-  );
 }
 
 export { benchmarkFuzzySearch };

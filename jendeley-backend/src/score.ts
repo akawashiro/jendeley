@@ -46,20 +46,30 @@ function filterOutSameStart(matches: Match[]): Match[] {
   return filtered;
 }
 
+// Naive cache. Check consistency.
 let suffixPatriciaTreeCache: { [key: string]: SuffixPatriciaTree } = {};
 
+// Take care of cache key (text_id)
+// If you don't have any good key to use, use undefined.
 function getScoreAndText(
   text: string,
-  query: string | undefined
+  query: string | undefined,
+  text_id: string | undefined
 ): [number, string] {
   if (query == undefined) {
     return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
   } else {
-    const cache_key = createHash("md5").update(text).digest("hex");
-    if (suffixPatriciaTreeCache[cache_key] == undefined) {
-      suffixPatriciaTreeCache[cache_key] = ukkonenAlgorithm(text);
+    let suffixPatriciaTree: SuffixPatriciaTree;
+    if (text_id == undefined) {
+      suffixPatriciaTree = ukkonenAlgorithm(text);
+    } else {
+      if (suffixPatriciaTreeCache[text_id] == undefined) {
+        suffixPatriciaTreeCache[text_id] = ukkonenAlgorithm(text);
+        suffixPatriciaTree = suffixPatriciaTreeCache[text_id];
+      } else {
+        suffixPatriciaTree = suffixPatriciaTreeCache[text_id];
+      }
     }
-    const suffixPatriciaTree = suffixPatriciaTreeCache[cache_key];
 
     const matches = fuzzySearchSuffixPatriciaTree(
       query,
@@ -97,13 +107,18 @@ function getScoreAndEntry(
   const start = process.hrtime.bigint();
   const [textScore, text] = getScoreAndText(
     entry.text == undefined ? "" : entry.text,
-    requestGetDB.text
+    requestGetDB.text,
+    entry.id
   );
   const end = process.hrtime.bigint();
   // logger.info(" in " + (end - start) / BigInt(1000 * 1000) + " ms");
   entry.text = text;
 
-  const [titleScore, _] = getScoreAndText(entry.title, requestGetDB.title);
+  const [titleScore, _] = getScoreAndText(
+    entry.title,
+    requestGetDB.title,
+    undefined
+  );
 
   let authorsScore = 0;
   if (requestGetDB.authors != undefined) {
