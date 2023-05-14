@@ -4,7 +4,9 @@ import {
   fuzzySearchSuffixPatriciaTree,
   ukkonenAlgorithm,
   Match,
+  SuffixPatriciaTree,
 } from "./suffix_patricia_tree";
+import { createHash } from "crypto";
 
 const MARGINE_AROUND_HIGHLIGHT = 30;
 
@@ -32,6 +34,20 @@ function highlightedText(text: string, matches: Array<Match>) {
   return highlighted;
 }
 
+function filterOutSameStart(matches: Match[]): Match[] {
+  let filtered: Match[] = [];
+  let starts: Set<number> = new Set();
+  for (let i = 0; i < matches.length; i++) {
+    if (!starts.has(matches[i].start)) {
+      filtered.push(matches[i]);
+      starts.add(matches[i].start);
+    }
+  }
+  return filtered;
+}
+
+let suffixPatriciaTreeCache: { [key: string]: SuffixPatriciaTree } = {};
+
 function getScoreAndText(
   text: string,
   query: string | undefined
@@ -39,16 +55,27 @@ function getScoreAndText(
   if (query == undefined) {
     return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
   } else {
-    const suffixPatriciaTree = ukkonenAlgorithm(text);
+    const cache_key = createHash("md5").update(text).digest("hex");
+    if (suffixPatriciaTreeCache[cache_key] == undefined) {
+      suffixPatriciaTreeCache[cache_key] = ukkonenAlgorithm(text);
+    }
+    const suffixPatriciaTree = suffixPatriciaTreeCache[cache_key];
+
     const matches = fuzzySearchSuffixPatriciaTree(
       query,
       query.length,
       suffixPatriciaTree
     );
-    if (matches.length == 0) {
+    const filtered = filterOutSameStart(matches);
+
+    if (filtered.length == 0 && matches.length > 0) {
+      logger.fatal("filtered.length == 0 && matches.length > 0");
+    }
+
+    if (filtered.length == 0) {
       return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
     } else {
-      return [matches[0].score, highlightedText(text, matches)];
+      return [filtered[0].score, highlightedText(text, filtered)];
     }
   }
 }
@@ -150,4 +177,4 @@ function compareScore(a: Scores, b: Scores) {
   }
 }
 
-export { getScoreAndEntry, Scores, compareScore };
+export { getScoreAndEntry, Scores, compareScore, filterOutSameStart };

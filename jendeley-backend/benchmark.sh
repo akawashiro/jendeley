@@ -4,10 +4,10 @@
 # NODE_ENV=production  node --inspect dist/index.js benchmark-fuzzy-search --db ~/Dropbox/jendeley-data/jendeley_db.json
 
 npm run build
-perf record -F 999 -g node dist/index.js benchmark-fuzzy-search --db ~/Dropbox/jendeley-data/jendeley_db.json
-perf script > out.perf
-$(ghq root)/github.com/brendangregg/FlameGraph/stackcollapse-perf.pl out.perf > out.folded
-$(ghq root)/github.com/brendangregg/FlameGraph/flamegraph.pl out.folded > benchmark.svg
+perf record -F 9999 -g node dist/index.js benchmark-fuzzy-search --db ~/Dropbox/jendeley-data/jendeley_db.json
+perf script > benchmark.perf
+$(ghq root)/github.com/brendangregg/FlameGraph/stackcollapse-perf.pl benchmark.perf > benchmark.folded
+$(ghq root)/github.com/brendangregg/FlameGraph/flamegraph.pl benchmark.folded > benchmark.svg
 echo "Check benchmark.svg"
 
 rm -f isolate-*v8.log
