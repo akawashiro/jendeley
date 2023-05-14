@@ -59,8 +59,8 @@ function getScoreAndText(
     );
     const filtered = filterOutSameStart(matches);
 
-    if (filtered.length == 0 && matches.length > 0) {
-      logger.fatal("filtered.length == 0 && matches.length > 0");
+    if(filtered.length == 0 && matches.length > 0) {
+        logger.fatal("filtered.length == 0 && matches.length > 0");
     }
 
     if (filtered.length == 0) {
