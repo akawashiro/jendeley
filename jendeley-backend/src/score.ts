@@ -33,7 +33,7 @@ function highlightedText(text: string, matches: Array<Match>) {
   return highlighted;
 }
 
-// TODO: We must check overlaps between matches.
+// TODO: Regions in filtered may overlap.
 function filterOutOverlaps(matches: Match[]): Match[] {
   let filtered: { start: number; end: number; best_match: Match }[] = [];
   for (let i = 0; i < matches.length; i++) {
