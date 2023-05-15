@@ -6,7 +6,6 @@ import {
   Match,
   SuffixPatriciaTree,
 } from "./suffix_patricia_tree";
-import { createHash } from "crypto";
 
 const MARGINE_AROUND_HIGHLIGHT = 30;
 
@@ -34,16 +33,47 @@ function highlightedText(text: string, matches: Array<Match>) {
   return highlighted;
 }
 
-function filterOutSameStart(matches: Match[]): Match[] {
-  let filtered: Match[] = [];
-  let starts: Set<number> = new Set();
+// TODO: Regions in filtered may overlap.
+function filterOutOverlaps(matches: Match[]): Match[] {
+  let filtered: { start: number; end: number; best_match: Match }[] = [];
   for (let i = 0; i < matches.length; i++) {
-    if (!starts.has(matches[i].start)) {
-      filtered.push(matches[i]);
-      starts.add(matches[i].start);
+    let overlap = false;
+    for (let j = 0; j < filtered.length; j++) {
+      if (
+        !(
+          matches[i].end < filtered[j].start ||
+          filtered[j].end <= matches[i].start
+        )
+      ) {
+        const s = Math.min(matches[i].start, filtered[j].start);
+        const e = Math.max(matches[i].end, filtered[j].end);
+        const m =
+          matches[i].score > filtered[j].best_match.score
+            ? matches[i]
+            : filtered[j].best_match;
+        filtered[j] = {
+          start: s,
+          end: e,
+          best_match: m,
+        };
+        overlap = true;
+        continue;
+      }
+    }
+    if (!overlap) {
+      filtered.push({
+        start: matches[i].start,
+        end: matches[i].end,
+        best_match: matches[i],
+      });
     }
   }
-  return filtered;
+
+  let ret: Match[] = [];
+  for (const f of filtered) {
+    ret.push(f.best_match);
+  }
+  return ret;
 }
 
 // Naive cache. Check consistency.
@@ -76,7 +106,7 @@ function getScoreAndText(
       query.length,
       suffixPatriciaTree
     );
-    const filtered = filterOutSameStart(matches);
+    const filtered = filterOutOverlaps(matches);
 
     if (filtered.length == 0 && matches.length > 0) {
       logger.fatal("filtered.length == 0 && matches.length > 0");
@@ -192,4 +222,4 @@ function compareScore(a: Scores, b: Scores) {
   }
 }
 
-export { getScoreAndEntry, Scores, compareScore, filterOutSameStart };
+export { getScoreAndEntry, Scores, compareScore, filterOutOverlaps };
