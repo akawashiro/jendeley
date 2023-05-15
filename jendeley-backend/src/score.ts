@@ -6,7 +6,6 @@ import {
   Match,
   SuffixPatriciaTree,
 } from "./suffix_patricia_tree";
-import { createHash } from "crypto";
 
 const MARGINE_AROUND_HIGHLIGHT = 30;
 
@@ -34,13 +33,14 @@ function highlightedText(text: string, matches: Array<Match>) {
   return highlighted;
 }
 
-function filterOutSameStart(matches: Match[]): Match[] {
+// TODO: We must check overlaps between matches.
+function filterOutSameEnd(matches: Match[]): Match[] {
   let filtered: Match[] = [];
-  let starts: Set<number> = new Set();
+  let ends: Set<number> = new Set();
   for (let i = 0; i < matches.length; i++) {
-    if (!starts.has(matches[i].start)) {
+    if (!ends.has(matches[i].end)) {
       filtered.push(matches[i]);
-      starts.add(matches[i].start);
+      ends.add(matches[i].end);
     }
   }
   return filtered;
@@ -76,12 +76,24 @@ function getScoreAndText(
       query.length,
       suffixPatriciaTree
     );
-    const filtered = filterOutSameStart(matches);
+    const filtered = filterOutSameEnd(matches);
 
     if (filtered.length == 0 && matches.length > 0) {
       logger.fatal("filtered.length == 0 && matches.length > 0");
     }
 
+    if (filtered.length > 0 || matches.length > 0) {
+      logger.info(
+        "text_id: " +
+          text_id +
+          " query: " +
+          query +
+          " matches: " +
+          matches.length +
+          " filtered: " +
+          filtered.length
+      );
+    }
     if (filtered.length == 0) {
       return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
     } else {
@@ -192,4 +204,4 @@ function compareScore(a: Scores, b: Scores) {
   }
 }
 
-export { getScoreAndEntry, Scores, compareScore, filterOutSameStart };
+export { getScoreAndEntry, Scores, compareScore, filterOutSameEnd };

@@ -71,23 +71,6 @@ function ukkonenAlgorithm(str: string): SuffixPatriciaTree {
     remainder++;
     let lastNewNode: Node | undefined = undefined;
     while (remainder > 0) {
-      // console.log(
-      //   "activeNode.id:",
-      //   activeNode.id,
-      //   "activeEdge:",
-      //   activeEdge,
-      //   "activeLength:",
-      //   activeLength,
-      //   "remainder:",
-      //   remainder,
-      //   "currentIndex:",
-      //   currentIndex,
-      //   "remainder:",
-      //   str.substring(currentIndex - remainder + 1, currentIndex + 1),
-      //   "lastNewNode:",
-      //   lastNewNode
-      // );
-
       if (activeLength == 0) {
         activeEdge = str[currentIndex];
       }
@@ -122,26 +105,12 @@ function ukkonenAlgorithm(str: string): SuffixPatriciaTree {
         }
 
         // Current character is already in the tree.
-        // console.log(
-        //   "activeEdgeStr[activeLength] = " +
-        //     activeEdgeStr[activeLength] +
-        //     " str[currentIndex] = " +
-        //     str[currentIndex]
-        // );
         if (activeEdgeStr[activeLength] == str[currentIndex]) {
           activeLength++;
           break;
         }
 
         // Split edge
-        // console.log(
-        //   "Split edge at activeLength:",
-        //   activeLength,
-        //   " activeEdgeStr:",
-        //   activeEdgeStr,
-        //   " activeNode.edges[activeEdge].to.edges:",
-        //   activeNode.edges[activeEdge].to.edges
-        // );
         const originalEdges = {};
         for (const k of Object.keys(activeNode.edges[activeEdge].to.edges)) {
           originalEdges[k] = activeNode.edges[activeEdge].to.edges[k];
@@ -194,7 +163,7 @@ function ukkonenAlgorithm(str: string): SuffixPatriciaTree {
 
 type Match = { start: number; end: number; score: number };
 
-const MAX_MATCHES = 5;
+const MAX_MATCHES = 20;
 const SCORE_REWARD_MATCHED = 8;
 const SCORE_REWARD_UNMATCHED = -3;
 
@@ -224,24 +193,6 @@ function fuzzySearchDFS(
     edge.end == "#"
       ? suffixPatriciaTree.str.substring(edge.start)
       : suffixPatriciaTree.str.substring(edge.start, edge.end);
-  // console.log(
-  //   "pattern:",
-  //   pattern,
-  //   "patternIndex:",
-  //   patternIndex,
-  //   "edgeStr:",
-  //   edgeStr,
-  //   "edgeIndex:",
-  //   edgeIndex,
-  //   "score:",
-  //   score,
-  //   "consumed:",
-  //   consumed,
-  //   "maxConsumed:",
-  //   maxConsumed,
-  //   "matches:",
-  //   matches
-  // );
   if (matches.size >= MAX_MATCHES) {
     return matches;
   } else if (getEdgeLength(edge, suffixPatriciaTree) === edgeIndex) {
@@ -328,29 +279,44 @@ function fuzzySearchSuffixPatriciaTree(
   maxExtraChars: number,
   suffixPatriciaTree: SuffixPatriciaTree
 ): Match[] {
-  if (suffixPatriciaTree.root.edges[pattern[0]] === undefined) {
-    return [];
-  } else {
-    const ms = fuzzySearchDFS(
-      pattern,
-      1,
-      suffixPatriciaTree,
-      suffixPatriciaTree.root.edges[pattern[0]],
-      1,
-      SCORE_REWARD_MATCHED,
-      1,
-      pattern.length + maxExtraChars,
-      new Set<string>()
-    );
-    let matches: Match[] = [];
-    for (const m of ms) {
-      matches.push(JSON.parse(m));
+  let matches: Match[] = [];
+  for (const [str, edge] of Object.entries(suffixPatriciaTree.root.edges)) {
+    if (str.toLowerCase() === pattern[0].toLowerCase()) {
+      const ms = fuzzySearchDFS(
+        pattern,
+        1,
+        suffixPatriciaTree,
+        edge,
+        1,
+        SCORE_REWARD_MATCHED,
+        1,
+        pattern.length + maxExtraChars,
+        new Set<string>()
+      );
+      for (const m of ms) {
+        matches.push(JSON.parse(m));
+      }
+    } else {
+      const ms = fuzzySearchDFS(
+        pattern,
+        0,
+        suffixPatriciaTree,
+        edge,
+        1,
+        SCORE_REWARD_MATCHED,
+        1,
+        pattern.length + maxExtraChars,
+        new Set<string>()
+      );
+      for (const m of ms) {
+        matches.push(JSON.parse(m));
+      }
     }
-    matches.sort((a, b) => {
-      return b.score - a.score;
-    });
-    return matches;
   }
+  matches.sort((a, b) => {
+    return b.score - a.score;
+  });
+  return matches;
 }
 
 export type { Edge, Node, SuffixPatriciaTree, Match };
