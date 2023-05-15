@@ -124,7 +124,16 @@ test("Search abcabxabcd", () => {
   for (const match of matches_1) {
     machtedStrs_1.push(str.substring(match.start, match.end));
   }
-  expect(machtedStrs_1).toStrictEqual(["abc", "abc", "abxabc", "abcabxabc"]);
+  expect(machtedStrs_1).toStrictEqual([
+    "xabc",
+    "bxabc",
+    "abc",
+    "abc",
+    "cabxabc",
+    "bcabxabc",
+    "abxabc",
+    "abcabxabc",
+  ]);
 });
 
 test("Filter same start of abcabxabcd", () => {
