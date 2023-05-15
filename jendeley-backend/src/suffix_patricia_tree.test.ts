@@ -6,7 +6,7 @@ import {
   fuzzySearchSuffixPatriciaTree,
   showGraph,
 } from "./suffix_patricia_tree";
-import { filterOutSameEnd } from "./score";
+import { filterOutOverlaps } from "./score";
 
 function listUpAllSuffixesFromSuffixTrie(
   node: Node,
@@ -144,7 +144,7 @@ test("Filter same start of abcabxabcd", () => {
 
   const pattern = "abc";
 
-  const matches_0 = filterOutSameEnd(
+  const matches_0 = filterOutOverlaps(
     fuzzySearchSuffixPatriciaTree(pattern, 6, suffixTrie)
   );
 

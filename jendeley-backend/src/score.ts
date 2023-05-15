@@ -34,16 +34,46 @@ function highlightedText(text: string, matches: Array<Match>) {
 }
 
 // TODO: We must check overlaps between matches.
-function filterOutSameEnd(matches: Match[]): Match[] {
-  let filtered: Match[] = [];
-  let ends: Set<number> = new Set();
+function filterOutOverlaps(matches: Match[]): Match[] {
+  let filtered: { start: number; end: number; best_match: Match }[] = [];
   for (let i = 0; i < matches.length; i++) {
-    if (!ends.has(matches[i].end)) {
-      filtered.push(matches[i]);
-      ends.add(matches[i].end);
+    let overlap = false;
+    for (let j = 0; j < filtered.length; j++) {
+      if (
+        !(
+          matches[i].end < filtered[j].start ||
+          filtered[j].end <= matches[i].start
+        )
+      ) {
+        const s = Math.min(matches[i].start, filtered[j].start);
+        const e = Math.max(matches[i].end, filtered[j].end);
+        const m =
+          matches[i].score > filtered[j].best_match.score
+            ? matches[i]
+            : filtered[j].best_match;
+        filtered[j] = {
+          start: s,
+          end: e,
+          best_match: m,
+        };
+        overlap = true;
+        continue;
+      }
+    }
+    if (!overlap) {
+      filtered.push({
+        start: matches[i].start,
+        end: matches[i].end,
+        best_match: matches[i],
+      });
     }
   }
-  return filtered;
+
+  let ret: Match[] = [];
+  for (const f of filtered) {
+    ret.push(f.best_match);
+  }
+  return ret;
 }
 
 // Naive cache. Check consistency.
@@ -76,24 +106,12 @@ function getScoreAndText(
       query.length,
       suffixPatriciaTree
     );
-    const filtered = filterOutSameEnd(matches);
+    const filtered = filterOutOverlaps(matches);
 
     if (filtered.length == 0 && matches.length > 0) {
       logger.fatal("filtered.length == 0 && matches.length > 0");
     }
 
-    if (filtered.length > 0 || matches.length > 0) {
-      logger.info(
-        "text_id: " +
-          text_id +
-          " query: " +
-          query +
-          " matches: " +
-          matches.length +
-          " filtered: " +
-          filtered.length
-      );
-    }
     if (filtered.length == 0) {
       return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
     } else {
@@ -204,4 +222,4 @@ function compareScore(a: Scores, b: Scores) {
   }
 }
 
-export { getScoreAndEntry, Scores, compareScore, filterOutSameEnd };
+export { getScoreAndEntry, Scores, compareScore, filterOutOverlaps };
