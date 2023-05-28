@@ -195,7 +195,7 @@ function fuzzySearchDFS(
       : suffixPatriciaTree.str.substring(edge.start, edge.end);
   if (matches.size >= MAX_MATCHES) {
     return matches;
-  } else if (getEdgeLength(edge, suffixPatriciaTree) === edgeIndex) {
+  } else if (getEdgeLength(edge, suffixPatriciaTree) <= edgeIndex) {
     for (const [_, e] of Object.entries(edge.to.edges)) {
       const ms = fuzzySearchDFS(
         pattern,
@@ -227,8 +227,7 @@ function fuzzySearchDFS(
     return matches;
   } else if (
     // Option to care about case
-    pattern[patternIndex].toLowerCase() ===
-    suffixPatriciaTree.str[edge.start + edgeIndex].toLowerCase()
+    pattern[patternIndex].toLowerCase() === edgeStr[edgeIndex].toLowerCase()
   ) {
     const ms1 = fuzzySearchDFS(
       pattern,
