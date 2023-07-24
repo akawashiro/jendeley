@@ -237,6 +237,20 @@ function getDocIDManuallyWritten(pdf: string[]): Either<string, DocID> {
     return genRight({ docIDType: "doi", doi: d });
   }
 
+  const regexpDOI8 = new RegExp(
+    "\\[\\s*jendeley\\s+doi\\s+10_([0-9]{4,})_([A-Za-z]+)_([0-9_]+)\\s*\\]",
+    "g"
+  );
+  const foundDOI8 = [...filename.matchAll(regexpDOI8)];
+  for (const f of foundDOI8) {
+    console.log(f);
+    const head = f[1] as string;
+    const body = f[2] as string;
+    const tail = (f[3] as string).replaceAll("_", ".");
+    const d = `10.${head}/${body}/${tail}`;
+    return genRight({ docIDType: "doi", doi: d });
+  }
+
   const regexpArxiv = new RegExp(
     "\\[\\s*jendeley\\s+arxiv\\s+([0-9]{4}_[0-9v]+)\\s*\\]",
     "g"
