@@ -215,9 +215,7 @@ test("Complicated book-like doi from path 8", async () => {
 });
 
 test("DOI from path https://github.com/akawashiro/jendeley/issues/258", async () => {
-  const pdf = [
-    "27-2-573 [jendeley doi 10_1093_nar_27_2_573].pdf",
-  ];
+  const pdf = ["27-2-573 [jendeley doi 10_1093_nar_27_2_573].pdf"];
   const docID = await getDocID(pdf, ["hoge"], false, undefined);
   expect(docID).toStrictEqual(rightDoi("10.1093/nar/27.2.573"));
 });
