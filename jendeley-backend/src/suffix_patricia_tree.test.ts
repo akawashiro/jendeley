@@ -11,7 +11,7 @@ import { filterOutOverlaps } from "./score";
 function listUpAllSuffixesFromSuffixTrie(
   node: Node,
   str: string,
-  prefix: string[]
+  prefix: string[],
 ): string[] {
   let result: string[] = [];
   for (const key in node.edges) {
@@ -32,7 +32,7 @@ function listUpAllSuffixesFromSuffixTrie(
         next_prefix.push(p + str.substring(edge.start, edge.end));
       }
       result = result.concat(
-        listUpAllSuffixesFromSuffixTrie(edge.to, str, next_prefix)
+        listUpAllSuffixesFromSuffixTrie(edge.to, str, next_prefix),
       );
     }
   }
@@ -52,7 +52,7 @@ test("Suffixes of abcabxabcd", () => {
   // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
   // console.log(graphStr);
   const suffixes_trie = new Set(
-    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [""])
+    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [""]),
   );
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
@@ -64,7 +64,7 @@ test("suffix of ezezeq", () => {
   // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
   // console.log(graphStr);
   const suffixes_trie = new Set(
-    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [])
+    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, []),
   );
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
@@ -88,7 +88,7 @@ Must give us pause.`;
   // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
   // console.log(graphStr);
   const suffixes_trie = new Set(
-    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [])
+    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, []),
   );
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
@@ -100,7 +100,7 @@ test("Suffixes of ぼっちゃん", () => {
   // const graphStr = showGraph(suffixTrie.root, 0, "", suffixTrie.str);
   // console.log(graphStr);
   const suffixes_trie = new Set(
-    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, [])
+    listUpAllSuffixesFromSuffixTrie(suffixTrie.root, suffixTrie.str, []),
   );
   const suffixes_naive = new Set(listUpAllSuffixes(suffixTrie.str));
   expect(suffixes_trie).toStrictEqual(suffixes_naive);
@@ -145,7 +145,7 @@ test("Filter same start of abcabxabcd", () => {
   const pattern = "abc";
 
   const matches_0 = filterOutOverlaps(
-    fuzzySearchSuffixPatriciaTree(pattern, 6, suffixTrie)
+    fuzzySearchSuffixPatriciaTree(pattern, 6, suffixTrie),
   );
 
   let starts: Set<number> = new Set();

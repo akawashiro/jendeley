@@ -8,7 +8,7 @@ import { validateJsonDB } from "./validate_db";
 import { ENTRY_AUTHORS, ENTRY_TEXT, ENTRY_TITLE } from "./constants";
 
 async function getTextsFromPDF(
-  pdfFullpath: string
+  pdfFullpath: string,
 ): Promise<Either<string, string>> {
   let dataBuffer: Buffer;
   try {
@@ -34,7 +34,7 @@ async function getTextsFromPDF(
 // to see what has changed.
 async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
   logger.info(
-    "Updating " + concatDirs(dbPathVer1) + " to " + concatDirs(dbPathVer2)
+    "Updating " + concatDirs(dbPathVer1) + " to " + concatDirs(dbPathVer2),
   );
   if (!fs.existsSync(concatDirs(dbPathVer1))) {
     logger.error(dbPathVer1 + " does not exist.");

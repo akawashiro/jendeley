@@ -40,7 +40,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
         logger.fatal(
           "DB version " +
             jsonDB[id]["version"] +
-            " is too old. Please update DB using `jendeley update_db` subcommand."
+            " is too old. Please update DB using `jendeley update_db` subcommand.",
         );
       }
       break;
@@ -74,7 +74,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
           "Invalid authors in id:" +
             id +
             " authors: " +
-            JSON.stringify(jsonDB[id][ENTRY_AUTHORS])
+            JSON.stringify(jsonDB[id][ENTRY_AUTHORS]),
         );
         validDB = false;
       }
@@ -87,7 +87,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
           "Invalid title in id:" +
             id +
             " tile: " +
-            JSON.stringify(jsonDB[id][ENTRY_TITLE])
+            JSON.stringify(jsonDB[id][ENTRY_TITLE]),
         );
         validDB = false;
       }
@@ -99,7 +99,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
       !jsonDB[id][ENTRY_TAGS].every((t: any) => typeof t == "string")
     ) {
       logger.warn(
-        "Invalid tags in id:" + id + " tags: " + jsonDB[id][ENTRY_TAGS]
+        "Invalid tags in id:" + id + " tags: " + jsonDB[id][ENTRY_TAGS],
       );
       validDB = false;
     }
@@ -110,7 +110,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
         "Invalid comments in id:" +
           id +
           " comments: " +
-          jsonDB[id][ENTRY_COMMENTS]
+          jsonDB[id][ENTRY_COMMENTS],
       );
       validDB = false;
     }
@@ -118,7 +118,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
     // ENTRY_TEXT check
     if (typeof jsonDB[id][ENTRY_TEXT] != "string") {
       logger.warn(
-        "Invalid text in id:" + id + " text: " + jsonDB[id][ENTRY_TEXT]
+        "Invalid text in id:" + id + " text: " + jsonDB[id][ENTRY_TEXT],
       );
       validDB = false;
     }
@@ -131,7 +131,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             " should not exists in id_type of " +
             ID_TYPE_URL +
             " id: " +
-            id
+            id,
         );
         validDB = false;
       }
@@ -144,7 +144,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             "File not exists: " +
               concatDirs(dbDir.concat(filepath)) +
               " id: " +
-              id
+              id,
           );
           validDB = false;
         }
@@ -169,7 +169,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
                   filepath +
                   " including forbidden char: '" +
                   fc +
-                  "'. jendeley bans usage of these characters because of cross platform compatibility."
+                  "'. jendeley bans usage of these characters because of cross platform compatibility.",
               );
               validDB = false;
             }
@@ -192,7 +192,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             " should not exists in id_type of " +
             ID_TYPE_URL +
             " id: " +
-            id
+            id,
         );
         validDB = false;
       }
@@ -222,7 +222,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             id +
             " path = " +
             entry.path +
-            " looks failed to get data from crossref. Please consider change filename to we can find manually written DocID."
+            " looks failed to get data from crossref. Please consider change filename to we can find manually written DocID.",
         );
       }
     } else if (entry.idType == ID_TYPE_ARXIV) {
@@ -233,7 +233,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             id +
             " path = " +
             entry.path +
-            " looks failed to get data from arxiv. Please consider change filename to we can find manually written DocID."
+            " looks failed to get data from arxiv. Please consider change filename to we can find manually written DocID.",
         );
       }
     } else if (entry.idType == ID_TYPE_BOOK || entry.idType == ID_TYPE_ISBN) {
@@ -244,7 +244,7 @@ function validateJsonDB(jsonDB: JsonDB, dbPath: string[] | undefined): boolean {
             id +
             " path = " +
             entry.path +
-            " looks failed to get data from isbn. Please consider change filename to we can find manually written DocID."
+            " looks failed to get data from isbn. Please consider change filename to we can find manually written DocID.",
         );
       }
     }

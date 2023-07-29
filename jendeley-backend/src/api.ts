@@ -55,7 +55,7 @@ function checkEntry(entry: ApiEntry) {
         "Check failed in checkEntry: id = " +
           entry.id +
           " entry = " +
-          JSON.stringify(entry, undefined, 2)
+          JSON.stringify(entry, undefined, 2),
       );
       process.exit(1);
     }
@@ -65,7 +65,7 @@ function checkEntry(entry: ApiEntry) {
         "Check failed in checkEntry: id = " +
           entry.id +
           " entry = " +
-          JSON.stringify(entry, undefined, 2)
+          JSON.stringify(entry, undefined, 2),
       );
       process.exit(1);
     }
@@ -156,7 +156,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
         authors.push(
           doiEntry.dataFromCrossref["author"][i]["given"] +
             " " +
-            doiEntry.dataFromCrossref["author"][i]["family"]
+            doiEntry.dataFromCrossref["author"][i]["family"],
         );
       }
     }
@@ -244,7 +244,7 @@ function getEntry(id: string, jsonDB: JsonDB): ApiEntry {
           ID_TYPE_PATH +
           " but id: " +
           id +
-          " is not."
+          " is not.",
       );
       process.exit(1);
     }
@@ -314,7 +314,7 @@ function updateEntry(request: Request, response: Response, dbPath: string[]) {
   } else {
     logger.warn(
       "Object from the client is not legitimated. entry_o = " +
-        JSON.stringify(entry_o)
+        JSON.stringify(entry_o),
     );
 
     const r: ApiResponse = {
@@ -332,7 +332,7 @@ function getPdf(request: Request, response: Response, dbPath: string[]) {
   const params = url.parse(request.url, true).query;
   const pdfPath = unescape(base_64.decode(params.file as string));
   const pdf = fs.readFileSync(
-    path.join(concatDirs(dbPath.slice(0, dbPath.length - 1)), pdfPath)
+    path.join(concatDirs(dbPath.slice(0, dbPath.length - 1)), pdfPath),
   );
 
   response.writeHead(200, {
@@ -350,7 +350,7 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
     "Get a get_db request" +
       request.url +
       " requestGetDB = " +
-      JSON.stringify(requestGetDB)
+      JSON.stringify(requestGetDB),
   );
   const jsonDB = loadDB(dbPath, false);
 
@@ -384,7 +384,7 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
       JSON.stringify(requestGetDB) +
       " in " +
       (end - start) / BigInt(1000 * 1000) +
-      " ms"
+      " ms",
   );
 }
 
@@ -407,14 +407,14 @@ async function getTitleFromUrl(url: string): Promise<Either<string, string>> {
 async function addWebFromUrl(
   httpRequest: Request,
   response: Response,
-  dbPath: string[]
+  dbPath: string[],
 ) {
   const req = httpRequest.body as RequestGetWebFromUrl;
   logger.info(
     "Get a add_web_from_url request url = " +
       httpRequest.url +
       " req = " +
-      JSON.stringify(req)
+      JSON.stringify(req),
   );
 
   let title = "";
@@ -446,7 +446,7 @@ async function addWebFromUrl(
     req.url,
     title,
     req.comments,
-    tags
+    tags,
   );
 
   if (newDBOrError._tag === "right") {
@@ -472,7 +472,7 @@ async function addWebFromUrl(
 async function addPdfFromFile(
   httpRequest: Request,
   response: Response,
-  dbPath: string[]
+  dbPath: string[],
 ) {
   // TODO: Handle RequestGetPdfFromFile.isbn/doi/comments/tags
   const req = httpRequest.body as RequestGetPdfFromFile;
@@ -480,12 +480,12 @@ async function addPdfFromFile(
     "Get a add_pdf_from_file request url = " +
       httpRequest.url +
       " req.filename = " +
-      JSON.stringify(req.filename)
+      JSON.stringify(req.filename),
   );
 
   if (
     fs.existsSync(
-      concatDirs(dbPath.slice(0, dbPath.length - 1).concat([req.filename]))
+      concatDirs(dbPath.slice(0, dbPath.length - 1).concat([req.filename])),
     )
   ) {
     const err: string = req.filename + " is already exists.";
@@ -499,7 +499,7 @@ async function addPdfFromFile(
     const buf = new Buffer(data, "base64");
 
     const fullpathOfUploadFile = concatDirs(
-      dbPath.slice(0, dbPath.length - 1).concat([req.filename])
+      dbPath.slice(0, dbPath.length - 1).concat([req.filename]),
     );
     fs.writeFileSync(fullpathOfUploadFile, buf);
 
@@ -518,7 +518,7 @@ async function addPdfFromFile(
       req.comments,
       tags,
       req.filename == undefined,
-      undefined
+      undefined,
     );
 
     if (idEntryOrError._tag === "right") {
@@ -559,7 +559,7 @@ async function addPdfFromFile(
 async function addPdfFromUrl(
   httpRequest: Request,
   response: Response,
-  dbPath: string[]
+  dbPath: string[],
 ) {
   // TODO: Handle RequestGetPdfFromUrl.isbn/doi/comments/tags
   const req = httpRequest.body as RequestGetPdfFromUrl;
@@ -567,7 +567,7 @@ async function addPdfFromUrl(
     "Get a add_pdf_from_url request url = " +
       httpRequest.url +
       " req = " +
-      JSON.stringify(req)
+      JSON.stringify(req),
   );
 
   const filename =
@@ -577,7 +577,7 @@ async function addPdfFromUrl(
 
   if (
     fs.existsSync(
-      concatDirs(dbPath.slice(0, dbPath.length - 1).concat([filename]))
+      concatDirs(dbPath.slice(0, dbPath.length - 1).concat([filename])),
     )
   ) {
     const err: string = filename + " is already exists.";
@@ -589,7 +589,7 @@ async function addPdfFromUrl(
   }
 
   const fullpathOfDownloadFile = concatDirs(
-    dbPath.slice(0, dbPath.length - 1).concat([filename])
+    dbPath.slice(0, dbPath.length - 1).concat([filename]),
   );
   let { got } = await import("got");
   const options = {
@@ -633,7 +633,7 @@ async function addPdfFromUrl(
       req.comments,
       tags,
       req.filename == undefined,
-      req.url
+      req.url,
     );
 
     if (idEntryOrError._tag === "right") {
@@ -683,13 +683,13 @@ function deleteEntry(request: Request, response: Response, dbPath: string[]) {
       jsonDB[entry.id][ENTRY_PATH] != undefined
     ) {
       const oldFilename = concatDirs(
-        dbPath.slice(0, dbPath.length - 1).concat(jsonDB[entry.id]["path"])
+        dbPath.slice(0, dbPath.length - 1).concat(jsonDB[entry.id]["path"]),
       );
       logger.info("Delete " + oldFilename);
       const dir = path.dirname(oldFilename);
       const newFilename = path.join(
         dir,
-        path.basename(oldFilename, ".pdf") + " " + JENDELEY_NO_TRACK + ".pdf"
+        path.basename(oldFilename, ".pdf") + " " + JENDELEY_NO_TRACK + ".pdf",
       );
       if (fs.existsSync(oldFilename) && !fs.existsSync(newFilename)) {
         logger.info("Rename " + oldFilename + " to " + newFilename);

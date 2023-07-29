@@ -83,7 +83,7 @@ function getAcronyms(conference: string): string {
   {
     const regexp = new RegExp(
       "([0-9][0-9][0-9][0-9] IEEE Conference on Computer Vision and Pattern Recognition)",
-      "g"
+      "g",
     );
     const found = [...conference.matchAll(regexp)];
     for (const f of found) {
@@ -95,7 +95,7 @@ function getAcronyms(conference: string): string {
   {
     const regexp = new RegExp(
       "([0-9][0-9][0-9][0-9] IEEE/ACM International Symposium on Code Generation and Optimization)",
-      "g"
+      "g",
     );
     const found = [...conference.matchAll(regexp)];
     for (const f of found) {
@@ -107,7 +107,7 @@ function getAcronyms(conference: string): string {
   {
     const regexp = new RegExp(
       "([0-9][0-9][0-9][0-9] IEEE/CVF International Conference on Computer Vision)",
-      "g"
+      "g",
     );
     const found = [...conference.matchAll(regexp)];
     for (const f of found) {
@@ -119,7 +119,7 @@ function getAcronyms(conference: string): string {
   {
     const regexp = new RegExp(
       "([0-9][0-9][0-9][0-9] .*Annual IEEE Symposium on Logic in Computer Science)",
-      "g"
+      "g",
     );
     const found = [...conference.matchAll(regexp)];
     for (const f of found) {
@@ -131,7 +131,7 @@ function getAcronyms(conference: string): string {
   {
     const regexp = new RegExp(
       "([0-9][0-9][0-9][0-9] .*International Conference on Software Engineering)",
-      "g"
+      "g",
     );
     const found = [...conference.matchAll(regexp)];
     for (const f of found) {
@@ -143,7 +143,7 @@ function getAcronyms(conference: string): string {
   {
     const regexp = new RegExp(
       "([0-9][0-9][0-9][0-9] IEEE/RSJ International Conference on Intelligent Robots and Systems)",
-      "g"
+      "g",
     );
     const found = [...conference.matchAll(regexp)];
     for (const f of found) {
@@ -155,7 +155,7 @@ function getAcronyms(conference: string): string {
   {
     const regexp = new RegExp(
       "([0-9][0-9][0-9][0-9] IEEE/CVF Conference on Computer Vision and Pattern Recognition)",
-      "g"
+      "g",
     );
     const found = [...conference.matchAll(regexp)];
     for (const f of found) {

@@ -46,7 +46,7 @@ function benchmarkFuzzySearch(dbPath: string[]) {
     logger.info(
       "benchmarkFuzzySearch takes " +
         (end - start) / BigInt(1000 * 1000) +
-        " ms"
+        " ms",
     );
   }
 }
