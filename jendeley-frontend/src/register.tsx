@@ -41,7 +41,7 @@ function RegisterWebWithDialog(props: any) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const handleWebUrlFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const url: string = event.target.value;
     setWebUrl(url);
@@ -237,7 +237,7 @@ function RegisterPDFFromFile(props: any) {
     setFilenameError(!isValidFilename(f) && f !== "");
     if (!isValidFilename(f) && f !== "") {
       setFilenameErrorText(
-        "Non valid filename: " + f + ". Filename must end with .pdf."
+        "Non valid filename: " + f + ". Filename must end with .pdf.",
       );
     } else {
       setFilenameErrorText("");
@@ -339,7 +339,7 @@ function RegisterPDFFromFile(props: any) {
         fetchDB(
           props.columnFilters,
           props.setTableData,
-          props.setConnectionError
+          props.setConnectionError,
         );
       }
     }
@@ -425,7 +425,7 @@ function RegisterPDFFromWeb(props: any) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const handlePdfUrlFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const url: string = event.target.value;
     setPdfUrl(url);
@@ -446,7 +446,7 @@ function RegisterPDFFromWeb(props: any) {
     setFilenameError(!isValidFilename(f) && f !== "");
     if (!isValidFilename(f) && f !== "") {
       setFilenameErrorText(
-        "Non valid filename: " + f + ". Filename must end with .pdf."
+        "Non valid filename: " + f + ". Filename must end with .pdf.",
       );
     } else {
       setFilenameErrorText("");

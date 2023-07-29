@@ -5,7 +5,7 @@ import { genRequestGetDB } from "./requests";
 function fetchDB(
   columnFilters: MRT_ColumnFiltersState,
   setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
-  setConnectionError: React.Dispatch<React.SetStateAction<boolean>>
+  setConnectionError: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   const request = genRequestGetDB(columnFilters);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
