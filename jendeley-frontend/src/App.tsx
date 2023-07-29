@@ -131,7 +131,7 @@ function ShowText(text: string | undefined) {
 function stringArrayFilterFn(
   row: any,
   id: string,
-  filterValue: string | number
+  filterValue: string | number,
 ) {
   const authors = row.getValue(id) as string[];
   const fv =
@@ -187,7 +187,7 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
 function useColumnDefs(
   tableData: ApiDB,
   setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
-  columnFilters: MRT_ColumnFiltersState
+  columnFilters: MRT_ColumnFiltersState,
 ): MRT_ColumnDef<ApiEntry>[] {
   return useMemo<MRT_ColumnDef<ApiEntry>[]>(
     () => [
@@ -293,7 +293,7 @@ function useColumnDefs(
         enableEditing: false,
       },
     ],
-    [tableData, setTableData]
+    [tableData, setTableData],
   );
 }
 
@@ -317,7 +317,7 @@ function App() {
       "Fetching from DB because of changes in columnFilters or sorting. columnFilters = ",
       columnFilters,
       "sorting = ",
-      sorting
+      sorting,
     );
 
     fetchDB(columnFilters, setTableData, setConnectionError);

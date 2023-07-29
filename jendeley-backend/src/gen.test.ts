@@ -32,7 +32,7 @@ test("Title from path", async () => {
   ];
   const title = getTitleFromPath(pdf);
   expect(title).toBe(
-    "Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation"
+    "Idris, a General Purpose Dependently Typed Programming Language- Design and Implementation",
   );
 });
 

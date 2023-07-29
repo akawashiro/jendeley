@@ -3,7 +3,7 @@ import { RequestGetDB } from "./api_schema";
 
 function getValueFromColumnFilters(
   columnFilters: MRT_ColumnFiltersState,
-  id: string
+  id: string,
 ): string | undefined {
   let value: string | undefined = undefined;
   for (const filter of columnFilters) {

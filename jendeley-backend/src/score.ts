@@ -84,7 +84,7 @@ let suffixPatriciaTreeCache: { [key: string]: SuffixPatriciaTree } = {};
 function getScoreAndText(
   text: string,
   query: string | undefined,
-  text_id: string | undefined
+  text_id: string | undefined,
 ): [number, string] {
   if (query == undefined) {
     return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
@@ -104,7 +104,7 @@ function getScoreAndText(
     const matches = fuzzySearchSuffixPatriciaTree(
       query,
       query.length,
-      suffixPatriciaTree
+      suffixPatriciaTree,
     );
     const filtered = filterOutOverlaps(matches);
 
@@ -132,13 +132,13 @@ type Scores = {
 
 function getScoreAndEntry(
   entry: ApiEntry,
-  requestGetDB: RequestGetDB
+  requestGetDB: RequestGetDB,
 ): [Scores, ApiEntry] {
   const start = process.hrtime.bigint();
   const [textScore, text] = getScoreAndText(
     entry.text == undefined ? "" : entry.text,
     requestGetDB.text,
-    entry.id
+    entry.id,
   );
   const end = process.hrtime.bigint();
   // logger.info(" in " + (end - start) / BigInt(1000 * 1000) + " ms");
@@ -147,7 +147,7 @@ function getScoreAndEntry(
   const [titleScore, _] = getScoreAndText(
     entry.title,
     requestGetDB.title,
-    undefined
+    undefined,
   );
 
   let authorsScore = 0;
@@ -157,7 +157,7 @@ function getScoreAndEntry(
         "entry.authors[i] = " +
           entry.authors[i] +
           " requestGetDB.authors = " +
-          requestGetDB.authors
+          requestGetDB.authors,
       );
       if (entry.authors[i].includes(requestGetDB.authors)) {
         authorsScore = 1;

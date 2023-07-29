@@ -32,7 +32,7 @@ function DeleteButton(props: any) {
     tableData: ApiDB,
     columnFilters: MRT_ColumnFiltersState,
     setTableData: React.Dispatch<React.SetStateAction<ApiDB>>,
-    setConnectionError: React.Dispatch<React.SetStateAction<boolean>>
+    setConnectionError: React.Dispatch<React.SetStateAction<boolean>>,
   ) {
     console.log("Delete " + id);
 
@@ -86,7 +86,7 @@ function DeleteButton(props: any) {
                 props.tableData,
                 props.columnFilters,
                 props.setTableData,
-                props.setConnectionError
+                props.setConnectionError,
               )
             }
             autoFocus

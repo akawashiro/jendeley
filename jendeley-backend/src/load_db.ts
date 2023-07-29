@@ -18,7 +18,7 @@ function saveDB(jsonDB: JsonDB, dbPath: string[]) {
 
   const jendeley_hidden_dir = path.join(
     path.dirname(concatDirs(dbPath)),
-    JENDELEY_DIR
+    JENDELEY_DIR,
   );
   if (!fs.existsSync(jendeley_hidden_dir)) {
     fs.mkdirSync(jendeley_hidden_dir, { recursive: true });
@@ -52,7 +52,7 @@ function saveDB(jsonDB: JsonDB, dbPath: string[]) {
 
   const backup = path.join(
     jendeley_hidden_dir,
-    backupPrefix + String(Date.now()) + "_" + path.basename(concatDirs(dbPath))
+    backupPrefix + String(Date.now()) + "_" + path.basename(concatDirs(dbPath)),
   );
   if (fs.existsSync(concatDirs(dbPath))) {
     fs.cpSync(concatDirs(dbPath), backup);
@@ -77,7 +77,7 @@ function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
   if (!validateJsonDB(jsonDB, dbPath)) {
     if (ignoreErrors) {
       logger.warn(
-        "validateJsonDB failed but ignore because ignoreErrors is true"
+        "validateJsonDB failed but ignore because ignoreErrors is true",
       );
     } else {
       logger.fatal("Failed to load DB. Check log.");
@@ -91,7 +91,7 @@ function loadDB(dbPath: string[], ignoreErrors: boolean): JsonDB {
 
 function loadFulltextDB(fulltextDBPath: string[]): FulltextDB {
   const fulltextDB = JSON.parse(
-    fs.readFileSync(concatDirs(fulltextDBPath)).toString()
+    fs.readFileSync(concatDirs(fulltextDBPath)).toString(),
   );
   return fulltextDB;
 }

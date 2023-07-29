@@ -28,7 +28,7 @@ function showGraph(
   node: Node,
   depth: number,
   buffer: string,
-  str: string
+  str: string,
 ): string {
   const indent = "    ".repeat(depth);
   buffer += `${indent}Node ${node.id} suffixLink:`;
@@ -92,7 +92,7 @@ function ukkonenAlgorithm(str: string): SuffixPatriciaTree {
           activeEdgeEnd == "#"
             ? str.substring(
                 activeNode.edges[activeEdge].start,
-                currentIndex + 1
+                currentIndex + 1,
               )
             : str.substring(activeNode.edges[activeEdge].start, activeEdgeEnd);
 
@@ -169,7 +169,7 @@ const SCORE_REWARD_UNMATCHED = -3;
 
 function getEdgeLength(
   edge: Edge,
-  suffixPatriciaTree: SuffixPatriciaTree
+  suffixPatriciaTree: SuffixPatriciaTree,
 ): number {
   if (edge.end == "#") {
     return suffixPatriciaTree.str.length - edge.start;
@@ -187,7 +187,7 @@ function fuzzySearchDFS(
   score: number,
   consumed: number,
   maxConsumed: number,
-  matches: Set<string>
+  matches: Set<string>,
 ): Set<string> {
   const edgeStr =
     edge.end == "#"
@@ -206,7 +206,7 @@ function fuzzySearchDFS(
         score,
         consumed,
         maxConsumed,
-        new Set<string>()
+        new Set<string>(),
       );
       for (const m of ms) {
         matches.add(m);
@@ -220,7 +220,7 @@ function fuzzySearchDFS(
         start: end - consumed,
         end: end,
         score: score,
-      })
+      }),
     );
     return matches;
   } else if (consumed == maxConsumed) {
@@ -238,7 +238,7 @@ function fuzzySearchDFS(
       score + SCORE_REWARD_UNMATCHED,
       consumed + 1,
       maxConsumed,
-      new Set<string>()
+      new Set<string>(),
     );
     for (const m of ms1) {
       matches.add(m);
@@ -252,7 +252,7 @@ function fuzzySearchDFS(
       score + SCORE_REWARD_MATCHED,
       consumed + 1,
       maxConsumed,
-      new Set<string>()
+      new Set<string>(),
     );
     for (const m of ms2) {
       matches.add(m);
@@ -268,7 +268,7 @@ function fuzzySearchDFS(
       score + SCORE_REWARD_UNMATCHED,
       consumed + 1,
       maxConsumed,
-      matches
+      matches,
     );
   }
 }
@@ -276,7 +276,7 @@ function fuzzySearchDFS(
 function fuzzySearchSuffixPatriciaTree(
   pattern: string,
   maxExtraChars: number,
-  suffixPatriciaTree: SuffixPatriciaTree
+  suffixPatriciaTree: SuffixPatriciaTree,
 ): Match[] {
   let matches: Match[] = [];
   for (const [str, edge] of Object.entries(suffixPatriciaTree.root.edges)) {
@@ -290,7 +290,7 @@ function fuzzySearchSuffixPatriciaTree(
         SCORE_REWARD_MATCHED,
         1,
         pattern.length + maxExtraChars,
-        new Set<string>()
+        new Set<string>(),
       );
       for (const m of ms) {
         matches.push(JSON.parse(m));
@@ -305,7 +305,7 @@ function fuzzySearchSuffixPatriciaTree(
         SCORE_REWARD_MATCHED,
         1,
         pattern.length + maxExtraChars,
-        new Set<string>()
+        new Set<string>(),
       );
       for (const m of ms) {
         matches.push(JSON.parse(m));
