@@ -106,7 +106,8 @@ function startServer(
       }
     });
   } else {
-    logger.error(dbPath + " is not exist.");
+    let p = concatDirs(dbPath);
+    logger.error(p + " does not exist.");
   }
 }
 
