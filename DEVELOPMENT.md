@@ -8,7 +8,8 @@ cd jendeley
 Build frontend
 ```
 cd jendeley-frontend
-npm run build # Generated file are copied to jendeley-backend/built-frontend automatically.
+npm run build
+cp -r ./build ../jendeley-backend/built-frontend
 ```
 
 Run backend server
