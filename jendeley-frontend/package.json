@@ -30,25 +30,25 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^14.0.0",
-    "@types/base-64": "^1.0.0",
-    "@types/node": "^20.4.5",
-    "@types/react": "^18.2.17",
-    "@types/react-dom": "^18.2.7",
-    "@types/react-table": "^7.7.14",
-    "@types/sanitize-html": "^2.9.0",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@types/base-64": "^1.0.2",
+    "@types/node": "^20.10.3",
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "@types/react-table": "^7.7.18",
+    "@types/sanitize-html": "^2.9.5",
     "base-64": "^1.0.0",
-    "material-react-table": "^1.14.0",
+    "material-react-table": "^2.0.5",
     "notistack": "^3.0.1",
     "path": "^0.12.7",
-    "prettier": "3.0.0",
+    "prettier": "3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-markdown": "^8.0.7",
+    "react-markdown": "^9.0.1",
     "react-scripts": "^5.0.1",
     "sanitize-html": "^2.11.0",
     "ts-jest": "^29.1.1",
-    "web-vitals": "^3.4.0"
+    "web-vitals": "^3.5.0"
   }
 }
