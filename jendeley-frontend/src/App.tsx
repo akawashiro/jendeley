@@ -443,18 +443,17 @@ function App() {
             enableStickyHeader
             enableColumnResizing
             columnResizeMode="onEnd"
-            // TODO: Disabled when update to MRT v2.
-            // editingMode="cell"
-            // muiTableBodyCellEditTextFieldProps={({ cell }) => ({
-            //   //onBlur is more efficient, but could use onChange instead
-            //   onBlur: (event) => {
-            //     handleSaveCell(cell, event.target.value);
-            //   },
-            //   variant: "outlined",
-            //   multiline: true,
-            //   margin: "none",
-            //   minRows: 7,
-            // })}
+            editDisplayMode="cell"
+            muiEditTextFieldProps={({ cell }) => ({
+              //onBlur is more efficient, but could use onChange instead
+              onBlur: (event) => {
+                handleSaveCell(cell, event.target.value);
+              },
+              variant: "outlined",
+              multiline: true,
+              margin: "none",
+              minRows: 7,
+            })}
             renderTopToolbarCustomActions={({ table }) => {
               return (
                 <div style={{ display: "flex", gap: "0.5rem" }}>
