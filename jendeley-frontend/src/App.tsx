@@ -438,6 +438,7 @@ function App() {
             enableStickyHeader
             enableColumnResizing
             columnResizeMode="onEnd"
+            // TODO: Disabled when update to MRT v2.
             // editingMode="cell"
             // muiTableBodyCellEditTextFieldProps={({ cell }) => ({
             //   //onBlur is more efficient, but could use onChange instead
