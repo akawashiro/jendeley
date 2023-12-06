@@ -209,7 +209,8 @@ function useColumnDefs(
         enableSorting: false,
         enableEditing: false,
         enableColumnActions: false,
-        size: 2,
+        size: 50,
+        enableResizing: false,
       },
       {
         accessorKey: "idType",
@@ -219,7 +220,17 @@ function useColumnDefs(
         enableSorting: false,
         enableEditing: false,
         enableColumnActions: false,
-        size: 2,
+        size: 50,
+        enableResizing: false,
+      },
+      {
+        accessorKey: "year",
+        header: "year",
+        enableSorting: false,
+        enableEditing: false,
+        size: 70,
+        enableResizing: false,
+        muiTableHeadCellFilterTextFieldProps: { placeholder: "year" },
       },
       {
         accessorKey: "title",
@@ -227,6 +238,7 @@ function useColumnDefs(
         header: "title",
         enableSorting: false,
         enableEditing: true,
+        size: 200,
         filterFn: "includesString",
       },
       {
@@ -252,7 +264,7 @@ function useColumnDefs(
         filterFn: stringArrayFilterFn,
         enableSorting: false,
         enableEditing: true,
-        size: 100,
+        // size: 100,
       },
       {
         accessorKey: "comments",
@@ -261,15 +273,7 @@ function useColumnDefs(
         filterFn: "includesString",
         enableSorting: false,
         enableEditing: true,
-        size: 200,
-      },
-      {
-        accessorKey: "year",
-        header: "year",
-        enableSorting: false,
-        enableEditing: false,
-        size: 50,
-        muiTableHeadCellFilterTextFieldProps: { placeholder: "year" },
+        size: 400,
       },
       {
         accessorKey: "publisher",
@@ -292,6 +296,7 @@ function useColumnDefs(
         enableSorting: false,
         header: "text",
         enableEditing: false,
+        size: 400,
       },
     ],
     [tableData, setTableData]
