@@ -3,6 +3,8 @@ import fs from "fs";
 import pdfparse from "pdf-parse";
 import { logger } from "./logger";
 import { loadDB } from "./load_db";
+import fetch from "node-fetch";
+import { Request as NFRequest } from "node-fetch";
 import { Either, genLeft, genRight } from "./either";
 import { validateJsonDB } from "./validate_db";
 import { ENTRY_AUTHORS, ENTRY_TEXT, ENTRY_TITLE } from "./constants";
@@ -63,9 +65,10 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
       }
     } else if (entry.idType == "url") {
       logger.info("url = " + entry.url);
-      let { got } = await import("got");
       const options = { headers: { Accept: "text/html" } };
-      const html = await got(entry.url, options).text();
+      const res = await fetch(new NFRequest(entry.url, options));
+      const html = res.text();
+
       const { convert } = require("html-to-text");
       const text = convert(html, {});
       jsonDB[id][ENTRY_TEXT] = text;

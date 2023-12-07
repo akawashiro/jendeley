@@ -1,6 +1,8 @@
 import path from "path";
 import fs from "fs";
 import pdfparse from "pdf-parse";
+import fetch from "node-fetch";
+import { Request as NFRequest } from "node-fetch";
 import { JENDELEY_NO_ID } from "./constants";
 import { logger } from "./logger";
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
@@ -359,8 +361,6 @@ async function getDocIDFromTitle(
     titles.push(titleFromPdf);
   }
 
-  let { got } = await import("got");
-
   for (const title of titles) {
     logger.info("getDocIDFromTitle title = " + title);
 
@@ -371,7 +371,9 @@ async function getDocIDFromTitle(
       title.replaceAll(" ", "+");
     const options = { headers: { Accept: "application/json" } };
     try {
-      const data = (await got(URL, options).json()) as Object;
+      const data = (await (
+        await fetch(new NFRequest(URL, options))
+      ).json()) as Object;
       const nItem = data["message"]["items"].length;
       for (let i = 0; i < nItem; i++) {
         const t = data["message"]["items"][i]["title"][0].toLowerCase();

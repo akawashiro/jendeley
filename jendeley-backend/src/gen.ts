@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import node_isbn from "node-isbn";
+import fetch from "node-fetch";
+import { Request as NFRequest } from "node-fetch";
 import pdfparse from "pdf-parse";
 import xml2js from "xml2js";
 import crypto from "crypto";
@@ -104,14 +106,14 @@ function getTitleFromPath(pdf: string[]): string {
 }
 
 async function getDoiJSON(doi: string): Promise<Either<string, Object>> {
-  let { got } = await import("got");
-
   // See here for API documentation
   // https://www.crossref.org/documentation/retrieve-metadata/rest-api/
   const URL = "https://api.crossref.org/v1/works/" + doi + "/transform";
   const options = { headers: { Accept: "application/json" } };
   try {
-    const data = (await got(URL, options).json()) as Object;
+    const data = (await (
+      await fetch(new NFRequest(URL, options))
+    ).json()) as Object;
     logger.info("data = " + JSON.stringify(data));
     return genRight(data);
   } catch (error) {
@@ -139,14 +141,13 @@ async function getIsbnJson(isbn: string) {
 }
 
 async function getArxivJson(arxiv: string) {
-  let { got } = await import("got");
-
   // See here for API documentation
   // https://arxiv.org/help/api/
   const URL = ARXIV_API_URL + arxiv;
   const options = { headers: { Accept: "application/json" } };
   try {
-    const data = (await got(URL, options)).body;
+    const res = await fetch(new NFRequest(URL, options));
+    const data = res.text();
     let jsonData;
     const parser = new xml2js.Parser({
       async: false,
@@ -343,9 +344,10 @@ async function registerWeb(
   const docID: DocID = { docIDType: "url", url: url };
   logger.info("docID = " + JSON.stringify(docID));
 
-  let { got } = await import("got");
   const options = { headers: { Accept: "text/html" } };
-  const html = await got(url, options).text();
+  const res = await fetch(new NFRequest(url, options));
+  const html = res.text();
+
   const { convert } = require("html-to-text");
   const text = convert(html, {});
 
