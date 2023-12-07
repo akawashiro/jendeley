@@ -1,4 +1,4 @@
-import { getJson, getTitleFromPath } from "./gen";
+import { getJson, getTitleFromPath, getArxivJson } from "./gen";
 import { DocID, getDocID, getDocIDFromTexts, getDocIDFromTitle } from "./docid";
 import { Either, genRight } from "./either";
 
@@ -74,6 +74,20 @@ test("arXiv from URL", async () => {
   const url = "https://arxiv.org/pdf/2212.07677.pdf";
   const docID = await getDocID(pdf, ["hoge"], false, url);
   expect(docID).toStrictEqual(rightArxiv("2212.07677"));
+});
+
+test("arXiv from URL 2", async () => {
+  const pdf = ["hoge2.pdf"];
+  const url = "https://arxiv.org/ftp/arxiv/papers/2312/2312.00752.pdf";
+  const docID = await getDocID(pdf, ["hoge2"], false, url);
+  expect(docID).toStrictEqual(rightArxiv("2312.00752"));
+});
+
+test("arXiv from URL 3", async () => {
+  const pdf = ["hoge3.pdf"];
+  const url = "https://arxiv.org/pdf/2311.14648.pdf";
+  const docID = await getDocID(pdf, ["hoge3"], false, url);
+  expect(docID).toStrictEqual(rightArxiv("2311.14648"));
 });
 
 test("arXiv from path", async () => {
@@ -224,4 +238,18 @@ test.skip("Lonely planet China", async () => {
   const pdf = ["lonelyplanet-china-15-full-book.pdf"];
   const docID = await getDocID(pdf, ["hoge"], false, undefined);
   expect(docID).toStrictEqual(rightIsbn("9781786575227"));
+});
+
+test("Get title from arxiv ID", async () => {
+  const arxiv = "1607.06450";
+  const title = await getArxivJson(arxiv);
+  expect(title["title"]).toBe("Layer Normalization");
+});
+
+test("Get title from arxiv ID", async () => {
+  const arxiv = "2312.00752";
+  const title = await getArxivJson(arxiv);
+  expect(title["title"]).toBe(
+    "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+  );
 });

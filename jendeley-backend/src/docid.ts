@@ -132,6 +132,16 @@ function getDocIDFromUrl(url: string): Either<string, DocID> {
   for (const f of foundArxiv) {
     return genRight({ docIDType: "arxiv", arxiv: f[1] });
   }
+
+  const regexpArxiv2 = new RegExp(
+    "https://arxiv.org/ftp/arxiv/papers/[0-9]{4}/([0-9]{4}[.][0-9]{4,5})[.]pdf",
+    "g",
+  );
+  const foundArxiv2 = [...url.matchAll(regexpArxiv2)];
+  for (const f of foundArxiv2) {
+    return genRight({ docIDType: "arxiv", arxiv: f[1] });
+  }
+
   return genLeft(ERROR_GET_DOCID_FROM_URL);
 }
 
