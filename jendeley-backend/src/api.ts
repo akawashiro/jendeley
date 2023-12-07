@@ -5,6 +5,8 @@ import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import cheerio from "cheerio";
+import fetch from "node-fetch";
+import { Request as NFRequest } from "node-fetch";
 import {
   JENDELEY_NO_TRACK,
   ENTRY_ID_TYPE,
@@ -390,11 +392,10 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
 
 // Rewrite using Either
 async function getTitleFromUrl(url: string): Promise<Either<string, string>> {
-  let { got } = await import("got");
-
   try {
-    const res = await got(url);
-    const root = cheerio.load(res.body);
+    const response = await fetch(url);
+    const body = await response.text();
+    const root = cheerio.load(body);
     const title = root("title").text();
     return genRight(title);
   } catch {
@@ -591,15 +592,15 @@ async function addPdfFromUrl(
   const fullpathOfDownloadFile = concatDirs(
     dbPath.slice(0, dbPath.length - 1).concat([filename]),
   );
-  let { got } = await import("got");
   const options = {
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
     },
   };
-  const download_pdf = await got(req.url, options).buffer();
-  fs.writeFileSync(fullpathOfDownloadFile, download_pdf);
+  const res = await fetch(new NFRequest(req.url, options));
+  const download_pdf = await res.arrayBuffer();
+  fs.writeFileSync(fullpathOfDownloadFile, new DataView(download_pdf));
 
   const binaryContents = fs.readFileSync(fullpathOfDownloadFile);
   // PDF magic number. See https://en.wikipedia.org/wiki/List_of_file_signatures.

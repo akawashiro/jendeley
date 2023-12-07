@@ -3,11 +3,11 @@
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
-    "target": "es6",
+    "target": "esnext",
     "module": "commonjs",
     "sourceMap": true,
     "esModuleInterop": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "node",
     "noImplicitAny": false,
     "lib": ["es2021"],
     "sourceMap": true
