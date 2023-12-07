@@ -246,9 +246,10 @@ test("Get title from arxiv ID", async () => {
   expect(title["title"]).toBe("Layer Normalization");
 });
 
-
 test("Get title from arxiv ID", async () => {
   const arxiv = "2312.00752";
   const title = await getArxivJson(arxiv);
-  expect(title["title"]).toBe("Mamba: Linear-Time Sequence Modeling with Selective State Spaces");
+  expect(title["title"]).toBe(
+    "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+  );
 });
