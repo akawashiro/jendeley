@@ -1,4 +1,4 @@
-import { getJson, getTitleFromPath } from "./gen";
+import { getJson, getTitleFromPath, getArxivJson } from "./gen";
 import { DocID, getDocID, getDocIDFromTexts, getDocIDFromTitle } from "./docid";
 import { Either, genRight } from "./either";
 
@@ -224,4 +224,17 @@ test.skip("Lonely planet China", async () => {
   const pdf = ["lonelyplanet-china-15-full-book.pdf"];
   const docID = await getDocID(pdf, ["hoge"], false, undefined);
   expect(docID).toStrictEqual(rightIsbn("9781786575227"));
+});
+
+test("Get title from arxiv ID", async () => {
+  const arxiv = "1607.06450";
+  const title = await getArxivJson(arxiv);
+  expect(title["title"]).toBe("Layer Normalization");
+});
+
+
+test("Get title from arxiv ID", async () => {
+  const arxiv = "2312.00752";
+  const title = await getArxivJson(arxiv);
+  expect(title["title"]).toBe("Mamba: Linear-Time Sequence Modeling with Selective State Spaces");
 });

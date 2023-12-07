@@ -145,9 +145,10 @@ async function getArxivJson(arxiv: string) {
   // https://arxiv.org/help/api/
   const URL = ARXIV_API_URL + arxiv;
   const options = { headers: { Accept: "application/json" } };
+  logger.debug("getArxivJson arxiv=" + arxiv + " URL=" + URL);
   try {
-    const res = await fetch(new NFRequest(URL, options));
-    const data = res.text();
+    const res = await await fetch(new NFRequest(URL, options));
+    const data = await res.text();
     let jsonData;
     const parser = new xml2js.Parser({
       async: false,
@@ -769,4 +770,5 @@ export {
   getTitleFromPath,
   registerNonBookPDF,
   registerWeb,
+  getArxivJson,
 };
