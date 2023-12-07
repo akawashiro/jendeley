@@ -393,7 +393,7 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
 // Rewrite using Either
 async function getTitleFromUrl(url: string): Promise<Either<string, string>> {
   try {
-    const response = await fetch("https://github.com/");
+    const response = await fetch(url);
     const body = await response.text();
     const root = cheerio.load(body);
     const title = root("title").text();
