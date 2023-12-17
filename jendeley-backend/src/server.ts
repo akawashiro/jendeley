@@ -17,11 +17,7 @@ import {
 import { concatDirs } from "./path_util";
 import { loadDB } from "./load_db";
 
-function startServer(
-  dbPath: string[],
-  allowCors: boolean,
-  port: number,
-) {
+function startServer(dbPath: string[], allowCors: boolean, port: number) {
   if (fs.existsSync(concatDirs(dbPath))) {
     {
       // Just check DB and ignore the result.
