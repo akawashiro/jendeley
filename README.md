@@ -86,7 +86,7 @@ When using Linux, you can set up `jendeley` to start automatically by using `sys
 Description=jendeley JSON-based document organization software
 
 [Service]
-ExecStart=jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser
+ExecStart=jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE>
 
 [Install]
 WantedBy=default.target
@@ -99,7 +99,7 @@ When using Windows, you can set up `jendeley` to launch automatically at startup
 And make `autorun-jendeley.bat` with the following contents using `notepad.exe`.
 ```
 :: autorun-jendeley.bat
-jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> --no_browser >> <FILL PATH TO THE LOG FILE>
+jendeley launch --db <FILL PATH TO THE YOUR DATABASE JSON FILE> >> <FILL PATH TO THE LOG FILE>
 ```
 
 <img src="https://raw.githubusercontent.com/akawashiro/jendeley/main/startup-directory.png" width="70%">

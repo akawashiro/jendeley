@@ -17,12 +17,7 @@ import {
 import { concatDirs } from "./path_util";
 import { loadDB } from "./load_db";
 
-function startServer(
-  dbPath: string[],
-  noBrowser: boolean,
-  allowCors: boolean,
-  port: number,
-) {
+function startServer(dbPath: string[], allowCors: boolean, port: number) {
   if (fs.existsSync(concatDirs(dbPath))) {
     {
       // Just check DB and ignore the result.
@@ -101,9 +96,6 @@ function startServer(
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
       logger.info(`Open http://localhost:${port} with your browser`);
-      if (!noBrowser) {
-        import("open").then((open) => open.default(`http://localhost:${port}`));
-      }
     });
   } else {
     let p = concatDirs(dbPath);
