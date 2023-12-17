@@ -19,7 +19,6 @@ import { loadDB } from "./load_db";
 
 function startServer(
   dbPath: string[],
-  noBrowser: boolean,
   allowCors: boolean,
   port: number,
 ) {
@@ -101,9 +100,6 @@ function startServer(
     app.listen(port, () => {
       logger.info(`jendeley backend server is listening on port ${port}`);
       logger.info(`Open http://localhost:${port} with your browser`);
-      if (!noBrowser) {
-        import("open").then((open) => open.default(`http://localhost:${port}`));
-      }
     });
   } else {
     let p = concatDirs(dbPath);

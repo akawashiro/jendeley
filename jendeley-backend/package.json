@@ -61,7 +61,6 @@
     "html-to-text": "^9.0.5",
     "node-fetch": "^2.7.0",
     "node-isbn": "^1.6.1",
-    "open": "^9.1.0",
     "pdf-parse": "^1.1.1",
     "pdf.js-extract": "^0.2.1",
     "pino": "^8.16.2",
