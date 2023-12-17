@@ -1,6 +1,7 @@
 import path from "path";
 import cors from "cors";
 import fs from "fs";
+import open from "open";
 import express from "express";
 import { Request, Response } from "express";
 import bodyParser from "body-parser";
@@ -102,7 +103,7 @@ function startServer(
       logger.info(`jendeley backend server is listening on port ${port}`);
       logger.info(`Open http://localhost:${port} with your browser`);
       if (!noBrowser) {
-        import("open").then((open) => open.default(`http://localhost:${port}`));
+        open(`http://localhost:${port}`);
       }
     });
   } else {
