@@ -118,10 +118,14 @@ async function getDoiJSON(doi: string): Promise<Either<string, Object>> {
     return genRight(data);
   } catch (error) {
     logger.warn("error = " + error);
+    const useManualSpecificationMessage =
+      "Please specify ID manually using [jendeley isbn <ISBN>], [jendeley doi <DOI>] or use [jendeley no id]. Check https://github.com/akawashiro/jendeley#when-jendeley-fails-to-scan-your-pdfs for more details.";
+
     const error_message =
       "Failed to get information from DOI: " +
       URL +
-      " in getDoiJSON. This DOI is not registered.";
+      " in getDoiJSON function. This DOI is not registered. " +
+      useManualSpecificationMessage;
     logger.warn(error_message);
     return genLeft(error_message);
   }
@@ -211,6 +215,9 @@ async function getJson(
     return genLeft(text.left);
   }
 
+  const useManualSpecificationMessage =
+    "Please specify ID manually using [jendeley isbn <ISBN>], [jendeley doi <DOI>] or use [jendeley no id]. Check https://github.com/akawashiro/jendeley#when-jendeley-fails-to-scan-your-pdfs for more details.";
+
   if (docID.docIDType == "arxiv") {
     const dataFromArxiv = await getArxivJson(docID.arxiv);
     if (dataFromArxiv != undefined) {
@@ -229,9 +236,11 @@ async function getJson(
     } else {
       const error_message =
         "Failed to get information of " +
-        JSON.stringify(docID) +
-        " using arxiv. Path: " +
-        pathPDF;
+        pathPDF +
+        " using arXiv id. Esitimated arXiv id is " +
+        docID.arxiv +
+        "." +
+        useManualSpecificationMessage;
       logger.warn(error_message);
       return genLeft(error_message);
     }
@@ -271,9 +280,11 @@ async function getJson(
     } else {
       const error_message =
         "Failed to get information of " +
-        JSON.stringify(docID) +
-        " using isbn. Path: " +
-        pathPDF;
+        pathPDF +
+        " using ISBN. Esitimated ISBN is " +
+        docID.isbn +
+        "." +
+        useManualSpecificationMessage;
       return genLeft(error_message);
     }
   } else if (docID.docIDType == "path") {
