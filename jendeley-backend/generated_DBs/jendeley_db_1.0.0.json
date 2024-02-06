@@ -1,0 +1,1555 @@
+{
+  "jendeley_meta": {
+    "idType": "meta",
+    "version": "1.0.0"
+  },
+  "arxiv_2212.12976": {
+    "path": [
+      "Modular Formal Verification of Rust Programs with Unsafe Blocks [jendeley download 1673165594267].pdf"
+    ],
+    "idType": "arxiv",
+    "tags": [],
+    "comments": "",
+    "dataFromArxiv": {
+      "id": "http://arxiv.org/abs/2212.12976v1",
+      "updated": "2022-12-26T00:19:19Z",
+      "published": "2022-12-26T00:19:19Z",
+      "title": "Modular Formal Verification of Rust Programs with Unsafe Blocks",
+      "summary": "  Rust is a modern systems programming language whose type system guarantees\nmemory safety. For the sake of expressivity and performance it allows\nprogrammers to relax typing rules temporarily, using unsafe code blocks.\nHowever, in unsafe blocks, the burden of making sure that the code does not end\nup having undefined behaviour is on the programmer. Even most expert\nprogrammers make mistakes and a memory safety bug in an unsafe block renders\nall the type system guarantees void. To address this problem we are trying to\nverify soundness of Rust unsafe code applying our Modular Symbolic Execution\nalgorithm. This text outlines our approach and the progress that has been made\nso far.\n",
+      "author": [
+        {
+          "name": "Nima Rahimi Foroushaani"
+        },
+        {
+          "name": "Bart Jacobs"
+        }
+      ],
+      "arxiv:comment": {
+        "_": "22 pages, 13 listings, 3 figures, Technical report, Appendix by Bart\n  Jacobs",
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "link": [
+        {
+          "$": {
+            "href": "http://arxiv.org/abs/2212.12976v1",
+            "rel": "alternate",
+            "type": "text/html"
+          }
+        },
+        {
+          "$": {
+            "title": "pdf",
+            "href": "http://arxiv.org/pdf/2212.12976v1",
+            "rel": "related",
+            "type": "application/pdf"
+          }
+        }
+      ],
+      "arxiv:primary_category": {
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom",
+          "term": "cs.LO",
+          "scheme": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "category": [
+        {
+          "$": {
+            "term": "cs.LO",
+            "scheme": "http://arxiv.org/schemas/atom"
+          }
+        },
+        {
+          "$": {
+            "term": "cs.PL",
+            "scheme": "http://arxiv.org/schemas/atom"
+          }
+        }
+      ]
+    }
+  },
+  "doi_10.1007/978-3-540-71229-9_9": {
+    "path": [
+      "Register Allocation and Optimal Spill Code Scheduling in Software Pipelined Loops Using 0-1 Integer Linear Programming Formulation.pdf"
+    ],
+    "idType": "doi",
+    "tags": [],
+    "comments": "",
+    "dataFromCrossref": {
+      "indexed": {
+        "date-parts": [
+          [
+            2024,
+            1,
+            23
+          ]
+        ],
+        "date-time": "2024-01-23T20:08:48Z",
+        "timestamp": 1706040528010
+      },
+      "publisher-location": "Berlin, Heidelberg",
+      "reference-count": 21,
+      "publisher": "Springer Berlin Heidelberg",
+      "isbn-type": [
+        {
+          "value": "9783540712282",
+          "type": "print"
+        },
+        {
+          "value": "9783540712299",
+          "type": "electronic"
+        }
+      ],
+      "content-domain": {
+        "domain": [],
+        "crossmark-restriction": false
+      },
+      "DOI": "10.1007/978-3-540-71229-9_9",
+      "type": "book-chapter",
+      "created": {
+        "date-parts": [
+          [
+            2007,
+            7,
+            1
+          ]
+        ],
+        "date-time": "2007-07-01T17:39:13Z",
+        "timestamp": 1183311553000
+      },
+      "page": "126-140",
+      "source": "Crossref",
+      "is-referenced-by-count": 11,
+      "title": "Register Allocation and Optimal Spill Code Scheduling in Software Pipelined Loops Using 0-1 Integer Linear Programming Formulation",
+      "prefix": "10.1007",
+      "author": [
+        {
+          "given": "Santosh G.",
+          "family": "Nagarakatte",
+          "sequence": "first",
+          "affiliation": []
+        },
+        {
+          "given": "R.",
+          "family": "Govindarajan",
+          "sequence": "additional",
+          "affiliation": []
+        }
+      ],
+      "member": "297",
+      "reference": [
+        {
+          "issue": "6",
+          "key": "9_CR1",
+          "doi-asserted-by": "publisher",
+          "first-page": "180",
+          "DOI": "10.1145/1064978.1065032",
+          "volume": "40",
+          "author": "A. Aleta",
+          "year": "2005",
+          "unstructured": "Aleta, A., et al.: Demystifying on-the-fly spill code. SIGPLAN Not. 40(6), 180–189 (2005), doi:10.1145/1064978.1065032",
+          "journal-title": "SIGPLAN Not."
+        },
+        {
+          "issue": "3",
+          "key": "9_CR2",
+          "doi-asserted-by": "publisher",
+          "first-page": "367",
+          "DOI": "10.1145/212094.212131",
+          "volume": "27",
+          "author": "V.H. Allan",
+          "year": "1995",
+          "unstructured": "Allan, V.H., et al.: Software pipelining. ACM Comput. Surv. 27(3), 367–432 (1995)",
+          "journal-title": "ACM Comput. Surv."
+        },
+        {
+          "issue": "9",
+          "key": "9_CR3",
+          "doi-asserted-by": "publisher",
+          "first-page": "1",
+          "DOI": "10.1016/S0898-1221(97)00184-3",
+          "volume": "34",
+          "author": "C.M. Chen",
+          "year": "1997",
+          "unstructured": "Chen, C.M., Chang, C.M., King, C.T.: Using integer linear programming for instruction scheduling and register allocation in multi-issue processors. Computers and Mathematics with Applications 34(9), 1–14 (1997)",
+          "journal-title": "Computers and Mathematics with Applications"
+        },
+        {
+          "key": "9_CR4",
+          "series-title": "Lecture Notes in Computer Science",
+          "doi-asserted-by": "publisher",
+          "first-page": "174",
+          "DOI": "10.1007/BFb0026430",
+          "volume-title": "Compiler Construction",
+          "author": "K.D. Cooper",
+          "year": "1998",
+          "unstructured": "Cooper, K.D., Simpson, L.T.: Live range splitting in a graph coloring register allocator. In: Koskimies, K. (ed.) CC 1998 and ETAPS 1998. LNCS, vol. 1383, pp. 174–187. Springer, Heidelberg (1998)"
+        },
+        {
+          "key": "9_CR5",
+          "unstructured": "ILOG CPLEX: http://www.ilog.com"
+        },
+        {
+          "issue": "1-2",
+          "key": "9_CR6",
+          "doi-asserted-by": "publisher",
+          "first-page": "181",
+          "DOI": "10.1007/BF01205184",
+          "volume": "7",
+          "author": "J.C. Dehnert",
+          "year": "1993",
+          "unstructured": "Dehnert, J.C., Towle, R.A.: Compiling for the cydra 5. J. Supercomput. 7(1-2), 181–227 (1993)",
+          "journal-title": "J. Supercomput."
+        },
+        {
+          "key": "9_CR7",
+          "doi-asserted-by": "publisher",
+          "first-page": "154",
+          "DOI": "10.1145/318789.318807",
+          "volume-title": "ICS ’89: Proceedings of the 3rd international conference on Supercomputing",
+          "author": "K. Ebcioglu",
+          "year": "1989",
+          "unstructured": "Ebcioglu, K., Nicolau, A.: A global resource-constrained parallelization technique. In: ICS ’89: Proceedings of the 3rd international conference on Supercomputing, Crete, Greece, pp. 154–163. ACM Press, New York (1989), doi:10.1145/318789.318807"
+        },
+        {
+          "key": "9_CR8",
+          "series-title": "Lecture Notes in Computer Science",
+          "doi-asserted-by": "publisher",
+          "first-page": "1",
+          "DOI": "10.1007/BFb0025867",
+          "volume-title": "Languages and Compilers for Parallel Computing",
+          "author": "P. Feautrier",
+          "year": "1995",
+          "unstructured": "Feautrier, P.: Fine-grain scheduling under resource constraints. In: Pingali, K.K., et al. (eds.) LCPC 1994. LNCS, vol. 892, pp. 1–15. Springer, Heidelberg (1995)"
+        },
+        {
+          "issue": "8",
+          "key": "9_CR9",
+          "doi-asserted-by": "publisher",
+          "first-page": "929",
+          "DOI": "10.1002/(SICI)1097-024X(199608)26:8<929::AID-SPE40>3.0.CO;2-T",
+          "volume": "26",
+          "author": "D.W. Goodwin",
+          "year": "1996",
+          "unstructured": "Goodwin, D.W., Wilken, K.D.: Optimal and near-optimal global register allocations using 0-1 integer programming. Softw. Pract. Exper. 26(8), 929–965 (1996)",
+          "journal-title": "Softw. Pract. Exper."
+        },
+        {
+          "issue": "11",
+          "key": "9_CR10",
+          "doi-asserted-by": "publisher",
+          "first-page": "1133",
+          "DOI": "10.1109/71.544355",
+          "volume": "7",
+          "author": "R. Govindarajan",
+          "year": "1996",
+          "unstructured": "Govindarajan, R., Altman, E.R., Gao, G.R.: A framework for resource-constrained rate-optimal software pipelining. IEEE Transactions on Parallel and Distributed Systems 7(11), 1133–1149 (1996), doi:10.1109/71.544355",
+          "journal-title": "IEEE Transactions on Parallel and Distributed Systems"
+        },
+        {
+          "key": "9_CR11",
+          "doi-asserted-by": "crossref",
+          "unstructured": "Huff, R.A.: Lifetime-sensitive modulo scheduling. In: SIGPLAN Conference on Programming Language Design and Implementation, pp. 258–267 (1993), citeseer.ist.psu.edu/84558.html",
+          "DOI": "10.1145/173262.155115"
+        },
+        {
+          "key": "9_CR12",
+          "unstructured": "SUIF Compiler Infrastructure, http://suif.stanford.edu/suif/"
+        },
+        {
+          "key": "9_CR13",
+          "unstructured": "Trimaran: An infrastructure for research in instruction level parallelism, http://www.trimaran.org"
+        },
+        {
+          "key": "9_CR14",
+          "doi-asserted-by": "publisher",
+          "first-page": "318",
+          "DOI": "10.1145/53990.54022",
+          "volume-title": "PLDI ’88: Proceedings of the ACM SIGPLAN 1988 conference on Programming Language design and Implementation",
+          "author": "M. Lam",
+          "year": "1988",
+          "unstructured": "Lam, M.: Software pipelining: an effective scheduling technique for vliw machines. In: PLDI ’88: Proceedings of the ACM SIGPLAN 1988 conference on Programming Language design and Implementation, Atlanta, Georgia, United States, pp. 318–328. ACM Press, New York (1988), doi:10.1145/53990.54022"
+        },
+        {
+          "key": "9_CR15",
+          "doi-asserted-by": "publisher",
+          "first-page": "250",
+          "DOI": "10.1109/MICRO.1996.566466",
+          "volume-title": "MICRO 29: Proceedings of the 29th annual ACM/IEEE international symposium on Microarchitecture",
+          "author": "J. Llosa",
+          "year": "1996",
+          "unstructured": "Llosa, J., Valero, M., Ayguade, E.: Heuristics for register-constrained software pipelining. In: MICRO 29: Proceedings of the 29th annual ACM/IEEE international symposium on Microarchitecture, Paris, France, pp. 250–261. IEEE Computer Society, Washington (1996)"
+        },
+        {
+          "key": "9_CR16",
+          "doi-asserted-by": "crossref",
+          "first-page": "29",
+          "DOI": "10.1145/158511.158519",
+          "volume-title": "Conference Record of the Twentieth Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages",
+          "author": "Q. Ning",
+          "year": "1993",
+          "unstructured": "Ning, Q., Gao, G.R.: A novel framework of register allocation for software pipelining. In: Conference Record of the Twentieth Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages, Charleston, South Carolina, pp. 29–42. ACM Press, New York (1993), citeseer.ist.psu.edu/ning93novel.html"
+        },
+        {
+          "key": "9_CR17",
+          "first-page": "183",
+          "volume-title": "MICRO 14: Proceedings of the 14th annual workshop on Microprogramming",
+          "author": "B.R. Rau",
+          "year": "1981",
+          "unstructured": "Rau, B.R., Glaeser, C.D.: Some scheduling techniques and an easily schedulable horizontal architecture for high performance scientific computing. In: MICRO 14: Proceedings of the 14th annual workshop on Microprogramming, Chatham, Massachusetts, United States, pp. 183–198. IEEE Press, Piscataway (1981)"
+        },
+        {
+          "issue": "7",
+          "key": "9_CR18",
+          "doi-asserted-by": "publisher",
+          "first-page": "283",
+          "DOI": "10.1145/143103.143141",
+          "volume": "27",
+          "author": "B.R. Rau",
+          "year": "1992",
+          "unstructured": "Rau, B.R., et al.: Register allocation for software pipelined loops. SIGPLAN Not. 27(7), 283–299 (1992), doi:10.1145/143103.143141",
+          "journal-title": "SIGPLAN Not."
+        },
+        {
+          "key": "9_CR19",
+          "doi-asserted-by": "publisher",
+          "first-page": "63",
+          "DOI": "10.1145/192724.192731",
+          "volume-title": "MICRO 27: Proceedings of the 27th annual international symposium on Microarchitecture",
+          "author": "B.R. Rau",
+          "year": "1994",
+          "unstructured": "Rau, B.R.: Iterative modulo scheduling: an algorithm for software pipelining loops. In: MICRO 27: Proceedings of the 27th annual international symposium on Microarchitecture, San Jose, California, United States, pp. 63–74. ACM Press, New York (1994), doi:10.1145/192724.192731"
+        },
+        {
+          "key": "9_CR20",
+          "doi-asserted-by": "publisher",
+          "first-page": "121",
+          "DOI": "10.1145/349299.349318",
+          "volume-title": "PLDI ’00: Proceedings of the ACM SIGPLAN 2000 conference on Programming language design and implementation",
+          "author": "K. Wilken",
+          "year": "2000",
+          "unstructured": "Wilken, K., Liu, J., Heffernan, M.: Optimal instruction scheduling using integer programming. In: PLDI ’00: Proceedings of the ACM SIGPLAN 2000 conference on Programming language design and implementation, Vancouver, British Columbia, Canada, pp. 121–133. ACM Press, New York (2000), doi:10.1145/349299.349318"
+        },
+        {
+          "key": "9_CR21",
+          "doi-asserted-by": "publisher",
+          "first-page": "134",
+          "DOI": "10.1145/349299.349319",
+          "volume-title": "PLDI ’00: Proceedings of the ACM SIGPLAN 2000 conference on Programming language design and implementation",
+          "author": "J. Zalamea",
+          "year": "2000",
+          "unstructured": "Zalamea, J., et al.: Improved spill code generation for software pipelined loops. In: PLDI ’00: Proceedings of the ACM SIGPLAN 2000 conference on Programming language design and implementation, Vancouver, British Columbia, Canada, pp. 134–144. ACM Press, New York (2000), doi:10.1145/349299.349319"
+        }
+      ],
+      "container-title": "Lecture Notes in Computer Science",
+      "original-title": [],
+      "link": [
+        {
+          "URL": "http://link.springer.com/content/pdf/10.1007/978-3-540-71229-9_9.pdf",
+          "content-type": "unspecified",
+          "content-version": "vor",
+          "intended-application": "similarity-checking"
+        }
+      ],
+      "deposited": {
+        "date-parts": [
+          [
+            2020,
+            11,
+            19
+          ]
+        ],
+        "date-time": "2020-11-19T05:17:09Z",
+        "timestamp": 1605763029000
+      },
+      "score": 1,
+      "resource": {
+        "primary": {
+          "URL": "http://link.springer.com/10.1007/978-3-540-71229-9_9"
+        }
+      },
+      "subtitle": [],
+      "short-title": [],
+      "issued": {
+        "date-parts": [
+          [
+            null
+          ]
+        ]
+      },
+      "ISBN": [
+        "9783540712282",
+        "9783540712299"
+      ],
+      "references-count": 21,
+      "URL": "http://dx.doi.org/10.1007/978-3-540-71229-9_9",
+      "relation": {}
+    }
+  },
+  "doi_10.1145/512529.512563": {
+    "path": [
+      "cyclone [jendeley doi 10_1145_512529_512563].pdf"
+    ],
+    "idType": "doi",
+    "tags": [],
+    "comments": "",
+    "dataFromCrossref": {
+      "indexed": {
+        "date-parts": [
+          [
+            2024,
+            1,
+            29
+          ]
+        ],
+        "date-time": "2024-01-29T15:59:19Z",
+        "timestamp": 1706543959870
+      },
+      "publisher-location": "New York, NY, USA",
+      "reference-count": 32,
+      "publisher": "ACM",
+      "content-domain": {
+        "domain": [
+          "dl.acm.org"
+        ],
+        "crossmark-restriction": true
+      },
+      "published-print": {
+        "date-parts": [
+          [
+            2002,
+            5,
+            17
+          ]
+        ]
+      },
+      "DOI": "10.1145/512529.512563",
+      "type": "proceedings-article",
+      "created": {
+        "date-parts": [
+          [
+            2004,
+            4,
+            19
+          ]
+        ],
+        "date-time": "2004-04-19T17:18:43Z",
+        "timestamp": 1082395123000
+      },
+      "update-policy": "http://dx.doi.org/10.1145/crossmark-policy",
+      "source": "Crossref",
+      "is-referenced-by-count": 229,
+      "title": "Region-based memory management in cyclone",
+      "prefix": "10.1145",
+      "author": [
+        {
+          "given": "Dan",
+          "family": "Grossman",
+          "sequence": "first",
+          "affiliation": [
+            {
+              "name": "Cornell University, Ithaca, NY"
+            }
+          ]
+        },
+        {
+          "given": "Greg",
+          "family": "Morrisett",
+          "sequence": "additional",
+          "affiliation": [
+            {
+              "name": "Cornell University, Ithaca, NY"
+            }
+          ]
+        },
+        {
+          "given": "Trevor",
+          "family": "Jim",
+          "sequence": "additional",
+          "affiliation": [
+            {
+              "name": "AT&amp;T Labs Research, Florham Park, NJ"
+            }
+          ]
+        },
+        {
+          "given": "Michael",
+          "family": "Hicks",
+          "sequence": "additional",
+          "affiliation": [
+            {
+              "name": "Cornell University, Ithaca, NY"
+            }
+          ]
+        },
+        {
+          "given": "Yanling",
+          "family": "Wang",
+          "sequence": "additional",
+          "affiliation": [
+            {
+              "name": "Cornell University, Ithaca, NY"
+            }
+          ]
+        },
+        {
+          "given": "James",
+          "family": "Cheney",
+          "sequence": "additional",
+          "affiliation": [
+            {
+              "name": "Cornell University, Ithaca, NY"
+            }
+          ]
+        }
+      ],
+      "member": "320",
+      "published-online": {
+        "date-parts": [
+          [
+            2002,
+            5,
+            17
+          ]
+        ]
+      },
+      "reference": [
+        {
+          "key": "e_1_3_2_1_1_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/207110.207137"
+        },
+        {
+          "key": "e_1_3_2_1_2_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/178243.178446"
+        },
+        {
+          "key": "e_1_3_2_1_3_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.5555/380921.380932"
+        },
+        {
+          "key": "e_1_3_2_1_4_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1002/spe.4380180902"
+        },
+        {
+          "key": "e_1_3_2_1_5_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1006/inco.1999.2829"
+        },
+        {
+          "key": "e_1_3_2_1_6_1",
+          "volume-title": "Technical Report 2001-1855",
+          "year": "2001",
+          "unstructured": "Cyclone user's manual. Technical Report 2001-1855 , Department of Computer Science , Cornell University , Nov. 2001 . Current version at http://www.cs.cornell.edu/projects/cyclone/ Cyclone user's manual. Technical Report 2001-1855, Department of Computer Science, Cornell University, Nov. 2001. Current version at http://www.cs.cornell.edu/projects/cyclone/"
+        },
+        {
+          "key": "e_1_3_2_1_7_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/378795.378811"
+        },
+        {
+          "key": "e_1_3_2_1_8_1",
+          "volume-title": "BABEL'01: First International Workshop on Multi-Language Infrastructure and Interoperability",
+          "volume": "59",
+          "author": "Dowd T.",
+          "year": "2001",
+          "unstructured": "T. Dowd , F. Henderson , and P. Ross . Compiling Mercury to the .NET common language runtime. In N. Benton and A. Kennedy, editors , BABEL'01: First International Workshop on Multi-Language Infrastructure and Interoperability , volume 59 .1 of Electronic Notes in Theoretical Computer Science, Florence, Italy , Sept. 2001 T. Dowd, F. Henderson, and P. Ross. Compiling Mercury to the .NET common language runtime. In N. Benton and A. Kennedy, editors, BABEL'01: First International Workshop on Multi-Language Infrastructure and Interoperability, volume 59.1 of Electronic Notes in Theoretical Computer Science, Florence, Italy, Sept. 2001"
+        },
+        {
+          "key": "e_1_3_2_1_9_1",
+          "unstructured": "D. Evans. LCLint user's guide. http://lclint.cs.virginia.edu/guide/  D. Evans. LCLint user's guide. http://lclint.cs.virginia.edu/guide/"
+        },
+        {
+          "key": "e_1_3_2_1_10_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/231379.231389"
+        },
+        {
+          "key": "e_1_3_2_1_11_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/277650.277748"
+        },
+        {
+          "key": "e_1_3_2_1_12_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/378795.378815"
+        },
+        {
+          "key": "e_1_3_2_1_13_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/360204.360228"
+        },
+        {
+          "key": "e_1_3_2_1_14_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.5555/645396.651967"
+        },
+        {
+          "key": "e_1_3_2_1_16_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/512529.512547"
+        },
+        {
+          "key": "e_1_3_2_1_17_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/773184.773203"
+        },
+        {
+          "key": "e_1_3_2_1_18_1",
+          "volume-title": "The Art of Computer Systems Performance Analysis",
+          "author": "Jain R.",
+          "year": "1991",
+          "unstructured": "R. Jain . The Art of Computer Systems Performance Analysis . Wiley , 1991 R. Jain. The Art of Computer Systems Performance Analysis. Wiley, 1991"
+        },
+        {
+          "key": "e_1_3_2_1_19_1",
+          "volume-title": "USENIX Annual Technical Conference",
+          "author": "Jim T.",
+          "year": "2002",
+          "unstructured": "T. Jim , G. Morrisett , D. Grossman , M. Hicks , J. Cheney , and Y. Wang . Cyclone: A safe dialect of C . In USENIX Annual Technical Conference , Monterey, CA , June 2002 T. Jim, G. Morrisett, D. Grossman, M. Hicks, J. Cheney, and Y. Wang. Cyclone: A safe dialect of C. In USENIX Annual Technical Conference, Monterey, CA, June 2002"
+        },
+        {
+          "key": "e_1_3_2_1_20_1",
+          "unstructured": "G. McGary. Bounds checking projects. http://www.gnu.org/software/gcc/projects/bp/main.html  G. McGary. Bounds checking projects. http://www.gnu.org/software/gcc/projects/bp/main.html"
+        },
+        {
+          "key": "e_1_3_2_1_21_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/237721.237791"
+        },
+        {
+          "key": "e_1_3_2_1_22_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/44501.45065"
+        },
+        {
+          "key": "e_1_3_2_1_23_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/378795.378817"
+        },
+        {
+          "key": "e_1_3_2_1_24_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.5555/647228.719245"
+        },
+        {
+          "key": "e_1_3_2_1_25_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/503272.503286"
+        },
+        {
+          "key": "e_1_3_2_1_26_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/291891.291894"
+        },
+        {
+          "key": "e_1_3_2_1_27_1",
+          "volume-title": "Programming with regions in the ML Kit (for version 4). Technical report",
+          "author": "Tofte M.",
+          "year": "2001",
+          "unstructured": "M. Tofte , L. Birkedal , M. Elsman , N. Hallenberg , T. H. Olesen , and P. Sestoft . Programming with regions in the ML Kit (for version 4). Technical report , IT University of Copenhagen , Sept. 2001 M. Tofte, L. Birkedal, M. Elsman, N. Hallenberg, T. H. Olesen, and P. Sestoft. Programming with regions in the ML Kit (for version 4). Technical report, IT University of Copenhagen, Sept. 2001"
+        },
+        {
+          "key": "e_1_3_2_1_28_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1006/inco.1996.2613"
+        },
+        {
+          "key": "e_1_3_2_1_29_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/363911.363923"
+        },
+        {
+          "key": "e_1_3_2_1_30_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/507635.507658"
+        },
+        {
+          "key": "e_1_3_2_1_31_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/360204.360218"
+        },
+        {
+          "key": "e_1_3_2_1_32_1",
+          "first-page": "375",
+          "volume-title": "Fifteenth IEEE Symposium on Logic in Computer Science",
+          "author": "Xi H.",
+          "year": "2000",
+          "unstructured": "H. Xi . Imperative programming with dependent types . In Fifteenth IEEE Symposium on Logic in Computer Science , pages 375 -- 387 , Santa Barbara, CA , June 2000 H. Xi. Imperative programming with dependent types. In Fifteenth IEEE Symposium on Logic in Computer Science, pages 375--387, Santa Barbara, CA, June 2000"
+        },
+        {
+          "key": "e_1_3_2_1_33_1",
+          "doi-asserted-by": "publisher",
+          "DOI": "10.1145/292540.292560"
+        }
+      ],
+      "event": "PLDI02: ACM SIGPLAN 2002 Conference on Programming Language Design and Implementation",
+      "container-title": "Proceedings of the ACM SIGPLAN 2002 conference on Programming language design and implementation",
+      "original-title": [],
+      "link": [
+        {
+          "URL": "https://dl.acm.org/doi/pdf/10.1145/512529.512563",
+          "content-type": "unspecified",
+          "content-version": "vor",
+          "intended-application": "similarity-checking"
+        }
+      ],
+      "deposited": {
+        "date-parts": [
+          [
+            2023,
+            9,
+            4
+          ]
+        ],
+        "date-time": "2023-09-04T21:19:02Z",
+        "timestamp": 1693862342000
+      },
+      "score": 1,
+      "resource": {
+        "primary": {
+          "URL": "https://dl.acm.org/doi/10.1145/512529.512563"
+        }
+      },
+      "subtitle": [],
+      "short-title": [],
+      "issued": {
+        "date-parts": [
+          [
+            2002,
+            5,
+            17
+          ]
+        ]
+      },
+      "references-count": 32,
+      "alternative-id": [
+        "10.1145/512529.512563",
+        "10.1145/512529"
+      ],
+      "URL": "http://dx.doi.org/10.1145/512529.512563",
+      "relation": {
+        "is-identical-to": [
+          {
+            "id-type": "doi",
+            "id": "10.1145/543552.512563",
+            "asserted-by": "object"
+          }
+        ]
+      },
+      "published": {
+        "date-parts": [
+          [
+            2002,
+            5,
+            17
+          ]
+        ]
+      },
+      "assertion": [
+        {
+          "value": "2002-05-17",
+          "order": 2,
+          "name": "published",
+          "label": "Published",
+          "group": {
+            "name": "publication_history",
+            "label": "Publication History"
+          }
+        }
+      ]
+    }
+  },
+  "arxiv_1704.04861": {
+    "path": [
+      "mobilenet.pdf"
+    ],
+    "idType": "arxiv",
+    "tags": [],
+    "comments": "",
+    "dataFromArxiv": {
+      "id": "http://arxiv.org/abs/1704.04861v1",
+      "updated": "2017-04-17T03:57:34Z",
+      "published": "2017-04-17T03:57:34Z",
+      "title": "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision\n  Applications",
+      "summary": "  We present a class of efficient models called MobileNets for mobile and\nembedded vision applications. MobileNets are based on a streamlined\narchitecture that uses depth-wise separable convolutions to build light weight\ndeep neural networks. We introduce two simple global hyper-parameters that\nefficiently trade off between latency and accuracy. These hyper-parameters\nallow the model builder to choose the right sized model for their application\nbased on the constraints of the problem. We present extensive experiments on\nresource and accuracy tradeoffs and show strong performance compared to other\npopular models on ImageNet classification. We then demonstrate the\neffectiveness of MobileNets across a wide range of applications and use cases\nincluding object detection, finegrain classification, face attributes and large\nscale geo-localization.\n",
+      "author": [
+        {
+          "name": "Andrew G. Howard"
+        },
+        {
+          "name": "Menglong Zhu"
+        },
+        {
+          "name": "Bo Chen"
+        },
+        {
+          "name": "Dmitry Kalenichenko"
+        },
+        {
+          "name": "Weijun Wang"
+        },
+        {
+          "name": "Tobias Weyand"
+        },
+        {
+          "name": "Marco Andreetto"
+        },
+        {
+          "name": "Hartwig Adam"
+        }
+      ],
+      "link": [
+        {
+          "$": {
+            "href": "http://arxiv.org/abs/1704.04861v1",
+            "rel": "alternate",
+            "type": "text/html"
+          }
+        },
+        {
+          "$": {
+            "title": "pdf",
+            "href": "http://arxiv.org/pdf/1704.04861v1",
+            "rel": "related",
+            "type": "application/pdf"
+          }
+        }
+      ],
+      "arxiv:primary_category": {
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom",
+          "term": "cs.CV",
+          "scheme": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "category": {
+        "$": {
+          "term": "cs.CV",
+          "scheme": "http://arxiv.org/schemas/atom"
+        }
+      }
+    }
+  },
+  "path_onnx loop [jendeley no id].pdf": {
+    "path": [
+      "onnx loop [jendeley no id].pdf"
+    ],
+    "title": "onnx loop [jendeley no id].pdf",
+    "idType": "path",
+    "tags": [],
+    "comments": ""
+  },
+  "doi_10.1006/inco.1996.2613": {
+    "path": [
+      "region-based-memory-management.pdf"
+    ],
+    "idType": "doi",
+    "tags": [],
+    "comments": "",
+    "dataFromCrossref": {
+      "indexed": {
+        "date-parts": [
+          [
+            2024,
+            1,
+            31
+          ]
+        ],
+        "date-time": "2024-01-31T16:34:41Z",
+        "timestamp": 1706718881300
+      },
+      "reference-count": 31,
+      "publisher": "Elsevier BV",
+      "issue": "2",
+      "license": [
+        {
+          "start": {
+            "date-parts": [
+              [
+                1997,
+                2,
+                1
+              ]
+            ],
+            "date-time": "1997-02-01T00:00:00Z",
+            "timestamp": 854755200000
+          },
+          "content-version": "tdm",
+          "delay-in-days": 0,
+          "URL": "https://www.elsevier.com/tdm/userlicense/1.0/"
+        },
+        {
+          "start": {
+            "date-parts": [
+              [
+                2013,
+                7,
+                17
+              ]
+            ],
+            "date-time": "2013-07-17T00:00:00Z",
+            "timestamp": 1374019200000
+          },
+          "content-version": "vor",
+          "delay-in-days": 6010,
+          "URL": "https://www.elsevier.com/open-access/userlicense/1.0/"
+        }
+      ],
+      "content-domain": {
+        "domain": [],
+        "crossmark-restriction": false
+      },
+      "published-print": {
+        "date-parts": [
+          [
+            1997,
+            2
+          ]
+        ]
+      },
+      "DOI": "10.1006/inco.1996.2613",
+      "type": "journal-article",
+      "created": {
+        "date-parts": [
+          [
+            2002,
+            10,
+            6
+          ]
+        ],
+        "date-time": "2002-10-06T17:10:40Z",
+        "timestamp": 1033924240000
+      },
+      "page": "109-176",
+      "source": "Crossref",
+      "is-referenced-by-count": 384,
+      "title": "Region-Based Memory Management",
+      "prefix": "10.1006",
+      "volume": "132",
+      "author": [
+        {
+          "given": "Mads",
+          "family": "Tofte",
+          "sequence": "first",
+          "affiliation": []
+        },
+        {
+          "given": "Jean-Pierre",
+          "family": "Talpin",
+          "sequence": "additional",
+          "affiliation": []
+        }
+      ],
+      "member": "78",
+      "reference": [
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF1",
+          "doi-asserted-by": "crossref",
+          "unstructured": "A. Aiken, M. Fähndrich, R. Levein, Better static memory management: Improving region-based analysis of higher-order languages, Proceedings of the ACM SIGPLAN '95 Conference on Programming Languages and Implementation (PLDI), La Jolla, CA, June 1995, ACM Press",
+          "DOI": "10.1145/207110.207137"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF2",
+          "series-title": "Compiling with Continuations",
+          "author": "Appel",
+          "year": "1992"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF3",
+          "doi-asserted-by": "crossref",
+          "first-page": "280",
+          "DOI": "10.1145/359460.359470",
+          "article-title": "List processing in real time on a serial computer",
+          "volume": "21",
+          "author": "Baker",
+          "year": "1978",
+          "journal-title": "Comm. ACM"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF4",
+          "doi-asserted-by": "crossref",
+          "unstructured": "H. G. Baker, Unify and conquer (garbage collection, updating, aliasing, …) in functional languages, Proceedings of the 1990 ACM Conference on Lisp and Functional Programming, June 1990,",
+          "DOI": "10.1145/91556.91652"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF5",
+          "doi-asserted-by": "crossref",
+          "unstructured": "L. Birkedal, M. Tofte, M. Vejlstrup, 1996, From region inference to von Neumann machines via region representation inference, Proceedings of the 23rd ACM SIGPLAN–SIGACT Symposium on Principles of Programming Languages, ACM Press",
+          "DOI": "10.1145/237721.237771"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF6",
+          "unstructured": "J. M. L. D. K. Gifford, P. Jouvelot, M. Sheldon, 1987, Fx-87 Reference Manual, MIT Laboratory for Computer Science"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF7",
+          "series-title": "Proceedings, 9th Annual ACM Symposium on Principles of Programming Languages",
+          "article-title": "Principal type schemes for functional programs",
+          "author": "Damas",
+          "year": "1982"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF8A",
+          "doi-asserted-by": "crossref",
+          "first-page": "312",
+          "DOI": "10.1007/BF01386232",
+          "article-title": "Recursive programming",
+          "volume": "2",
+          "author": "Dijkstra",
+          "year": "1960",
+          "journal-title": "Numer. Math"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF8B",
+          "series-title": "Programming Systems and Languages",
+          "author": "Rosen",
+          "year": "1967"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF9",
+          "series-title": "An Optimizing Backend for the ML Kit Using a Stack of Regions",
+          "author": "Elsman",
+          "year": "1995"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF10",
+          "doi-asserted-by": "crossref",
+          "first-page": "603",
+          "DOI": "10.1145/1780.1803",
+          "article-title": "Transformations and reduction strategies for typed lambda expressions",
+          "volume": "6",
+          "author": "Georgeff",
+          "year": "1984",
+          "journal-title": "ACM Trans. Programming Languages Systems"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF10A",
+          "series-title": "A region profiler for a standard ML compiler based on region inference",
+          "author": "Hallenberg",
+          "year": "1996"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF11",
+          "doi-asserted-by": "crossref",
+          "unstructured": "P. Hudak, A semantic model of reference counting and its abstraction, ACM Symposium on List and Functional Programming, 1986",
+          "DOI": "10.1145/319838.319876"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF12",
+          "doi-asserted-by": "crossref",
+          "unstructured": "P. Jouvelot, D. Gifford, Algebraic reconstruction of types and effects, Proceedings of the 18th ACM Symposium on Principles of Programming Languages (POPL), 1991.",
+          "DOI": "10.1145/99583.99623"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF13",
+          "doi-asserted-by": "crossref",
+          "first-page": "555",
+          "DOI": "10.1145/48022.48025",
+          "article-title": "Analysis of functional programs to detect run-time garbage cells",
+          "volume": "10",
+          "author": "Katsuro Inoue",
+          "year": "1988",
+          "journal-title": "ACM Trans. Programming Languages Systems"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF14",
+          "series-title": "Fundamental Algorithms",
+          "volume": "Vol. 1",
+          "author": "Knuth",
+          "year": "1972"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF15",
+          "doi-asserted-by": "crossref",
+          "first-page": "419",
+          "DOI": "10.1145/358141.358147",
+          "article-title": "A real-time garbage collector based on the lifetimes of objects",
+          "volume": "26",
+          "author": "Lieberman",
+          "year": "1983",
+          "journal-title": "Comm. ACM"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF16",
+          "doi-asserted-by": "crossref",
+          "unstructured": "J. Lucassen, D. Gifford, Polymorphic effect systems, Proceedings of the 1988 ACM Conference on Principle of Programming Languages, 1988",
+          "DOI": "10.1145/73560.73564"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF17",
+          "unstructured": "J. M. Lucassen, 1987, Types and Effects, towards the Integration of Functional and Imperative Programming, MIT Laboratory for Computer Science; MIT/LCS/TR-408"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF18",
+          "doi-asserted-by": "crossref",
+          "first-page": "348",
+          "DOI": "10.1016/0022-0000(78)90014-4",
+          "article-title": "A theory of type polymorphism in programming",
+          "volume": "17",
+          "author": "Milner",
+          "year": "1978",
+          "journal-title": "J. Comput. System Sci."
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF19",
+          "series-title": "The Definition of Standard ML",
+          "author": "Milner",
+          "year": "1990"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF20",
+          "doi-asserted-by": "crossref",
+          "DOI": "10.1007/3-540-12925-1_41",
+          "article-title": "Polymorphic type schemes and recursive definitions",
+          "volume": "Vol. 167",
+          "author": "Mycroft",
+          "year": "1984",
+          "journal-title": "Lecture Notes in Computer Science"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF21",
+          "first-page": "1",
+          "article-title": "Revised report on the algorithmic language Algol 60",
+          "volume": "1",
+          "author": "Naur",
+          "year": "1963",
+          "journal-title": "Comm. ACM"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF21A",
+          "doi-asserted-by": "crossref",
+          "unstructured": "H. R. Nielson, F. Nielson, Jan. 1994, Higher-order concurrent programs with finite communication topology, Conference Record of POPL'94: 21 st ACM SIGPLAN–SIGACT Symposium on Principles of Programming Languages, Assoc. Comput. Mach. Press",
+          "DOI": "10.1145/174675.174538"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF22",
+          "series-title": "Proceedings of the 15th Annual ACM Symposium on Principles of Programming Languages",
+          "article-title": "Lifetime analysis of dynamically allocated objects",
+          "author": "Ruggieri",
+          "year": "1988"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF23A",
+          "series-title": "Theoretical and Practical Aspects of Type and Effect Inference",
+          "author": "Talpin",
+          "year": "1993"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF23B",
+          "unstructured": "Ecole des Mines de Paris"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF24",
+          "doi-asserted-by": "crossref",
+          "DOI": "10.1017/S0956796800000393",
+          "article-title": "Polymorphic type, region and effect inference",
+          "volume": "2",
+          "author": "Talpin",
+          "year": "1992",
+          "journal-title": "J. Funct. Programming"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF25",
+          "unstructured": "M. Tofte, J.-P. Talpin, 1993, A Theory of Stack Allocation in Polymorphically Typed Languages, Department of Computer Science, University of Copenhagen"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF26",
+          "series-title": "Proceedings of the 21st ACM SIGPLAN–SIGACT Symposium on Principles of Programming Languages",
+          "article-title": "Implementing the call-by-value lambda-calculus using a stack of regions",
+          "author": "Tofte",
+          "year": "1994"
+        },
+        {
+          "key": "10.1006/inco.1996.2613_IC962613RF27",
+          "doi-asserted-by": "crossref",
+          "unstructured": "D. N. Turner, P. Wadler, C. Mossin, June 1995, Once upon a type, Conference Record of FPCA'95, SIGPLAN–SIGARCH–WG2.8 Conference on Functional Programming Languages and Computer Architecture, Assoc. Comput. Mach. Press",
+          "DOI": "10.1145/224164.224168"
+        }
+      ],
+      "container-title": "Information and Computation",
+      "original-title": [],
+      "language": "en",
+      "link": [
+        {
+          "URL": "https://api.elsevier.com/content/article/PII:S0890540196926139?httpAccept=text/xml",
+          "content-type": "text/xml",
+          "content-version": "vor",
+          "intended-application": "text-mining"
+        },
+        {
+          "URL": "https://api.elsevier.com/content/article/PII:S0890540196926139?httpAccept=text/plain",
+          "content-type": "text/plain",
+          "content-version": "vor",
+          "intended-application": "text-mining"
+        }
+      ],
+      "deposited": {
+        "date-parts": [
+          [
+            2019,
+            12,
+            17
+          ]
+        ],
+        "date-time": "2019-12-17T03:20:37Z",
+        "timestamp": 1576552837000
+      },
+      "score": 1,
+      "resource": {
+        "primary": {
+          "URL": "https://linkinghub.elsevier.com/retrieve/pii/S0890540196926139"
+        }
+      },
+      "subtitle": [],
+      "short-title": [],
+      "issued": {
+        "date-parts": [
+          [
+            1997,
+            2
+          ]
+        ]
+      },
+      "references-count": 31,
+      "journal-issue": {
+        "issue": "2",
+        "published-print": {
+          "date-parts": [
+            [
+              1997,
+              2
+            ]
+          ]
+        }
+      },
+      "alternative-id": [
+        "S0890540196926139"
+      ],
+      "URL": "http://dx.doi.org/10.1006/inco.1996.2613",
+      "relation": {},
+      "ISSN": [
+        "0890-5401"
+      ],
+      "subject": [
+        "Computational Theory and Mathematics",
+        "Computer Science Applications",
+        "Information Systems",
+        "Theoretical Computer Science"
+      ],
+      "container-title-short": "Information and Computation",
+      "published": {
+        "date-parts": [
+          [
+            1997,
+            2
+          ]
+        ]
+      }
+    }
+  },
+  "arxiv_1512.03385": {
+    "path": [
+      "resnet.pdf"
+    ],
+    "idType": "arxiv",
+    "tags": [],
+    "comments": "",
+    "dataFromArxiv": {
+      "id": "http://arxiv.org/abs/1512.03385v1",
+      "updated": "2015-12-10T19:51:55Z",
+      "published": "2015-12-10T19:51:55Z",
+      "title": "Deep Residual Learning for Image Recognition",
+      "summary": "  Deeper neural networks are more difficult to train. We present a residual\nlearning framework to ease the training of networks that are substantially\ndeeper than those used previously. We explicitly reformulate the layers as\nlearning residual functions with reference to the layer inputs, instead of\nlearning unreferenced functions. We provide comprehensive empirical evidence\nshowing that these residual networks are easier to optimize, and can gain\naccuracy from considerably increased depth. On the ImageNet dataset we evaluate\nresidual nets with a depth of up to 152 layers---8x deeper than VGG nets but\nstill having lower complexity. An ensemble of these residual nets achieves\n3.57% error on the ImageNet test set. This result won the 1st place on the\nILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100\nand 1000 layers.\n  The depth of representations is of central importance for many visual\nrecognition tasks. Solely due to our extremely deep representations, we obtain\na 28% relative improvement on the COCO object detection dataset. Deep residual\nnets are foundations of our submissions to ILSVRC & COCO 2015 competitions,\nwhere we also won the 1st places on the tasks of ImageNet detection, ImageNet\nlocalization, COCO detection, and COCO segmentation.\n",
+      "author": [
+        {
+          "name": "Kaiming He"
+        },
+        {
+          "name": "Xiangyu Zhang"
+        },
+        {
+          "name": "Shaoqing Ren"
+        },
+        {
+          "name": "Jian Sun"
+        }
+      ],
+      "arxiv:comment": {
+        "_": "Tech report",
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "link": [
+        {
+          "$": {
+            "href": "http://arxiv.org/abs/1512.03385v1",
+            "rel": "alternate",
+            "type": "text/html"
+          }
+        },
+        {
+          "$": {
+            "title": "pdf",
+            "href": "http://arxiv.org/pdf/1512.03385v1",
+            "rel": "related",
+            "type": "application/pdf"
+          }
+        }
+      ],
+      "arxiv:primary_category": {
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom",
+          "term": "cs.CV",
+          "scheme": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "category": {
+        "$": {
+          "term": "cs.CV",
+          "scheme": "http://arxiv.org/schemas/atom"
+        }
+      }
+    }
+  },
+  "arxiv_2002.09002": {
+    "path": [
+      "rusthorn.pdf"
+    ],
+    "idType": "arxiv",
+    "tags": [],
+    "comments": "",
+    "dataFromArxiv": {
+      "id": "http://arxiv.org/abs/2002.09002v2",
+      "updated": "2020-06-11T06:31:16Z",
+      "published": "2020-02-20T20:28:08Z",
+      "title": "RustHorn: CHC-based Verification for Rust Programs (full version)",
+      "summary": "  Reduction to the satisfiability problem for constrained Horn clauses (CHCs)\nis a widely studied approach to automated program verification. The current\nCHC-based methods for pointer-manipulating programs, however, are not very\nscalable. This paper proposes a novel translation of pointer-manipulating Rust\nprograms into CHCs, which clears away pointers and memories by leveraging\nownership. We formalize the translation for a simplified core of Rust and prove\nits correctness. We have implemented a prototype verifier for a subset of Rust\nand confirmed the effectiveness of our method.\n",
+      "author": [
+        {
+          "name": "Yusuke Matsushita"
+        },
+        {
+          "name": "Takeshi Tsukada"
+        },
+        {
+          "name": "Naoki Kobayashi"
+        }
+      ],
+      "arxiv:doi": {
+        "_": "10.1007/978-3-030-44914-8_18",
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "link": [
+        {
+          "$": {
+            "title": "doi",
+            "href": "http://dx.doi.org/10.1007/978-3-030-44914-8_18",
+            "rel": "related"
+          }
+        },
+        {
+          "$": {
+            "href": "http://arxiv.org/abs/2002.09002v2",
+            "rel": "alternate",
+            "type": "text/html"
+          }
+        },
+        {
+          "$": {
+            "title": "pdf",
+            "href": "http://arxiv.org/pdf/2002.09002v2",
+            "rel": "related",
+            "type": "application/pdf"
+          }
+        }
+      ],
+      "arxiv:comment": {
+        "_": "Full version of the same-titled paper in ESOP2020",
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "arxiv:primary_category": {
+        "$": {
+          "xmlns:arxiv": "http://arxiv.org/schemas/atom",
+          "term": "cs.PL",
+          "scheme": "http://arxiv.org/schemas/atom"
+        }
+      },
+      "category": {
+        "$": {
+          "term": "cs.PL",
+          "scheme": "http://arxiv.org/schemas/atom"
+        }
+      }
+    }
+  },
+  "book_0262162091_ch01.pdf": {
+    "idType": "book",
+    "path": [
+      "dummyTapl",
+      "ch01.pdf"
+    ],
+    "tags": [],
+    "comments": "",
+    "userSpecifiedTitle": "Types and Programming Languages_ch01",
+    "dataFromNodeIsbn": {
+      "title": "Types and Programming Languages",
+      "authors": [
+        "Benjamin C. Pierce"
+      ],
+      "publisher": "MIT Press",
+      "publishedDate": "2002-01-04",
+      "description": "A comprehensive introduction to type systems and programming languages. A type system is a syntactic method for automatically checking the absence of certain erroneous behaviors by classifying program phrases according to the kinds of values they compute. The study of type systems—and of programming languages from a type-theoretic perspective—has important applications in software engineering, language design, high-performance compilers, and security. This text provides a comprehensive introduction both to type systems in computer science and to the basic theory of programming languages. The approach is pragmatic and operational; each new concept is motivated by programming examples and the more theoretical sections are driven by the needs of implementations. Each chapter is accompanied by numerous exercises and solutions, as well as a running implementation, available via the Web. Dependencies between chapters are explicitly identified, allowing readers to choose a variety of paths through the material. The core topics include the untyped lambda-calculus, simple type systems, type reconstruction, universal and existential polymorphism, subtyping, bounded quantification, recursive types, kinds, and type operators. Extended case studies develop a variety of approaches to modeling the features of object-oriented languages.",
+      "industryIdentifiers": [
+        {
+          "type": "ISBN_13",
+          "identifier": "9780262162098"
+        },
+        {
+          "type": "ISBN_10",
+          "identifier": "0262162091"
+        }
+      ],
+      "readingModes": {
+        "text": false,
+        "image": true
+      },
+      "pageCount": 646,
+      "printType": "BOOK",
+      "categories": [
+        "Computers"
+      ],
+      "maturityRating": "NOT_MATURE",
+      "allowAnonLogging": false,
+      "contentVersion": "preview-1.0.0",
+      "panelizationSummary": {
+        "containsEpubBubbles": false,
+        "containsImageBubbles": false
+      },
+      "imageLinks": {
+        "smallThumbnail": "http://books.google.com/books/content?id=ULT4DwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        "thumbnail": "http://books.google.com/books/content?id=ULT4DwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      },
+      "language": "en",
+      "previewLink": "http://books.google.co.jp/books?id=ULT4DwAAQBAJ&printsec=frontcover&dq=isbn:0262162091&hl=&cd=1&source=gbs_api",
+      "infoLink": "http://books.google.co.jp/books?id=ULT4DwAAQBAJ&dq=isbn:0262162091&hl=&source=gbs_api",
+      "canonicalVolumeLink": "https://books.google.com/books/about/Types_and_Programming_Languages.html?hl=&id=ULT4DwAAQBAJ"
+    }
+  },
+  "book_0262162091_ch02.pdf": {
+    "idType": "book",
+    "path": [
+      "dummyTapl",
+      "ch02.pdf"
+    ],
+    "tags": [],
+    "comments": "",
+    "userSpecifiedTitle": "Types and Programming Languages_ch02",
+    "dataFromNodeIsbn": {
+      "title": "Types and Programming Languages",
+      "authors": [
+        "Benjamin C. Pierce"
+      ],
+      "publisher": "MIT Press",
+      "publishedDate": "2002-01-04",
+      "description": "A comprehensive introduction to type systems and programming languages. A type system is a syntactic method for automatically checking the absence of certain erroneous behaviors by classifying program phrases according to the kinds of values they compute. The study of type systems—and of programming languages from a type-theoretic perspective—has important applications in software engineering, language design, high-performance compilers, and security. This text provides a comprehensive introduction both to type systems in computer science and to the basic theory of programming languages. The approach is pragmatic and operational; each new concept is motivated by programming examples and the more theoretical sections are driven by the needs of implementations. Each chapter is accompanied by numerous exercises and solutions, as well as a running implementation, available via the Web. Dependencies between chapters are explicitly identified, allowing readers to choose a variety of paths through the material. The core topics include the untyped lambda-calculus, simple type systems, type reconstruction, universal and existential polymorphism, subtyping, bounded quantification, recursive types, kinds, and type operators. Extended case studies develop a variety of approaches to modeling the features of object-oriented languages.",
+      "industryIdentifiers": [
+        {
+          "type": "ISBN_13",
+          "identifier": "9780262162098"
+        },
+        {
+          "type": "ISBN_10",
+          "identifier": "0262162091"
+        }
+      ],
+      "readingModes": {
+        "text": false,
+        "image": true
+      },
+      "pageCount": 646,
+      "printType": "BOOK",
+      "categories": [
+        "Computers"
+      ],
+      "maturityRating": "NOT_MATURE",
+      "allowAnonLogging": false,
+      "contentVersion": "preview-1.0.0",
+      "panelizationSummary": {
+        "containsEpubBubbles": false,
+        "containsImageBubbles": false
+      },
+      "imageLinks": {
+        "smallThumbnail": "http://books.google.com/books/content?id=ULT4DwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        "thumbnail": "http://books.google.com/books/content?id=ULT4DwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      },
+      "language": "en",
+      "previewLink": "http://books.google.co.jp/books?id=ULT4DwAAQBAJ&printsec=frontcover&dq=isbn:0262162091&hl=&cd=1&source=gbs_api",
+      "infoLink": "http://books.google.co.jp/books?id=ULT4DwAAQBAJ&dq=isbn:0262162091&hl=&source=gbs_api",
+      "canonicalVolumeLink": "https://books.google.com/books/about/Types_and_Programming_Languages.html?hl=&id=ULT4DwAAQBAJ"
+    }
+  },
+  "book_0262162091_title.pdf": {
+    "idType": "book",
+    "path": [
+      "dummyTapl",
+      "title.pdf"
+    ],
+    "tags": [],
+    "comments": "",
+    "userSpecifiedTitle": "Types and Programming Languages_title",
+    "dataFromNodeIsbn": {
+      "title": "Types and Programming Languages",
+      "authors": [
+        "Benjamin C. Pierce"
+      ],
+      "publisher": "MIT Press",
+      "publishedDate": "2002-01-04",
+      "description": "A comprehensive introduction to type systems and programming languages. A type system is a syntactic method for automatically checking the absence of certain erroneous behaviors by classifying program phrases according to the kinds of values they compute. The study of type systems—and of programming languages from a type-theoretic perspective—has important applications in software engineering, language design, high-performance compilers, and security. This text provides a comprehensive introduction both to type systems in computer science and to the basic theory of programming languages. The approach is pragmatic and operational; each new concept is motivated by programming examples and the more theoretical sections are driven by the needs of implementations. Each chapter is accompanied by numerous exercises and solutions, as well as a running implementation, available via the Web. Dependencies between chapters are explicitly identified, allowing readers to choose a variety of paths through the material. The core topics include the untyped lambda-calculus, simple type systems, type reconstruction, universal and existential polymorphism, subtyping, bounded quantification, recursive types, kinds, and type operators. Extended case studies develop a variety of approaches to modeling the features of object-oriented languages.",
+      "industryIdentifiers": [
+        {
+          "type": "ISBN_13",
+          "identifier": "9780262162098"
+        },
+        {
+          "type": "ISBN_10",
+          "identifier": "0262162091"
+        }
+      ],
+      "readingModes": {
+        "text": false,
+        "image": true
+      },
+      "pageCount": 646,
+      "printType": "BOOK",
+      "categories": [
+        "Computers"
+      ],
+      "maturityRating": "NOT_MATURE",
+      "allowAnonLogging": false,
+      "contentVersion": "preview-1.0.0",
+      "panelizationSummary": {
+        "containsEpubBubbles": false,
+        "containsImageBubbles": false
+      },
+      "imageLinks": {
+        "smallThumbnail": "http://books.google.com/books/content?id=ULT4DwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        "thumbnail": "http://books.google.com/books/content?id=ULT4DwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      },
+      "language": "en",
+      "previewLink": "http://books.google.co.jp/books?id=ULT4DwAAQBAJ&printsec=frontcover&dq=isbn:0262162091&hl=&cd=1&source=gbs_api",
+      "infoLink": "http://books.google.co.jp/books?id=ULT4DwAAQBAJ&dq=isbn:0262162091&hl=&source=gbs_api",
+      "canonicalVolumeLink": "https://books.google.com/books/about/Types_and_Programming_Languages.html?hl=&id=ULT4DwAAQBAJ"
+    }
+  }
+}

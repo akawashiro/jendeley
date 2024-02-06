@@ -18,3 +18,4 @@ benchmark.svg
 perf.data*
 processed-isolate-*.txt
 processed-isolate-*.txt
+generated_DBs
