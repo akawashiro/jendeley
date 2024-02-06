@@ -7,7 +7,12 @@ import fetch from "node-fetch";
 import { Request as NFRequest } from "node-fetch";
 import { Either, genLeft, genRight } from "./either";
 import { validateJsonDB } from "./validate_db";
-import { ENTRY_AUTHORS, ENTRY_TEXT, ENTRY_TITLE } from "./constants";
+import {
+  ENTRY_AUTHORS,
+  ENTRY_TEXT,
+  DB_META_KEY,
+  JENDELEY_VERSION,
+} from "./constants";
 
 async function getTextsFromPDF(
   pdfFullpath: string,
@@ -79,6 +84,7 @@ async function update_db(dbPathVer1: string[], dbPathVer2: string[]) {
       jsonDB[id][ENTRY_AUTHORS] = [];
     }
   }
+  jsonDB[DB_META_KEY]["version"] = JENDELEY_VERSION;
 
   if (fs.existsSync(concatDirs(dbPathVer2))) {
     logger.fatal(dbPathVer2 + " already exists.");
