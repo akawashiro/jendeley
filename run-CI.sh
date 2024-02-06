@@ -1,5 +1,5 @@
 #! /bin/bash -eux
 
-docker build . -f ./Dockerfile
-docker build . -f ./Releasable.Dockerfile
-docker build . -f ./shellcheck.Dockerfile
+docker build . -f ./Dockerfile --network=host
+docker build . -f ./Releasable.Dockerfile --network=host
+docker build . -f ./shellcheck.Dockerfile --network=host
