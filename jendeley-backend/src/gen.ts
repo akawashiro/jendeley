@@ -473,7 +473,7 @@ async function registerNonBookPDF(
       pdf +
         " is duplicated. You can find another file in " +
         jsonDB[dbID][ENTRY_PATH] +
-        " with id = " +
+        ". Both of them has the same ID: " +
         dbID,
     );
   }
