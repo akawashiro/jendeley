@@ -326,7 +326,8 @@ async function getTitleFromPDF(
     data["meta"] != undefined &&
     data["meta"]["metadata"] != undefined &&
     data["meta"]["metadata"]["dc:title"] != undefined &&
-    data["meta"]["metadata"]["dc:title"] != ""
+    data["meta"]["metadata"]["dc:title"] != "" &&
+    data["meta"]["metadata"]["dc:title"] != "untitled"
   ) {
     const title = data["meta"]["metadata"]["dc:title"];
     logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = " + title);
@@ -337,7 +338,8 @@ async function getTitleFromPDF(
     data["meta"] != undefined &&
     data["meta"]["info"] != undefined &&
     data["meta"]["info"]["Title"] != undefined &&
-    data["meta"]["info"]["Title"] != ""
+    data["meta"]["info"]["Title"] != "" &&
+    data["meta"]["info"]["Title"] != "untitled"
   ) {
     const title = data["meta"]["info"]["Title"];
     logger.info("getTitleFromPDF(" + pdf + ", " + papersDir + ") = " + title);
