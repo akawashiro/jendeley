@@ -3,7 +3,7 @@ import { genRight } from "./either";
 
 test("title from nodejs", async () => {
   const title = await getTitleFromUrl("https://nodejs.org/en/");
-  expect(title).toStrictEqual(genRight("Node.js"));
+  expect(title).toStrictEqual(genRight("Node.js — Run JavaScript Everywhere"));
 });
 
 test("title from python", async () => {
