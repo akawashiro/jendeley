@@ -363,6 +363,19 @@ function getDB(request: Request, response: Response, dbPath: string[]) {
     const e_raw = getEntry(id, jsonDB);
     const e = abbribatePublisherInEntry(e_raw);
     const sande = getScoreAndEntry(e, requestGetDB);
+    const score = sande[0];
+    if (
+      score.title == Number.NEGATIVE_INFINITY ||
+      score.text == Number.NEGATIVE_INFINITY ||
+      score.authors == Number.NEGATIVE_INFINITY ||
+      score.tags == Number.NEGATIVE_INFINITY ||
+      score.comments == Number.NEGATIVE_INFINITY ||
+      score.year == Number.NEGATIVE_INFINITY ||
+      score.publisher == Number.NEGATIVE_INFINITY
+    ) {
+      continue;
+    }
+
     scoreAndEntry.push(sande);
   }
 

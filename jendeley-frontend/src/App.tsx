@@ -239,7 +239,6 @@ function useColumnDefs(
         enableSorting: false,
         enableEditing: true,
         size: 200,
-        filterFn: "includesString",
       },
       {
         accessorKey: "path",
@@ -255,13 +254,11 @@ function useColumnDefs(
         header: "authors",
         enableSorting: false,
         enableEditing: true,
-        filterFn: stringArrayFilterFn,
       },
       {
         accessorKey: "tags",
         Cell: ({ cell }) => TagChips(cell.getValue<string[]>()),
         header: "tags",
-        filterFn: stringArrayFilterFn,
         enableSorting: false,
         enableEditing: true,
         // size: 100,
