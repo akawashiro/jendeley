@@ -87,7 +87,7 @@ function getScoreAndText(
   text_id: string | undefined,
 ): [number, string] {
   if (query == undefined) {
-    return [Number.NEGATIVE_INFINITY, text.slice(0, 140) + "..."];
+    return [0, text.slice(0, 140) + "..."];
   } else {
     let suffixPatriciaTree: SuffixPatriciaTree;
     if (text_id == undefined) {
@@ -141,7 +141,7 @@ function getScoreAndEntry(
     entry.id,
   );
   const end = process.hrtime.bigint();
-  // logger.info(" in " + (end - start) / BigInt(1000 * 1000) + " ms");
+  logger.debug("Text search in " + (end - start) / BigInt(1000 * 1000) + " ms");
   entry.text = text;
 
   const [titleScore, _] = getScoreAndText(
@@ -198,6 +198,23 @@ function getScoreAndEntry(
     year: yearScore,
     publisher: publisherScore,
   };
+
+  logger.debug(
+    "title: " +
+      titleScore +
+      " text: " +
+      textScore +
+      " authors: " +
+      authorsScore +
+      " tags: " +
+      tagsScore +
+      " comments: " +
+      commentsScore +
+      " year: " +
+      yearScore +
+      " publisher: " +
+      publisherScore,
+  );
 
   return [score, entry];
 }
