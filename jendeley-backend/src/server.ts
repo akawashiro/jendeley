@@ -16,8 +16,10 @@ import {
 } from "./api";
 import { concatDirs } from "./path_util";
 import { loadDB } from "./load_db";
+import { JENDELEY_VERSION } from "./constants";
 
 function startServer(dbPath: string[], allowCors: boolean, port: number) {
+  logger.info("startServer version: " + JENDELEY_VERSION);
   if (fs.existsSync(concatDirs(dbPath))) {
     {
       // Just check DB and ignore the result.
