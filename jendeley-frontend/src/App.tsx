@@ -32,7 +32,7 @@ import {
 } from "./constants";
 import { fetchDB } from "./api_call";
 
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+const VITE_API_URL = process.env.VITE_API_URL;
 
 function TypeChip(type: string) {
   return (
@@ -173,7 +173,7 @@ function CellHref(cell: MRT_Cell<ApiEntry>, row: MRT_Row<ApiEntry>) {
         )}
         <a
           href={`${
-            REACT_APP_API_URL +
+            VITE_API_URL +
             "/api/get_pdf/?file=" +
             base_64.encode(escape(row.original.path))
           }`}
@@ -380,7 +380,7 @@ function App() {
       year: tableData[cell.row.index]["year"],
       publisher: tableData[cell.row.index]["publisher"],
     };
-    const response = await fetch(REACT_APP_API_URL + "/api/update_entry", {
+    const response = await fetch(VITE_API_URL + "/api/update_entry", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

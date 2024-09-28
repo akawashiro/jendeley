@@ -20,7 +20,7 @@ import { splitTagsOrAuthorsStr } from "./stringUtils";
 import { useSnackbar } from "notistack";
 import { fetchDB } from "./api_call";
 
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+const VITE_API_URL = process.env.VITE_API_URL;
 
 function isValidUrl(urlString: string) {
   try {
@@ -100,7 +100,7 @@ function RegisterWebWithDialog(props: any) {
 
     console.log("Add an web article from URL");
     setOpen(false);
-    await fetch(REACT_APP_API_URL + "/api/add_web_from_url", {
+    await fetch(VITE_API_URL + "/api/add_web_from_url", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -314,7 +314,7 @@ function RegisterPDFFromFile(props: any) {
         };
         console.log("Add PDF from URL");
         setOpen(false);
-        await fetch(REACT_APP_API_URL + "/api/add_pdf_from_file", {
+        await fetch(VITE_API_URL + "/api/add_pdf_from_file", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -511,7 +511,7 @@ function RegisterPDFFromWeb(props: any) {
     setPdfUrl("");
     console.log("Add PDF from URL");
     setOpen(false);
-    await fetch(REACT_APP_API_URL + "/api/add_pdf_from_url", {
+    await fetch(VITE_API_URL + "/api/add_pdf_from_url", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "start": "vite",
+    "build": "tsc && vite build",
     "test": "react-scripts --openssl-legacy-provider test",
     "jest": "jest",
     "eject": "react-scripts --openssl-legacy-provider eject",
@@ -38,6 +38,7 @@
     "@types/react-dom": "^18.2.17",
     "@types/react-table": "^7.7.18",
     "@types/sanitize-html": "^2.9.5",
+    "@vitejs/plugin-react": "^4.3.1",
     "base-64": "^1.0.0",
     "material-react-table": "^2.0.5",
     "notistack": "^3.0.1",
@@ -46,9 +47,12 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
-    "react-scripts": "^5.0.1",
     "sanitize-html": "^2.11.0",
     "ts-jest": "^29.1.1",
+    "vite": "^5.4.8",
     "web-vitals": "^3.5.0"
+  },
+  "dependencies": {
+    "typescript": "^5.3.2"
   }
 }
