@@ -13,7 +13,7 @@ import { Delete } from "@mui/icons-material";
 import { MRT_ColumnFiltersState } from "material-react-table";
 import { fetchDB } from "./api_call";
 
-const VITE_API_URL = process.env.VITE_API_URL;
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 function DeleteButton(props: any) {
   const [open, setOpen] = React.useState(false);

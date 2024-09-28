@@ -8,7 +8,7 @@ function fetchDB(
   setConnectionError: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   const request = genRequestGetDB(columnFilters);
-  const VITE_API_URL = process.env.VITE_API_URL;
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
 
   fetch(VITE_API_URL + "/api/get_db", {
     method: "POST",

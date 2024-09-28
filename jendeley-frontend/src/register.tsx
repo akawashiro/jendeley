@@ -20,7 +20,7 @@ import { splitTagsOrAuthorsStr } from "./stringUtils";
 import { useSnackbar } from "notistack";
 import { fetchDB } from "./api_call";
 
-const VITE_API_URL = process.env.VITE_API_URL;
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 function isValidUrl(urlString: string) {
   try {

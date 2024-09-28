@@ -32,7 +32,7 @@ import {
 } from "./constants";
 import { fetchDB } from "./api_call";
 
-const VITE_API_URL = process.env.VITE_API_URL;
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 function TypeChip(type: string) {
   return (
