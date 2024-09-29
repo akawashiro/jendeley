@@ -169,7 +169,7 @@ function getScoreAndEntry(
   if (requestGetDB.tags != undefined) {
     for (let i = 0; i < entry.tags.length; i++) {
       if (entry.tags[i].includes(requestGetDB.tags)) {
-        authorsScore = 1;
+        tagsScore = 1;
       }
     }
   }
