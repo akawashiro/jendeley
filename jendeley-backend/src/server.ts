@@ -29,13 +29,14 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
     const app = express();
     app.use(bodyParser.json({ limit: "1gb" }));
     if (allowCors) {
+      logger.info("Allowing CORS");
       app.use(cors());
     }
 
     const built_frontend_dir = path.join(__dirname, "..", "built-frontend");
     if (!fs.existsSync(built_frontend_dir)) {
       logger.warn(
-        built_frontend_dir + " doesn't exist. Are you jendeley developer?",
+        built_frontend_dir + " doesn't exist. Are you jendeley developer?"
       );
     }
     app.use(express.static(path.join(__dirname, "..", "built-frontend")));
@@ -48,7 +49,7 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
       jsonParser,
       (request: Request, response: Response) => {
         getDB(request, response, dbPath);
-      },
+      }
     );
 
     app.get("/api/get_pdf", (request: Request, response: Response) => {
@@ -60,7 +61,7 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
       jsonParser,
       async (httpRequest: Request, response: Response) => {
         addPdfFromFile(httpRequest, response, dbPath);
-      },
+      }
     );
 
     app.put(
@@ -68,7 +69,7 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
       jsonParser,
       async (httpRequest: Request, response: Response) => {
         addPdfFromUrl(httpRequest, response, dbPath);
-      },
+      }
     );
 
     app.put(
@@ -76,7 +77,7 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
       jsonParser,
       async (httpRequest: Request, response: Response) => {
         addWebFromUrl(httpRequest, response, dbPath);
-      },
+      }
     );
 
     app.put(
@@ -84,7 +85,7 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
       jsonParser,
       (request: Request, response: Response) => {
         updateEntry(request, response, dbPath);
-      },
+      }
     );
 
     app.delete(
@@ -92,7 +93,7 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
       jsonParser,
       (request: Request, response: Response) => {
         deleteEntry(request, response, dbPath);
-      },
+      }
     );
 
     app.listen(port, () => {

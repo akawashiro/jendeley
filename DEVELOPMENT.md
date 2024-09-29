@@ -12,6 +12,9 @@ npm run build
 cp -r ./build ../jendeley-backend/built-frontend
 ```
 
+[!NOTE]
+When your machines which the browser running and the backend server running are different, you must change the `VITE_API_URL` in `jendeley-frontend/.env.development` to the backend server's URL. For example, `VITE_API_URL=http://192.168.11.70:5001`.
+
 Run backend server
 ```
 cd jendeley-backend
