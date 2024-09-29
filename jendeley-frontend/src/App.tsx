@@ -77,7 +77,11 @@ function AuthorChips(idType: string, authors: string[]) {
   );
 }
 
-function TagChips(tags: string[]) {
+function TagChips(tags: string[] | string) {
+  // I admit this "string" type is just a workaround. I don't know why we get a string here.
+  if (typeof tags === "string") {
+    tags = tags.split(",");
+  }
   return (
     <Box>
       <EditIcon sx={{ color: grey[300] }} />
