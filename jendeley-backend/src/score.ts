@@ -130,6 +130,24 @@ type Scores = {
   publisher: number;
 };
 
+function extractDateScore(tags: string[]): number {
+  for (let i = 0; i < tags.length; i++) {
+    let s = tags[i];
+    if (
+      s.length == 10 &&
+      s[4] == "-" &&
+      s[7] == "-" &&
+      s.slice(0, 4).match(/^[0-9]+$/) &&
+      s.slice(5, 7).match(/^[0-9]+$/) &&
+      s.slice(8, 10).match(/^[0-9]+$/)
+    ) {
+      let yyyymmdd = s.slice(0, 4) + s.slice(5, 7) + s.slice(8, 10);
+      return parseInt(yyyymmdd);
+    }
+  }
+  return 0;
+}
+
 function getScoreAndEntry(
   entry: ApiEntry,
   requestGetDB: RequestGetDB,
@@ -165,11 +183,13 @@ function getScoreAndEntry(
     }
   }
 
-  let tagsScore = 0;
+  let tagsScore = extractDateScore(entry.tags);
   if (requestGetDB.tags != undefined) {
     for (let i = 0; i < entry.tags.length; i++) {
       if (entry.tags[i].includes(requestGetDB.tags)) {
-        authorsScore = 1;
+        // yyyymmdd
+        // 99999999
+        tagsScore = 99999999;
       }
     }
   }
