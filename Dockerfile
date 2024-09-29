@@ -9,7 +9,7 @@ RUN diff /jendeley/jendeley-backend/src/constants.ts /jendeley/jendeley-frontend
 WORKDIR /jendeley/jendeley-backend
 RUN ./check-version.sh
 RUN npm install
-RUN npm run check:prettier
+RUN npm run lint
 RUN npm run build
 RUN npm run test
 RUN npm run scan_test_pdfs
@@ -18,6 +18,6 @@ RUN [ -f "edit_and_run.sh" ] && cat edit_and_run.sh && exit 1 || echo "Build DB 
 
 WORKDIR /jendeley/jendeley-frontend
 RUN npm install
-RUN npm run check:prettier
+RUN npm run lint
 RUN npm run build
 # RUN npm run jest

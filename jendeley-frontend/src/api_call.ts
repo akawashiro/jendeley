@@ -8,9 +8,9 @@ function fetchDB(
   setConnectionError: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   const request = genRequestGetDB(columnFilters);
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-  fetch(REACT_APP_API_URL + "/api/get_db", {
+  fetch(VITE_API_URL + "/api/get_db", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

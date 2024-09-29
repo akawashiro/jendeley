@@ -29,6 +29,7 @@ function startServer(dbPath: string[], allowCors: boolean, port: number) {
     const app = express();
     app.use(bodyParser.json({ limit: "1gb" }));
     if (allowCors) {
+      logger.info("Allowing CORS");
       app.use(cors());
     }
 

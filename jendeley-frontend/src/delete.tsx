@@ -13,7 +13,7 @@ import { Delete } from "@mui/icons-material";
 import { MRT_ColumnFiltersState } from "material-react-table";
 import { fetchDB } from "./api_call";
 
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 function DeleteButton(props: any) {
   const [open, setOpen] = React.useState(false);
@@ -50,7 +50,7 @@ function DeleteButton(props: any) {
       year: 0,
       publisher: "",
     };
-    const response = await fetch(REACT_APP_API_URL + "/api/delete_entry", {
+    const response = await fetch(VITE_API_URL + "/api/delete_entry", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

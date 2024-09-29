@@ -15,8 +15,8 @@
     "scan_test_pdfs": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl",
     "profile_scan_test_pdfs": "npm run build && node --require source-map-support/register --prof dist/index.js scan --papers_dir test_pdfs",
     "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json --port 5001 --allow_cors",
-    "fix:prettier": "prettier --write src",
-    "check:prettier": "prettier --check src"
+    "format": "prettier --write src",
+    "lint": "prettier --check src"
   },
   "repository": {
     "type": "git",
