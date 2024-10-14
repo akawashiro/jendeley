@@ -376,7 +376,8 @@ async function registerWeb(
 
   const options = { headers: { Accept: "text/html" } };
   const res = await fetch(new NFRequest(url, options));
-  const html = res.text();
+  const html = await res.text();
+  logger.debug("Fetched from " + url + ":\n" + html);
 
   const { convert } = require("html-to-text");
   const text = convert(html, {});
@@ -384,7 +385,6 @@ async function registerWeb(
   logger.info("experimentalUseOllamaServer = ", experimentalUseOllamaServer);
   if (experimentalUseOllamaServer) {
     logger.info("Use ollama server to generate tags.");
-    logger.info("text = " + text);
     const tag_candidates = getTagCandiates(jsonDB);
     const generated_tags = await genTags(OLLAMA_SERVER, title, text, tag_candidates);
     if (generated_tags._tag === "left") {

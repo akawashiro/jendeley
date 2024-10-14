@@ -17,6 +17,8 @@ import {
 import { concatDirs } from "./path_util";
 import { loadDB } from "./load_db";
 import { JENDELEY_VERSION } from "./constants";
+import { checkOllamaServer } from "./tag_generate";
+import { OLLAMA_SERVER } from "./constants";
 
 function startServer(
   dbPath: string[],
@@ -25,6 +27,15 @@ function startServer(
   experimentalUseOllamaServer: boolean
 ) {
   logger.info("startServer version: " + JENDELEY_VERSION);
+  checkOllamaServer(OLLAMA_SERVER).then((result) => {
+    if (result) {
+      logger.info("Ollama server is available. " + OLLAMA_SERVER);
+    } else {
+      logger.fatal("Ollama server is not available. " + OLLAMA_SERVER);
+      process.exit(1);
+    }
+  });
+
   if (fs.existsSync(concatDirs(dbPath))) {
     {
       // Just check DB and ignore the result.
@@ -81,7 +92,12 @@ function startServer(
       "/api/add_web_from_url",
       jsonParser,
       async (httpRequest: Request, response: Response) => {
-        addWebFromUrl(httpRequest, response, dbPath, experimentalUseOllamaServer);
+        addWebFromUrl(
+          httpRequest,
+          response,
+          dbPath,
+          experimentalUseOllamaServer
+        );
       }
     );
 
