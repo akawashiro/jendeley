@@ -32,6 +32,12 @@ function startServer(
       logger.info("Ollama server is available. " + OLLAMA_SERVER);
     } else {
       logger.fatal("Ollama server is not available. " + OLLAMA_SERVER);
+      logger.fatal(
+        "Please check https://github.com/akawashiro/jendeley/blob/main/README.md to launch ollama server.",
+      );
+      logger.fatal(
+        "Or just wait for a while to launch ollama server if you already ran ./run_ollama.sh",
+      );
       process.exit(1);
     }
   });
