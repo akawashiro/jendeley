@@ -38,7 +38,7 @@ jendeley scan --papers_dir <YOUR PDFs DIR>
 jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
 Then you can see a screen like this!
-![image](./blog100/top.png)
+![image](https://akawashiro.github.io/jendeley/blog100/top.png)
 
 ## Install
 ```
