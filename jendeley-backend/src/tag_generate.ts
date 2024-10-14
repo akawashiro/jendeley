@@ -2,19 +2,18 @@ import { genRight, genLeft } from "./either";
 import fetch from "node-fetch";
 import { logger } from "./logger";
 
-const OLLAMA_SERVER = "http://localhost:11434/";
 const GENERATE_TAGS_PROMPT =
   "Generate tags from text. Tags must be comma separated. And each tag must be a single word. The number of tags must be at most 3. You must emit only tags.\n";
 
-async function genTags(text: string) {
+async function genTags(ollama_server: string, text: string) {
   const body = {
     model: "llama3.2",
     prompt: GENERATE_TAGS_PROMPT + "```" + text + "```",
     stream: false,
   };
   try {
-    logger.info("Sendding request to " + OLLAMA_SERVER);
-    const response = await fetch(OLLAMA_SERVER + "api/generate/", {
+    logger.info("Sendding request to " + ollama_server);
+    const response = await fetch(ollama_server + "api/generate/", {
       method: "post",
       body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
