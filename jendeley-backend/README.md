@@ -1,30 +1,36 @@
-# jendeley <!-- omit in toc -->
+# jendeley
 `jendeley` is a JSON-based document organizing software.
 - `jendeley` is JSON-based. You can see and edit your database quickly.
 - `jendeley` works locally. Your important database is owned only by you. No cloud.
 - `jendeley` is browser-based. You can run it anywhere node.js runs.
 
-## Table of Contents <!-- omit in toc -->
+## Table of Contents
+
+<!-- toc -->
+
 - [Why jendeley?](#why-jendeley)
 - [Quickstart](#quickstart)
 - [Install](#install)
 - [Generate JSON database file](#generate-json-database-file)
-  - [Recommended filename style](#recommended-filename-style)
-  - [When `jendeley` fails to scan your PDFs](#when-jendeley-fails-to-scan-your-pdfs)
+  * [Recommended filename style](#recommended-filename-style)
+  * [When `jendeley` fails to scan your PDFs](#when-jendeley-fails-to-scan-your-pdfs)
 - [Launch the service daemon and open the web user interface](#launch-the-service-daemon-and-open-the-web-user-interface)
-  - [Launch `jendeley` automatically](#launch-jendeley-automatically)
-    - [Linux](#linux)
-    - [Windows](#windows)
+  * [Launch `jendeley` automatically](#launch-jendeley-automatically)
+    + [Linux](#linux)
+    + [Windows](#windows)
 - [Use the web user interface](#use-the-web-user-interface)
-  - [Add a webpage](#add-a-webpage)
-  - [Add a PDF file on the Web](#add-a-pdf-file-on-the-web)
-  - [Upload a PDF file](#upload-a-pdf-file)
-  - [Use tags and comments](#use-tags-and-comments)
+  * [Add a webpage](#add-a-webpage)
+  * [Add a PDF file on the Web](#add-a-pdf-file-on-the-web)
+  * [Upload a PDF file](#upload-a-pdf-file)
+  * [Use tags and comments](#use-tags-and-comments)
 - [Advanced topics](#advanced-topics)
-  - [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
-  - [Check source code (advanced)](#check-source-code-advanced)
+  * [Check and edit your database (advanced)](#check-and-edit-your-database-advanced)
+  * [Check source code (advanced)](#check-source-code-advanced)
+  * [Use LLM (Large Language Model) to generate tags (advanced)](#use-llm-large-language-model-to-generate-tags-advanced)
 - [Contact me](#contact-me)
 - [Support me](#support-me)
+
+<!-- tocstop -->
 
 ## Why jendeley?
 As programmers, we need various documents in different formats, such as recent machine learning papers, classic compiler books, CPU and accelerator specification documents, programming language documents, and informative blog articles. To efficiently manage these documents, it's essential to categorize and classify them. Additionally, we need to ensure that they are saved and accessible long-term, as we never know when we need them.
