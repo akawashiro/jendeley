@@ -7,6 +7,7 @@ import pdfparse from "pdf-parse";
 import xml2js from "xml2js";
 import crypto from "crypto";
 import { logger } from "./logger";
+import { genTags } from "./tag_generate";
 import {
   JENDELEY_NO_TRACK,
   ENTRY_ID_TYPE,
@@ -19,6 +20,7 @@ import {
   ARXIV_API_URL,
   JENDELEY_VERSION,
   DB_META_KEY,
+  OLLAMA_SERVER,
 } from "./constants";
 import { DocID, getDocID } from "./docid";
 import { validateJsonDB } from "./validate_db";
@@ -336,12 +338,28 @@ function genDummyDB(output: string) {
   saveDB(jsonDB, [output]);
 }
 
+function getTagCandiates(jsonDB: JsonDB): string[] {
+  let tag_candidates: string[] = [];
+  for (const id of Object.keys(jsonDB)) {
+    const e = jsonDB[id];
+    if (e.idType != "meta") {
+      for (const t of e.tags) {
+        if (!tag_candidates.includes(t)) {
+          tag_candidates.push(t);
+        }
+      }
+    }
+  }
+  return tag_candidates;
+}
+
 async function registerWeb(
   jsonDB: JsonDB,
   url: string,
   title: string,
   comments: string,
   tags: string[],
+  experimentalUseOllamaServer: boolean,
 ): Promise<Either<string, JsonDB>> {
   logger.info(
     "url = " +
@@ -358,10 +376,30 @@ async function registerWeb(
 
   const options = { headers: { Accept: "text/html" } };
   const res = await fetch(new NFRequest(url, options));
-  const html = res.text();
+  const html = await res.text();
+  logger.debug("Fetched from " + url + ":\n" + html);
 
   const { convert } = require("html-to-text");
   const text = convert(html, {});
+
+  logger.info("experimentalUseOllamaServer = ", experimentalUseOllamaServer);
+  if (experimentalUseOllamaServer) {
+    logger.info("Use ollama server to generate tags.");
+    const tag_candidates = getTagCandiates(jsonDB);
+    const generated_tags = await genTags(
+      OLLAMA_SERVER,
+      title,
+      text,
+      tag_candidates,
+    );
+    if (generated_tags._tag === "left") {
+      return genLeft(generated_tags.left);
+    } else {
+      for (const t of generated_tags.right) {
+        tags.push(t);
+      }
+    }
+  }
 
   let json: UrlEntry = {
     title: title,
