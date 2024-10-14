@@ -25,6 +25,8 @@ const AUTHORES_EDITABLE_ID_TYPES = ["url", "path"];
 const TITLE_EDITABLE_ID_TYPES = ["path"];
 const MAX_ENTRIES_IN_GET_API = 20;
 
+const OLLAMA_SERVER = "http://localhost:11434/";
+
 export {
   AUTHORES_EDITABLE_ID_TYPES,
   TITLE_EDITABLE_ID_TYPES,
@@ -51,4 +53,5 @@ export {
   JENDELEY_VERSION,
   JENDELEY_DIR,
   MAX_ENTRIES_IN_GET_API,
+  OLLAMA_SERVER,
 };

@@ -12,9 +12,10 @@
   "scripts": {
     "build": "npx tsc",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --silent=false --verbose false",
+    "test_tag": "NODE_OPTIONS=--experimental-vm-modules jest --silent=false src/tag_generate.test.ts",
     "scan_test_pdfs": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl",
     "profile_scan_test_pdfs": "npm run build && node --require source-map-support/register --prof dist/index.js scan --papers_dir test_pdfs",
-    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json --port 5001 --allow_cors",
+    "scan_test_pdfs_and_launch": "npm run build && node --require source-map-support/register dist/index.js scan --papers_dir test_pdfs --book_dirs test_pdfs/dummyTapl && node --require source-map-support/register dist/index.js launch --db test_pdfs/jendeley_db.json --port 5001 --allow_cors --experimental_use_ollama_server",
     "format": "prettier --write src",
     "lint": "prettier --check src"
   },
@@ -40,6 +41,7 @@
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.4",
+    "@types/node-fetch": "^2.6.11",
     "@types/node-isbn": "^1.6.4",
     "@types/pdf-parse": "^1.1.4",
     "@types/xml2js": "^0.4.14",
