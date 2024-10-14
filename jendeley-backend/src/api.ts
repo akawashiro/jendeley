@@ -44,7 +44,7 @@ import {
   PathEntry,
   UrlEntry,
 } from "./db_schema";
-import { Either, genLeft, genRight } from "./either";
+import { Either, genLeft, genRight, isLeft, getLeft, getRight } from "./either";
 import { loadDB, saveDB } from "./load_db";
 import { concatDirs } from "./path_util";
 import { getScoreAndEntry, Scores, compareScore } from "./score";
@@ -436,15 +436,15 @@ async function addWebFromUrl(
     title = req.title;
   } else {
     const titleOrError = await getTitleFromUrl(req.url);
-    if (titleOrError._tag === "left") {
+    if (isLeft(titleOrError)) {
       const r: ApiResponse = {
         isSucceeded: false,
-        message: titleOrError.left,
+        message: getLeft(titleOrError),
       };
       response.status(500).json(r);
       return;
     } else {
-      title = titleOrError.right;
+      title = getRight(titleOrError);
     }
   }
 
