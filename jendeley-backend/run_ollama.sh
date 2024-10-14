@@ -18,7 +18,7 @@ docker run \
     -v ${ollama_dir}:/root/.ollama \
     ollama/ollama
 sleep 2
-docker exec -it ${ollama_container_name} bash -c "ollama pull llama3.2"
+docker exec ${ollama_container_name} bash -c "ollama pull llama3.2"
 curl http://localhost:11434/api/generate -d '{
   "model": "llama3.2",
   "prompt": "What is 1 + 1?",
