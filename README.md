@@ -171,6 +171,27 @@ For example,
 $ jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json --experimental_use_ollama_server
 ```
 
+To run the LLM server automatically, you can use the following `systemd` service file.
+```console
+$ cat ~/.config/systemd/user/ollama-jendeley.service
+# jendeley.service
+[Unit]
+Description=jendeley JSON-based document organization software
+
+[Service]
+ExecStart=<PATH_TO_NODE>/node/v18.16.0/lib/node_modules/@a_kawashiro/jendeley/run_ollama.sh
+
+[Install]
+WantedBy=default.target
+$ systemctl --user enable ollama-jendeley
+$ systemctl --user start ollama-jendeley
+```
+
+To check the LLM server's status, you can use the following command.
+```console
+$ journalctl --user -f -u ollama-jendeley.service
+```
+
 ## Contact me
 You can find me on Twitter at [https://twitter.com/a_kawashiro](https://twitter.com/a_kawashiro) and on Mastodon at [https://mstdn.jp/@a_kawashiro](https://mstdn.jp/@a_kawashiro). Additional contact information can be found on my website at [https://akawashiro.github.io/#links](https://akawashiro.github.io/#links). Also, feel free to create an issue or submit a pull request on [the repository](https://github.com/akawashiro/jendeley).
 
