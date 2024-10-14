@@ -422,6 +422,7 @@ async function addWebFromUrl(
   httpRequest: Request,
   response: Response,
   dbPath: string[],
+  experimentalUseOllamaServer: boolean,
 ) {
   const req = httpRequest.body as RequestGetWebFromUrl;
   logger.info(
@@ -461,6 +462,7 @@ async function addWebFromUrl(
     title,
     req.comments,
     tags,
+    experimentalUseOllamaServer,
   );
 
   if (newDBOrError._tag === "right") {
