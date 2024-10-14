@@ -32,23 +32,23 @@ As programmers, we need various documents in different formats, such as recent m
 To address these challenges, I developed `jendeley`. It allows you to register both PDFs and webpages in the same database, making categorization easy through the use of tags. Moreover, the database is stored as a plain text JSON file, making it easily editable using your preferred editor. This means that even if `jendeley`'s development process ends, you can still access your information and create alternative applications to manage it.
 
 ## Quickstart
-```
-npm install @a_kawashiro/jendeley -g
-jendeley scan --papers_dir <YOUR PDFs DIR>
-jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
+```console
+$ npm install @a_kawashiro/jendeley -g
+$ jendeley scan --papers_dir <YOUR PDFs DIR>
+$ jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json
 ```
 Then you can see a screen like this!
 ![image](https://akawashiro.github.io/jendeley/blog100/top.png)
 
 ## Install
-```
-npm install @a_kawashiro/jendeley -g
+```console
+$ npm install @a_kawashiro/jendeley -g
 ```
 You can find the latest package at [npm page](https://www.npmjs.com/package/@a_kawashiro/jendeley).
 
 ## Generate JSON database file
-```
-jendeley scan --papers_dir <YOUR PDFs DIR>
+```console
+$ jendeley scan --papers_dir <YOUR PDFs DIR>
 ```
 This command outputs the database to `<YOUR PDFs DIR>/jendeley_db.json`. If you have no PDF file, please specify an empty directory as `<YOUR PDFs DIR>`.
 
@@ -132,8 +132,8 @@ Furthermore, you can filter the database using tags or comments.
 ## Advanced topics
 ### Check and edit your database (advanced)
 Because `jendeley` is fully JSON-based, you can quickly check the database's contents.
-```
-> cat jendeley_db.json | jq '.' | head
+```console
+$ cat jendeley_db.json | jq '.' | head
 {
   "jendeley_meta": {
     "idType": "meta",
@@ -150,6 +150,20 @@ You can edit your database using your preferred editor. However, after making th
 
 ### Check source code (advanced)
 You can check the source code [https://github.com/akawashiro/jendeley](https://github.com/akawashiro/jendeley) here. We welcome your pull request.
+
+### Use LLM (Large Language Model) to generate tags (advanced)
+You can use LLM to generate tags for your documents.
+Launch the LLM server by running the following command.
+```console
+$ ./run_ollama.sh
+```
+You can find `./run_ollama.sh` at [run_ollama.sh](https://github.com/akawashiro/jendeley/tree/main/jendeley-backend/run_ollama.sh).
+
+Then, you can enable automatic tagging by setting the `--experimental_use_ollama_server` option when launching `jendeley`.
+For example,
+```console
+$ jendeley launch --db <YOUR PDFs DIR>/jendeley_db.json --experimental_use_ollama_server
+```
 
 ## Contact me
 You can find me on Twitter at [https://twitter.com/a_kawashiro](https://twitter.com/a_kawashiro) and on Mastodon at [https://mstdn.jp/@a_kawashiro](https://mstdn.jp/@a_kawashiro). Additional contact information can be found on my website at [https://akawashiro.github.io/#links](https://akawashiro.github.io/#links). Also, feel free to create an issue or submit a pull request on [the repository](https://github.com/akawashiro/jendeley).
