@@ -12,5 +12,25 @@ function isRight<L, R>(e: Either<L, R>) {
   return e._tag === "right";
 }
 
+function isLeft<L, R>(e: Either<L, R>) {
+  return e._tag === "left";
+}
+
+function getLeft<L, R>(e: Either<L, R>) {
+  if (e._tag === "left") {
+    return e.left;
+  } else {
+    throw new Error(e + " is not a left");
+  }
+}
+
+function getRight<L, R>(e: Either<L, R>) {
+  if (e._tag === "right") {
+    return e.right;
+  } else {
+    throw new Error(e + " is not a right");
+  }
+}
+
 export type { Either };
-export { genRight, genLeft, isRight };
+export { genRight, genLeft, isRight, isLeft, getLeft, getRight };

@@ -7,6 +7,7 @@ import pdfparse from "pdf-parse";
 import xml2js from "xml2js";
 import crypto from "crypto";
 import { logger } from "./logger";
+import { genTags } from "./tag_generate";
 import {
   JENDELEY_NO_TRACK,
   ENTRY_ID_TYPE,
@@ -19,6 +20,7 @@ import {
   ARXIV_API_URL,
   JENDELEY_VERSION,
   DB_META_KEY,
+  OLLAMA_SERVER,
 } from "./constants";
 import { DocID, getDocID } from "./docid";
 import { validateJsonDB } from "./validate_db";
@@ -87,7 +89,7 @@ function walkPDF(papersDir: string[]): string[][] {
       pdf
         .replace(pf, "")
         .split(path.sep)
-        .filter((p) => p != ""),
+        .filter((p) => p != "")
     );
   }
   return r;
@@ -165,7 +167,7 @@ async function getArxivJson(arxiv: string) {
       logger.warn(
         "Failed to get information from arXiv: " +
           URL +
-          JSON.stringify(jsonData),
+          JSON.stringify(jsonData)
       );
       return new Object();
     } else {
@@ -178,7 +180,7 @@ async function getArxivJson(arxiv: string) {
 }
 
 async function getTextsFromPDF(
-  pdfFullpath: string,
+  pdfFullpath: string
 ): Promise<Either<string, string>> {
   let dataBuffer: Buffer;
   try {
@@ -203,7 +205,7 @@ async function getTextsFromPDF(
 async function getJson(
   docID: DocID,
   paperDir: string[],
-  pathPDF: string[],
+  pathPDF: string[]
 ): Promise<
   Either<
     string,
@@ -303,7 +305,7 @@ async function getJson(
     return genRight({ dbID: dbID, dbEntry: json });
   } else {
     logger.fatal(
-      "Invalid docID.docIDType = " + docID.docIDType + "for getJson.",
+      "Invalid docID.docIDType = " + docID.docIDType + "for getJson."
     );
     process.exit(1);
   }
@@ -336,12 +338,28 @@ function genDummyDB(output: string) {
   saveDB(jsonDB, [output]);
 }
 
+function getTagCandiates(jsonDB: JsonDB): string[] {
+  let tag_candidates: string[] = [];
+  for (const id of Object.keys(jsonDB)) {
+    const e = jsonDB[id];
+    if (e.idType != "meta") {
+      for (const t of e.tags) {
+        if (!tag_candidates.includes(t)) {
+          tag_candidates.push(t);
+        }
+      }
+    }
+  }
+  return tag_candidates;
+}
+
 async function registerWeb(
   jsonDB: JsonDB,
   url: string,
   title: string,
   comments: string,
   tags: string[],
+  experimentalUseOllamaServer: boolean
 ): Promise<Either<string, JsonDB>> {
   logger.info(
     "url = " +
@@ -351,7 +369,7 @@ async function registerWeb(
       " tags = " +
       tags +
       " comments = " +
-      comments,
+      comments
   );
   const docID: DocID = { docIDType: "url", url: url };
   logger.info("docID = " + JSON.stringify(docID));
@@ -362,6 +380,21 @@ async function registerWeb(
 
   const { convert } = require("html-to-text");
   const text = convert(html, {});
+
+  logger.info("experimentalUseOllamaServer = ", experimentalUseOllamaServer);
+  if (experimentalUseOllamaServer) {
+    logger.info("Use ollama server to generate tags.");
+    logger.info("text = " + text);
+    const tag_candidates = getTagCandiates(jsonDB);
+    const generated_tags = await genTags(OLLAMA_SERVER, title, text, tag_candidates);
+    if (generated_tags._tag === "left") {
+      return genLeft(generated_tags.left);
+    } else {
+      for (const t of generated_tags.right) {
+        tags.push(t);
+      }
+    }
+  }
 
   let json: UrlEntry = {
     title: title,
@@ -383,7 +416,7 @@ async function registerWeb(
           url +
           ". Because " +
           url +
-          " is already registered.",
+          " is already registered."
       );
     } else {
       jsonDB[id] = json;
@@ -393,7 +426,7 @@ async function registerWeb(
     }
   } else {
     return genLeft(
-      "Failed to register url_" + url + ". Because got JSON is not valid.",
+      "Failed to register url_" + url + ". Because got JSON is not valid."
     );
   }
 }
@@ -425,7 +458,7 @@ async function registerNonBookPDF(
   comments: string,
   tags: string[],
   renameUsingTitle: boolean,
-  downloadUrl: string | undefined,
+  downloadUrl: string | undefined
 ): Promise<Either<string, [string, DBEntry]>> {
   logger.info(
     "papersDir = " +
@@ -435,7 +468,7 @@ async function registerNonBookPDF(
       " tags = " +
       tags +
       " comments = " +
-      comments,
+      comments
   );
   if (!validateJsonDB(jsonDB, undefined)) {
     logger.fatal("validateJsonDB failed in registerNonBookPDF");
@@ -453,7 +486,7 @@ async function registerNonBookPDF(
   const t = await getJson(
     docID.right,
     papersDir,
-    JSON.parse(JSON.stringify(pdf)),
+    JSON.parse(JSON.stringify(pdf))
   );
 
   if (t._tag === "left") {
@@ -474,7 +507,7 @@ async function registerNonBookPDF(
         " is duplicated. You can find another file in " +
         jsonDB[dbID][ENTRY_PATH] +
         ". Both of them has the same ID: " +
-        dbID,
+        dbID
     );
   }
 
@@ -500,7 +533,7 @@ async function registerNonBookPDF(
     }
     fs.renameSync(
       concatDirs(papersDir.concat(oldFilename)),
-      concatDirs(papersDir.concat(newFilename)),
+      concatDirs(papersDir.concat(newFilename))
     );
     logger.info("Rename " + oldFilename + " to " + newFilename);
   }
@@ -512,7 +545,7 @@ async function genDB(
   papersDirUserArg: string,
   bookDirsStr: string,
   dbName: string,
-  deleteUnreachableFiles: boolean,
+  deleteUnreachableFiles: boolean
 ) {
   const papersDir = pathStrToDirs(path.resolve(papersDirUserArg));
   logger.info(
@@ -521,7 +554,7 @@ async function genDB(
       " path.resolve(papersDirUserArg) = " +
       path.resolve(papersDirUserArg) +
       " papersDir = " +
-      showDirs(papersDir),
+      showDirs(papersDir)
   );
   let bookDirStrs = bookDirsStr == "" ? [] : bookDirsStr.split(",");
   let bookDirs: string[][] = [];
@@ -542,7 +575,7 @@ async function genDB(
   for (const bd of bookDirs) {
     if (!fs.existsSync(concatDirs(papersDir.concat(bd)))) {
       logger.fatal(
-        "book directory:" + concatDirs(papersDir.concat(bd)) + " is not exist.",
+        "book directory:" + concatDirs(papersDir.concat(bd)) + " is not exist."
       );
       process.exit(1);
     }
@@ -553,7 +586,7 @@ async function genDB(
       logger.fatal(
         "You use --delete_unreachable_files but " +
           concatDirs(papersDir.concat([dbName])) +
-          " does not exist.",
+          " does not exist."
       );
       process.exit(1);
     }
@@ -623,7 +656,7 @@ async function genDB(
         if (docID._tag === "right") {
           const i: DocID = docID.right;
           logger.info(
-            "papersDir = " + showDirs(papersDir) + " p = " + showDirs(p),
+            "papersDir = " + showDirs(papersDir) + " p = " + showDirs(p)
           );
           const t = await getJson(i, papersDir, p);
           if (
@@ -649,7 +682,7 @@ async function genDB(
         "",
         [],
         false,
-        undefined,
+        undefined
       );
       if (idEntryOrError._tag === "right") {
         const t: [string, DBEntry] = idEntryOrError.right;
@@ -663,9 +696,7 @@ async function genDB(
     if (bookInfo == undefined) {
       if (bookChapters[bookDir].pdfs.length > 0) {
         logger.warn(
-          "PDFs in " +
-            bookDir +
-            " are ignored. Because we cannot find no ISBN.",
+          "PDFs in " + bookDir + " are ignored. Because we cannot find no ISBN."
         );
       }
       continue;
@@ -690,7 +721,7 @@ async function genDB(
           "Cannot get text from " +
             concatDirs(papersDir.concat(pdf)) +
             ": " +
-            text.left,
+            text.left
         );
         process.exit(1);
       }
@@ -731,7 +762,7 @@ async function genDB(
   if (notRegisterdPdfs.length > 0) {
     logger.warn(
       notRegisterdPdfs.length +
-        " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs.",
+        " files are not registered. Please edit edit_and_run.sh and run it so that we can find IDs."
     );
 
     // TODO: For Windows.
