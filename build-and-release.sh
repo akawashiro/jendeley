@@ -1,12 +1,6 @@
 #! /bin/bash -eux
 
-if [[ $# != 1 ]]
-then
-    echo You must pass one argument.
-    exit 1
-fi
-
-if [[ $1 != "major" ]] && [[ $1 != "minor" ]] && [[ $1 != "patch" ]]
+if [[ $# != 1 ]] || [[ $1 != "major" ]] && [[ $1 != "minor" ]] && [[ $1 != "patch" ]]
 then
     echo You must pass one of major, minor or patch.
     exit 1
