@@ -27,20 +27,22 @@ function startServer(
   experimentalUseOllamaServer: boolean,
 ) {
   logger.info("startServer version: " + JENDELEY_VERSION);
-  checkOllamaServer(OLLAMA_SERVER).then((result) => {
-    if (result) {
-      logger.info("Ollama server is available. " + OLLAMA_SERVER);
-    } else {
-      logger.fatal("Ollama server is not available. " + OLLAMA_SERVER);
-      logger.fatal(
-        "Please check https://github.com/akawashiro/jendeley/blob/main/README.md to launch ollama server.",
-      );
-      logger.fatal(
-        "Or just wait for a while to launch ollama server if you already ran ./run_ollama.sh",
-      );
-      process.exit(1);
-    }
-  });
+  if (experimentalUseOllamaServer) {
+    checkOllamaServer(OLLAMA_SERVER).then((result) => {
+      if (result) {
+        logger.info("Ollama server is available. " + OLLAMA_SERVER);
+      } else {
+        logger.fatal("Ollama server is not available. " + OLLAMA_SERVER);
+        logger.fatal(
+          "Please check https://github.com/akawashiro/jendeley/blob/main/README.md to launch ollama server.",
+        );
+        logger.fatal(
+          "Or just wait for a while to launch ollama server if you already ran ./run_ollama.sh",
+        );
+        process.exit(1);
+      }
+    });
+  }
 
   if (fs.existsSync(concatDirs(dbPath))) {
     {
